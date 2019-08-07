@@ -1,0 +1,26 @@
+{
+  "name": "evalumate-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon lib/index.js --exec babel-node",
+    "build": "babel lib -d dist --source-maps",
+    "serve": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "nodemon": "^1.19.1"
+  }
+}
