@@ -1,6 +1,7 @@
-import axios from "axios";
+import winston from "winston";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
+import axios from "axios";
 
 let should = chai.should();
 chai.use(chaiAsPromised);
