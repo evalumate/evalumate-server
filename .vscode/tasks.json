@@ -1,14 +1,20 @@
 {
-  "version": "0.1.0",
+  "version": "2.0.0",
   "command": "npm",
-  "isShellCommand": true,
-  "showOutput": "always",
-  "suppressTaskName": true,
+  "type": "shell",
+  "presentation": {
+    "echo": true,
+    "reveal": "always",
+    "focus": false,
+    "panel": "shared",
+    "showReuseMessage": true,
+    "clear": false
+  },
   "tasks": [
     {
-      "taskName": "build",
+      "label": "build",
       "args": ["run", "build"],
-      "isBuildCommand": true
+      "group": "build"
     }
   ]
 }
