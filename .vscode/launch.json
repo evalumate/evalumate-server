@@ -5,7 +5,7 @@
           "type": "node",
           "request": "launch",
           "name": "Node",
-          "program": "${workspaceRoot}/dist/app.js",
+          "program": "${workspaceRoot}/dist/index.js",
           "cwd": "${workspaceRoot}",
           "preLaunchTask": "build",
           "outFiles": [

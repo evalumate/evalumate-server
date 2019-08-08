@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon lib/index.js --exec babel-node",
-    "build": "babel lib -d dist --source-maps",
-    "serve": "node ./bin/www"
+    "build": "babel lib -d dist",
+    "start": "npm run build && nodemon dist/index.js",
+    "serve": "node dist/index.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
