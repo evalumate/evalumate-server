@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "nodemon lib/index.js --exec babel-node",
     "build": "babel lib -d dist",
-    "start": "npm run build && nodemon dist/index.js",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "test": "mocha --require @babel/register"
   },
   "dependencies": {
+    "@babel/runtime-corejs3": "^7.5.5",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -19,8 +21,13 @@
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/register": "^7.5.5",
+    "axios": "^0.19.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^6.2.0",
     "nodemon": "^1.19.1"
   }
 }
