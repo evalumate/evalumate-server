@@ -3,13 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon lib/index.js --exec babel-node",
-    "build": "babel lib -d dist",
-    "serve": "node dist/index.js",
-    "test": "NODE_ENV=test mocha --require @babel/register"
+    "start": "NODE_ENV=development nodemon lib/index.ts --exec babel-node --extensions \".ts\"",
+    "build": "babel lib -d dist --extensions \".ts\"",
+    "serve": "NODE_ENV=production node dist/index.js",
+    "check-types": "tsc",
+    "test": "NODE_ENV=test mocha --require babel-register.js test/*.ts"
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.5.5",
+    "@types/config": "0.0.34",
+    "@types/cookie-parser": "1.4.1",
+    "@types/express": "4.17.0",
+    "@types/morgan": "1.7.36",
+    "@types/node": "12.7.1",
     "config": "3.2.2",
     "cookie-parser": "~1.4.4",
     "dotenv": "8.0.0",
@@ -28,13 +34,17 @@
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "7.5.5",
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "7.3.3",
     "@babel/register": "^7.5.5",
     "axios": "^0.19.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^6.2.0",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "typescript": "3.5.3"
   }
 }

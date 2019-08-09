@@ -6,5 +6,7 @@ module.exports = {
   useNullAsDefault: true,
   migrations: {
     directory: "lib/db/migrations",
+    extension: process.env.NODE_ENV === "production" ? "js" : ".ts",
+    loadExtensions: process.env.NODE_ENV === "production" ? ["js"] : [".ts"],
   },
 };

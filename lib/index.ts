@@ -6,24 +6,25 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import Knex from "knex";
+import knexConfig from "../knexfile";
 import { Model } from "objection";
 
-import logger, { logStream } from "./utils/logger";
+import { createLogger, logStream } from "./utils/logger";
 
 import indexRouter from "./routes/index";
 import apiRouter from "./routes/api";
 
+let logger = createLogger(module);
+
 // Setup database (knex & objection.js)
 logger.debug("Setting up knex");
-let knex = Knex({
-  client: config.get("database.client"),
-  connection: config.get("database.connection"),
-  useNullAsDefault: true,
-});
+let knex = Knex(knexConfig);
 
 // Migrate the database using knex
 logger.debug("Executing knex migrations");
-knex.migrate.latest({ directory: "./lib/db/migrations" });
+(async () => {
+  await knex.migrate.latest();
+})();
 
 // Bind objection Models to knex
 Model.knex(knex);
@@ -72,7 +73,7 @@ logger.debug("Creating HTTP server");
 let server = http.createServer(app);
 server.listen(port);
 
-server.on("error", error => {
+server.on("error", (error: NodeJS.ErrnoException) => {
   if (error.syscall !== "listen") {
     throw error;
   }
@@ -96,8 +97,12 @@ server.on("error", error => {
 
 server.on("listening", () => {
   let addr = server.address();
+  if(addr == null) {
+    logger.error("HTTP Server address is null!");
+    return;
+  }
   let bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  logger.info("EveluMate server listening on " + bind);
+  logger.info("EvaluMate server listening on " + bind);
 });
 
 export default server;
