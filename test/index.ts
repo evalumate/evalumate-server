@@ -7,7 +7,7 @@ import axios from "axios";
 let should = chai.should();
 chai.use(chaiAsPromised);
 
-import server from "../lib/index";
+import app from "../lib/index";
 
 axios.defaults.baseURL = "http://127.0.0.1:" + config.get("port");
 
@@ -29,5 +29,5 @@ describe("API", () => {
 });
 
 after(async () => {
-  server.close();
+  app.server.close();
 });
