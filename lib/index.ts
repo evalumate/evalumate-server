@@ -6,9 +6,10 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import Knex from "knex";
-import knexConfig from "../knexfile";
 import { Model } from "objection";
 
+import HttpException from "./exceptions/HttpException";
+import knexConfig from "../knexfile";
 import { createLogger, logStream } from "./utils/logger";
 
 import indexRouter from "./routes/index";
@@ -55,7 +56,7 @@ app.use((req, res, next) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
+app.use((err: HttpException, req: express.Request, res: express.Response) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -97,7 +98,7 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 
 server.on("listening", () => {
   let addr = server.address();
-  if(addr == null) {
+  if (addr == null) {
     logger.error("HTTP Server address is null!");
     return;
   }
