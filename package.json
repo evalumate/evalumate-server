@@ -7,7 +7,8 @@
     "build": "babel lib -d dist --extensions \".ts\"",
     "serve": "NODE_ENV=production node dist/index.js",
     "check-types": "tsc",
-    "test": "NODE_ENV=test mocha --require babel-register.js test/*.ts"
+    "test": "NODE_ENV=test mocha --require babel-register.js test/*.ts",
+    "generate-migration": "typeorm migration:generate"
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.5.5",
@@ -24,13 +25,13 @@
     "dotenv": "8.0.0",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
-    "knex": "0.19.1",
     "morgan": "~1.9.1",
     "mysql": "2.17.1",
-    "objection": "1.6.9",
     "pug": "^2.0.4",
+    "reflect-metadata": "0.1.13",
     "sqlite3": "4.0.9",
     "svg-captcha": "1.4.0",
+    "typeorm": "0.2.18",
     "winston": "3.2.1"
   },
   "devDependencies": {

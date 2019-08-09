@@ -3,9 +3,7 @@
     "logDir": "logs",
     "logLevel": "info",
     "database": {
-        "client": "sqlite3",
-        "connection": {
-            "filename": "./db.sqlite"
-        }
+        "type": "sqlite",
+        "database": "db.sqlite"
     }
 }

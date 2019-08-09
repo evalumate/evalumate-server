@@ -1,17 +1,15 @@
 import * as express from "express";
+import { createConnection } from "typeorm";
 import http from "http";
 import createError from "http-errors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import Knex from "knex";
-import { Model } from "objection";
-
-import knexConfig from "../knexfile";
 import { createLogger, logStream } from "./utils/logger";
 
 import Controller from "./interfaces/controller";
 import errorMiddleware from "./middlewares/error";
+import databaseConfig from "./ormconfig";
 
 let logger = createLogger(module);
 
@@ -28,7 +26,6 @@ class App {
     this.app = express.default();
     this.app.set("port", this.port);
 
-    this.setupDatabase();
     this.setupViewEngine();
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
@@ -48,28 +45,19 @@ class App {
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "../public")));
 
-    // Error middleware
-    this.app.use(errorMiddleware);
-
     // Catch 404 and forward to error handler
     this.app.use((req, res, next) => {
       next(createError(404));
     });
+
+    // Error middleware
+    this.app.use(errorMiddleware);
   }
 
-  private setupDatabase() {
-    // Setup database (knex & objection.js)
-    logger.debug("Setting up knex");
-    let knex = Knex(knexConfig);
-
-    // Migrate the database using knex
-    logger.debug("Executing knex migrations");
-    (async () => {
-      await knex.migrate.latest();
-    })();
-
-    // Bind objection.js Models to knex
-    Model.knex(knex);
+  public async connectDatabase() {
+    logger.debug("Connecting to database");
+    await createConnection(databaseConfig);
+    logger.info("Connected to database");
   }
 
   private setupViewEngine() {
