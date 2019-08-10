@@ -6,6 +6,7 @@ import {
   transports,
 } from "winston";
 import config from "config";
+import path from "path";
 
 const options: LoggerOptions = {
   format: format.combine(
@@ -43,8 +44,6 @@ if (!["test", "production"].includes(process.env.NODE_ENV)) {
     })
   );
 }
-
-import path from "path";
 
 const rootModulePath = path.resolve(module.id, "../../");
 
