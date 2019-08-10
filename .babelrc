@@ -2,7 +2,8 @@
   "presets": ["@babel/env", "@babel/typescript"],
   "env": {
     "debug": {
-      "sourceMaps": "inline"
+      "sourceMaps": "inline",
+      "retainLines": true
     }
   },
   "plugins": [
