@@ -17,6 +17,7 @@
     // For TypeORM:
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "strictPropertyInitialization": false
   },
   "include": ["lib"]
 }
