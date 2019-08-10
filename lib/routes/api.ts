@@ -1,9 +1,10 @@
-import express from "express";
+import * as express from "express";
+import * as respond from "../utils/api-respond";
 let router = express.Router();
 
-/* GET home page. */
+/* GET API root */
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express" });
+  respond.success(res);
 });
 
 export default router;

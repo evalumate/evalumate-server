@@ -11,6 +11,8 @@ import Controller from "./interfaces/controller";
 import { frontendErrorHandler, apiErrorHandler } from "./middlewares/errors";
 import databaseConfig from "./ormconfig";
 
+import mainRouter from "./routes";
+
 let logger = createLogger(module);
 
 class App {
@@ -29,6 +31,7 @@ class App {
 
     this.setupViewEngine();
     this.initializeMiddlewares();
+    this.initializeRoutes();
     this.initializeApiControllers(apiControllers);
     this.initializeErrorHandling();
 
@@ -38,20 +41,19 @@ class App {
   }
 
   private initializeMiddlewares() {
-    logger.debug("Initializing middlewares");
     logger.debug("Configuring morgan for request logging");
     this.app.use(morgan("combined", { stream: logStream }));
 
+    logger.debug("Initializing middlewares");
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "../public")));
+  }
 
-    // Temporary solution until a frontend is added
-    // TODO add frontend
-    this.app.get("/", (req, res, next) => {
-      res.render("index", { title: "EvaluMate" });
-    });
+  private initializeRoutes() {
+    logger.debug("Initializing routes");
+    this.app.use(mainRouter);
   }
 
   private initializeErrorHandling() {
@@ -72,7 +74,7 @@ class App {
   }
 
   private initializeApiControllers(apiControllers: Controller[]) {
-    logger.debug("Initializing controllers");
+    logger.debug("Initializing API controllers");
     apiControllers.forEach(controller => {
       this.app.use("/api", controller.router);
     });
