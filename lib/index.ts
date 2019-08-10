@@ -1,14 +1,15 @@
-import config from "config";
 import "reflect-metadata"; // for TypeORM
+import config from "config";
 import App from "./app";
+import CaptchaController from "./controllers/captcha";
 
 const port: number = config.get("port");
 
-const app = new App([], port);
+const app = new App([new CaptchaController()], port);
 
-(async () => {
-  await app.connectDatabase();
-  app.listen();
-})();
+// Do not run the app in a test environment as the test script does this for us
+if (process.env.NODE_ENV !== "test") {
+  app.run();
+}
 
 export default app;
