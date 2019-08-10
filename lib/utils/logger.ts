@@ -1,4 +1,10 @@
-import { createLogger as createWinstonLogger, Logger, LoggerOptions, format, transports } from "winston";
+import {
+  createLogger as createWinstonLogger,
+  Logger,
+  LoggerOptions,
+  format,
+  transports,
+} from "winston";
 import config from "config";
 
 const options: LoggerOptions = {
@@ -24,7 +30,7 @@ const options: LoggerOptions = {
 
 const logger: Logger = createWinstonLogger(options);
 
-if (typeof(process.env.NODE_ENV) === "undefined") {
+if (typeof process.env.NODE_ENV === "undefined") {
   process.env.NODE_ENV = "development";
 }
 
@@ -38,24 +44,28 @@ if (!["test", "production"].includes(process.env.NODE_ENV)) {
   );
 }
 
+import path from "path";
+
+const rootModulePath = path.resolve(module.id, "../../");
+
 // Add module id to log messages
 export function createLogger(module: NodeModule) {
-  var filename = module.id;
+  const filename = path.relative(rootModulePath, module.id);
   return {
-    debug : function (msg: string, meta?: any) {
-      logger.debug(filename + ': ' + msg, meta); 
+    debug: function(msg: string, meta?: any) {
+      logger.debug(filename + ": " + msg, meta);
     },
-    info : function (msg: string, meta?: any) {
-      logger.info(filename + ': ' + msg, meta); 
+    info: function(msg: string, meta?: any) {
+      logger.info(filename + ": " + msg, meta);
     },
-    warn : function (msg: string, meta?: any) {
-      logger.warn(filename + ': ' + msg, meta); 
+    warn: function(msg: string, meta?: any) {
+      logger.warn(filename + ": " + msg, meta);
     },
-    error : function (msg: string, meta?: any) {
-      logger.error(filename + ': ' + msg, meta); 
-    }
-  }
-};
+    error: function(msg: string, meta?: any) {
+      logger.error(filename + ": " + msg, meta);
+    },
+  };
+}
 
 // For use by morgan
 export const logStream = {
