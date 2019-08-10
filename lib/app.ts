@@ -8,7 +8,7 @@ import morgan from "morgan";
 import { createLogger, logStream } from "./utils/logger";
 
 import Controller from "./interfaces/controller";
-import errorMiddleware from "./middlewares/error";
+import { frontendErrorHandler, apiErrorHandler } from "./middlewares/errors";
 import databaseConfig from "./ormconfig";
 
 let logger = createLogger(module);
@@ -17,8 +17,9 @@ class App {
   public app: express.Application;
   public port: number;
   public server: http.Server;
+  public up: Promise<boolean>;
 
-  constructor(controllers: Controller[], port: number) {
+  constructor(apiControllers: Controller[], port: number) {
     this.port = port;
 
     logger.info("Initializing App");
@@ -28,7 +29,8 @@ class App {
 
     this.setupViewEngine();
     this.initializeMiddlewares();
-    this.initializeControllers(controllers);
+    this.initializeApiControllers(apiControllers);
+    this.initializeErrorHandling();
 
     // Create HTTP server
     logger.debug("Creating HTTP server");
@@ -45,19 +47,22 @@ class App {
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "../public")));
 
-    // Catch 404 and forward to error handler
+    // Temporary solution until a frontend is added
+    // TODO add frontend
+    this.app.get("/", (req, res, next) => {
+      res.render("index", { title: "EvaluMate" });
+    });
+  }
+
+  private initializeErrorHandling() {
+    // Create Error 404 if no previously added middleware has responded
     this.app.use((req, res, next) => {
       next(createError(404));
     });
 
-    // Error middleware
-    this.app.use(errorMiddleware);
-  }
-
-  public async connectDatabase() {
-    logger.debug("Connecting to database");
-    await createConnection(databaseConfig);
-    logger.info("Connected to database");
+    // Error middlewares
+    this.app.use("/api", apiErrorHandler);
+    this.app.use(frontendErrorHandler);
   }
 
   private setupViewEngine() {
@@ -66,42 +71,56 @@ class App {
     this.app.set("view engine", "pug");
   }
 
-  private initializeControllers(controllers: Controller[]) {
+  private initializeApiControllers(apiControllers: Controller[]) {
     logger.debug("Initializing controllers");
-    controllers.forEach(controller => {
-      this.app.use("/", controller.router);
+    apiControllers.forEach(controller => {
+      this.app.use("/api", controller.router);
     });
   }
 
-  public listen() {
-    logger.debug("Calling server.listen");
-    this.server.listen(this.port);
+  private async connectToDatabase() {
+    logger.debug("Connecting to database");
+    await createConnection(databaseConfig);
+    logger.info("Connected to database");
+  }
 
-    this.server.on("error", (error: NodeJS.ErrnoException) => {
-      if (error.syscall !== "listen") {
-        throw error;
-      }
+  private listen(): Promise<undefined> {
+    return new Promise((resolve, reject) => {
+      logger.debug("Calling Server.listen");
+      this.server.listen(this.port);
 
-      let portString = "Port " + this.port;
+      this.server.on("error", (error: NodeJS.ErrnoException) => {
+        if (error.syscall !== "listen") {
+          reject(error);
+        }
 
-      // handle specific listen errors with friendly messages
-      switch (error.code) {
-        case "EACCES":
-          logger.error(portString + " requires elevated privileges");
-          process.exit(1);
-          break;
-        case "EADDRINUSE":
-          logger.error(portString + " is already in use");
-          process.exit(1);
-          break;
-        default:
-          throw error;
-      }
+        let portString = "Port " + this.port;
+
+        // handle specific listen errors with friendly messages
+        switch (error.code) {
+          case "EACCES":
+            logger.error(portString + " requires elevated privileges");
+            process.exit(1);
+            break;
+          case "EADDRINUSE":
+            logger.error(portString + " is already in use");
+            process.exit(1);
+            break;
+          default:
+            reject(error);
+        }
+      });
+
+      this.server.on("listening", () => {
+        logger.info("EvaluMate server listening on port " + this.port);
+        resolve();
+      });
     });
+  }
 
-    this.server.on("listening", () => {
-      logger.info("EvaluMate server listening on port " + this.port);
-    });
+  public async run() {
+    await this.connectToDatabase();
+    await this.listen();
   }
 }
 
