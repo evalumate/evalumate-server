@@ -1,6 +1,11 @@
 {
   "presets": ["@babel/env", "@babel/typescript"],
-  "sourceMaps": "inline",
+  "env": {
+    "debug": {
+      "sourceMaps": "inline",
+      "retainLines": true
+    }
+  },
   "plugins": [
     [
       "@babel/plugin-transform-runtime",
