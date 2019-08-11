@@ -29,16 +29,20 @@
       "type": "node",
       "request": "launch",
       "name": "Mocha",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "env": { "NODE_ENV": "test" },
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "env": {
+        "BABEL_ENV": "debug",
+        "NODE_ENV": "test"
+      },
       "args": [
         "--require",
         "babel-register.js",
         "--timeout",
         "999999",
         "--colors",
-        "'${workspaceFolder}/test/*.ts'"
+        "'${workspaceRoot}/test/*.ts'"
       ],
+      "runtimeArgs": ["--nolazy"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
