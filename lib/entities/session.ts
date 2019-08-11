@@ -7,20 +7,26 @@ import {
 } from "typeorm";
 
 @Entity()
-class Captcha extends BaseEntity {
+class Session extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id?: number;
 
   @Column({
-    length: 32,
+    length: 10,
   })
-  public token: string;
+  public publicId?: string;
 
   @Column()
-  public solution: string;
+  public name: string;
+
+  @Column()
+  public key: string;
+
+  @Column()
+  public captchaRequired: boolean;
 
   @CreateDateColumn()
   public createdAt: Date;
 }
 
-export default Captcha;
+export default Session;

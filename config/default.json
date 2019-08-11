@@ -5,5 +5,8 @@
     "database": {
         "type": "sqlite",
         "database": "db.sqlite"
+    },
+    "captcha": {
+        "ttl": 120
     }
 }

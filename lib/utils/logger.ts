@@ -28,14 +28,11 @@ const options: LoggerOptions = {
     }),
   ],
 };
-
 const logger: Logger = createWinstonLogger(options);
 
-if (typeof process.env.NODE_ENV === "undefined") {
-  process.env.NODE_ENV = "development";
-}
+const nodeEnv = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
 
-if (!["test", "production"].includes(process.env.NODE_ENV)) {
+if (!["test", "production"].includes(nodeEnv)) {
   logger.add(
     new transports.Console({
       level: "debug",
