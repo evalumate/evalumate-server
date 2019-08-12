@@ -13,12 +13,6 @@ before(() => {
   return app.run();
 });
 
-describe("/", () => {
-  it("GET should return 200", async () => {
-    return axios.get("/").should.eventually.have.property("status", 200);
-  });
-});
-
 after(() => {
   return app.server.close();
 });
