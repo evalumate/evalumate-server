@@ -1,5 +1,5 @@
 {
-  "presets": ["@babel/env", "@babel/typescript"],
+  "presets": [["latest-node", { "target": "10" }], "@babel/typescript"],
   "env": {
     "debug": {
       "sourceMaps": "inline",
@@ -18,8 +18,18 @@
       }
     ],
     "babel-plugin-transform-typescript-metadata",
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/proposal-class-properties", { "loose": true }],
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "@babel/proposal-class-properties",
+      {
+        "loose": true
+      }
+    ],
     "@babel/proposal-object-rest-spread"
   ]
 }
