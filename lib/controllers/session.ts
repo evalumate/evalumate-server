@@ -1,5 +1,5 @@
-import asyncHandler from "express-async-handler";
 import * as respond from "../utils/api-respond";
+import asyncHandler from "express-async-handler";
 import CaptchaController from "./captcha";
 import config from "config";
 import Controller from "../interfaces/controller";
@@ -10,7 +10,7 @@ import Session from "../entities/session";
 import validationMiddleware from "../middlewares/validation";
 import { createLogger } from "../utils/logger";
 import { CreateSessionDto } from "../dtos/session";
-import { Request, Response, Router, NextFunction } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 
 const logger = createLogger(module);
 
@@ -26,39 +26,54 @@ class SessionController implements Controller {
     this.router.post(
       this.path,
       validationMiddleware(CreateSessionDto),
-      this.createSession
+      this.mCreateSession
     );
   }
 
-  createSession = asyncHandler(async (req: Request, res: Response) => {
+  public async createSession(
+    name: string,
+    captchaRequired: boolean
+  ): Promise<Session> {
+    logger.info("Creating new session");
+    const session = new Session();
+    // TODO use hashing from the id after saving
+    session.publicId = randomstring.generate({ length: 10 });
+    // TODO generate cryptographically secure, user-friendly key
+    session.key = "mySessionKey";
+    session.name = name;
+    session.captchaRequired = captchaRequired;
+    await session.save();
+
+    return session;
+  }
+
+  private mCreateSession = asyncHandler(async (req: Request, res: Response) => {
     const requestData: CreateSessionDto = req.body;
+    const captcha = requestData.captcha;
 
     // Validate captcha solution
     if (
       !(await CaptchaController.validateCaptchaSolution(
-        requestData.captcha.token,
-        requestData.captcha.solution
+        captcha.token,
+        captcha.solution
       ))
     ) {
       throw new InvalidCaptchaSolutionException();
     }
 
-    logger.info("Creating new session");
-    const session = new Session();
-    session.publicId = randomstring.generate({ length: 10 }); // TODO use hashing from the id after saving
-    // TODO generate cryptographically secure, user-friendly key
-    session.name = requestData.sessionName;
-    session.captchaRequired = requestData.captchaRequired;
-    await session.save();
+    const session = await this.createSession(
+      requestData.sessionName,
+      requestData.captchaRequired
+    );
 
-    // TODO specify uri format (domain-relative?)
+    logger.info("Serving new session %s", session.publicId);
     respond.success(
       res,
       {
         session: {
-          uri: "TODO",
-          sessionId: session.publicId,
-          sessionKey: "TODO",
+          uri: session.getUri(),
+          id: session.publicId,
+          key: session.key,
         },
       },
       HttpStatus.CREATED

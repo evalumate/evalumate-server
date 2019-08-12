@@ -27,6 +27,17 @@ class Session extends BaseEntity {
 
   @CreateDateColumn()
   public createdAt: Date;
+
+  // TODO make api url customizable
+  public getUri(): string | undefined {
+    return this.publicId ? `/api/sessions/{$this.publicId}` : undefined;
+  }
+
+  public static findOneByPublicId(publicId: string) {
+    return this.findOne({
+      publicId: publicId,
+    });
+  }
 }
 
 export default Session;

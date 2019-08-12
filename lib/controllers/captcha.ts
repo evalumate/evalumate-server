@@ -1,3 +1,4 @@
+import { validate } from "class-validator";
 import * as respond from "../utils/api-respond";
 import Captcha from "../entities/captcha";
 import config from "config";
@@ -21,26 +22,32 @@ class CaptchaController implements Controller {
   }
 
   public initializeRoutes() {
-    this.router.get(this.path, this.getNewCaptcha);
+    this.router.get(this.path, this.mGetNewCaptcha);
   }
 
-  getNewCaptcha = async (req: Request, res: Response) => {
+  public static async createCaptcha(): Promise<Captcha> {
     logger.debug("Generating new captcha");
     const generatedCaptcha = svgCaptcha.create();
 
     const captcha = new Captcha();
+    captcha.image = generatedCaptcha.data;
     captcha.solution = generatedCaptcha.text;
     captcha.token = randomstring.generate({ length: 32 });
 
+    await captcha.save();
+    return captcha;
+  }
+
+  private mGetNewCaptcha = async (req: Request, res: Response) => {
+    const captcha = await CaptchaController.createCaptcha();
+
+    logger.debug("Serving captcha with token %s", captcha.token);
     respond.success(res, {
       captcha: {
-        image: generatedCaptcha.data,
+        image: captcha.image,
         token: captcha.token,
       },
     });
-
-    await captcha.save();
-    logger.debug("Served new captcha %o", captcha);
   };
 
   /**
@@ -56,24 +63,17 @@ class CaptchaController implements Controller {
     token: string,
     solution: string
   ): Promise<boolean> {
-    const ttl: number = config.get("captcha.ttl");
-
-    logger.debug("Validating captcha with token %s", token);
-    const captcha = await Captcha.findOne({
-      token: token,
-      /*createdAt: MoreThanOrEqualDate(
-        moment(new Date())
-          .add(-ttl, "s")
-          .toDate(),
-        EDateType.Datetime
-      ),*/
-    });
-
+    logger.debug("Validating captcha solution with token %s", token);
+    const captcha = await Captcha.findAliveByToken(token);
     if (!captcha) {
       throw new InvalidCaptchaTokenException();
     }
 
-    return solution === captcha.solution;
+    const valid = solution === captcha.solution;
+    if (valid) {
+      await captcha.remove();
+    }
+    return valid;
   }
 }
 

@@ -6,6 +6,16 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 
+class CaptchaDto {
+  @IsString()
+  @IsDefined()
+  public solution: string;
+
+  @IsString()
+  @IsDefined()
+  public token: string;
+}
+
 export class CreateSessionDto {
   @ValidateNested()
   @Type(() => CaptchaDto)
@@ -18,14 +28,4 @@ export class CreateSessionDto {
   @IsBoolean()
   @IsDefined()
   public captchaRequired: boolean;
-}
-
-class CaptchaDto {
-  @IsString()
-  @IsDefined()
-  public solution: string;
-
-  @IsString()
-  @IsDefined()
-  public token: string;
 }
