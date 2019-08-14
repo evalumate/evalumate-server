@@ -1,17 +1,16 @@
-import { validate } from "class-validator";
 import * as respond from "../utils/api-respond";
 import Captcha from "../entities/captcha";
 import config from "config";
 import Controller from "../interfaces/controller";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
-import moment from "moment";
 import randomstring from "randomstring";
 import svgCaptcha from "svg-captcha";
 import { createLogger } from "../utils/logger";
-import { EDateType, MoreThanOrEqualDate } from "../utils/typeorm-compare-date";
 import { Request, Response, Router } from "express";
 
 const logger = createLogger(module);
+
+const captchaTtl: number = config.get("captcha.ttl");
 
 class CaptchaController implements Controller {
   public path = "/captcha";
@@ -64,7 +63,7 @@ class CaptchaController implements Controller {
     solution: string
   ): Promise<boolean> {
     logger.debug("Validating captcha solution with token %s", token);
-    const captcha = await Captcha.findAliveByToken(token);
+    const captcha = await Captcha.findAliveByToken(token, captchaTtl);
     if (!captcha) {
       throw new InvalidCaptchaTokenException();
     }

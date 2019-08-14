@@ -7,7 +7,7 @@
     "build": "babel lib -d dist --extensions \".ts\"",
     "serve": "NODE_ENV=production node dist/index.js",
     "check-types": "tsc",
-    "test": "NODE_ENV=test mocha --require babel-register.js test/*.ts",
+    "test": "NODE_ENV=test mocha --timeout 15000 --require babel-register.js test/*.ts",
     "generate-migration": "typeorm migration:generate"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "@types/morgan": "1.7.36",
     "@types/node": "12.7.1",
     "@types/randomstring": "1.1.6",
+    "await-sleep": "0.0.1",
     "await-to-js": "2.1.1",
     "babel-plugin-transform-typescript-metadata": "0.2.2",
     "class-transformer": "0.2.3",

@@ -5,14 +5,11 @@ import {
   BaseEntity,
   Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   MoreThan,
 } from "typeorm";
 
-const ttl: number = config.get("captcha.ttl");
-
-// TypeORM query operator to check a date field against a given ttl
-export const Alive = (ttl: number) => MoreThan(subSeconds(Date(), ttl));
+// TypeORM query operator to check the createdAt field against a given ttl
+export const Alive = (ttl: number) => MoreThan(Date.now() / 1000 - ttl);
 
 @Entity()
 class Captcha extends BaseEntity {
@@ -27,10 +24,17 @@ class Captcha extends BaseEntity {
   @Column()
   public solution: string;
 
-  @CreateDateColumn()
-  public createdAt: Date;
+  /**
+   * A column storing the creation time as a UNIX timestamp
+   */
+  @Column({
+    default: () => {
+      return Date.now() / 1000;
+    },
+  })
+  public createdAt: number;
 
-  public static findAliveByToken(token: string) {
+  public static findAliveByToken(token: string, ttl: number) {
     return this.findOne({
       token: token,
       createdAt: Alive(ttl),
