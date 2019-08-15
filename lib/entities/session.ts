@@ -25,8 +25,15 @@ class Session extends BaseEntity {
   @Column()
   public captchaRequired: boolean;
 
-  @CreateDateColumn()
-  public createdAt: Date;
+  /**
+   * A column storing the creation time as a UNIX timestamp
+   */
+  @Column({
+    default: () => {
+      return Date.now() / 1000;
+    },
+  })
+  public createdAt: number;
 
   public getUri(): string | undefined {
     return this.publicId ? `/api/sessions/{$this.publicId}` : undefined;
