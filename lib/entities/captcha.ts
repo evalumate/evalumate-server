@@ -6,10 +6,12 @@ import {
   Column,
   PrimaryGeneratedColumn,
   MoreThan,
+  LessThan,
 } from "typeorm";
 
-// TypeORM query operator to check the createdAt field against a given ttl
+// TypeORM query operators to check the createdAt field against a given ttl
 export const Alive = (ttl: number) => MoreThan(Date.now() / 1000 - ttl);
+export const Expired = (ttl: number) => LessThan(Date.now() / 1000 - ttl);
 
 @Entity()
 class Captcha extends BaseEntity {
@@ -28,9 +30,7 @@ class Captcha extends BaseEntity {
    * A column storing the creation time as a UNIX timestamp
    */
   @Column({
-    default: () => {
-      return Date.now() / 1000;
-    },
+    default: () => Date.now() / 1000,
   })
   public createdAt: number;
 
@@ -39,6 +39,20 @@ class Captcha extends BaseEntity {
       token: token,
       createdAt: Alive(ttl),
     });
+  }
+
+  /**
+   * Removes all captchas from the database that have been created more than
+   * `ttl` seconds ago.
+   *
+   * @param ttl The time to live for a captcha in seconds
+   */
+  public static deleteExpired(ttl: number) {
+    return Captcha.createQueryBuilder()
+      .delete()
+      .from(Captcha)
+      .where(Expired(ttl))
+      .execute();
   }
 
   /**

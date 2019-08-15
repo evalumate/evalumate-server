@@ -102,6 +102,18 @@ describe("Unit tests", () => {
         should.not.exist(retrievedCaptcha);
       });
     });
+
+    describe("deleteExpired", () => {
+      it("should delete an expired captcha", async () => {
+        const captcha = await CaptchaController.createCaptcha();
+        await sleep(200);
+        await Captcha.deleteExpired(0.1);
+        const retrievedCaptcha = await Captcha.findOne({
+          token: captcha.token,
+        });
+        should.not.exist(retrievedCaptcha);
+      });
+    });
   });
 
   describe("SessionController", () => {

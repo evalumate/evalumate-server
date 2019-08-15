@@ -9,7 +9,8 @@
     "migrationsRun": false
   },
   "captchas": {
-    "ttl": 120
+    "ttl": 120,
+    "deleteExpiredInterval": 120
   },
   "ids": {
     "length": 4,

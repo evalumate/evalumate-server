@@ -7,10 +7,11 @@ import randomstring from "randomstring";
 import svgCaptcha from "svg-captcha";
 import { createLogger } from "../utils/logger";
 import { Request, Response, Router } from "express";
+import { setInterval } from "timers";
 
 const logger = createLogger(module);
 
-const captchaTtl: number = config.get("captcha.ttl");
+const captchaTtl: number = config.get("captchas.ttl");
 
 class CaptchaController implements Controller {
   public path = "/captcha";
@@ -18,6 +19,14 @@ class CaptchaController implements Controller {
 
   constructor() {
     this.initializeRoutes();
+    let deleteExpiredInterval: number = config.get(
+      "captchas.deleteExpiredInterval"
+    );
+    setInterval(
+      Captcha.deleteExpired,
+      deleteExpiredInterval * 1000,
+      captchaTtl
+    );
   }
 
   public initializeRoutes() {
