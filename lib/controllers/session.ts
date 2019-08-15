@@ -66,8 +66,7 @@ class SessionController implements Controller {
       requestData.sessionName,
       requestData.captchaRequired
     );
-    // TODO how to get rid of the TypeScript warning?
-    const publicId = idhasher.encode(session.id);
+    const publicId = idhasher.encode(session.id!);
 
     logger.info("Serving new session %s", session.id);
     respond.success(

@@ -121,19 +121,9 @@ describe("Unit tests", () => {
         ).should.eventually.be.an.instanceOf(Session);
       });
     });
-  });
 
-  describe("Session", () => {
-    describe("findByPublicId", () => {
-      it("should return a session by its public id", async () => {
-        const session = await SessionController.createSession(
-          "my session name",
-          false
-        );
-        return Session.findOneByPublicId(
-          session.publicId
-        ).should.eventually.be.an.instanceOf(Session);
-      });
+    describe("POST /session", () => {
+      // TODO add unit tests for the /session route
     });
   });
 });

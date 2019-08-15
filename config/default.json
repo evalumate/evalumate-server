@@ -9,5 +9,8 @@
   "captcha": {
     "ttl": 120
   },
-  "hashIdSalt": null
+  "ids": {
+    "length": 4,
+    "hashSalt": null
+  }
 }

@@ -1,30 +1,40 @@
 import config from "config";
 import Hashids from "hashids";
 import cryptoRandomString from "crypto-random-string";
-import farmhash from "farmhash";
+import xxhash from "xxhashjs";
 
-let salt: string = config.get("hashIdSalt");
+let salt: string = config.get("ids.hashSalt");
 if (salt == null) {
-  salt = cryptoRandomString({ length: 64 });
+  salt = cryptoRandomString({ length: 32 });
 }
+
+let idLength: number = config.get("ids.length");
 
 /**
  * A class to encode and decode ids
  */
-class IdHasher {
-  private hashids: Hashids;
-
+class IdHasher extends Hashids {
   /**
    * Creates a new IdHasher.
    * @param identifier An arbitrary string that is unique to the IdHasher's use
    * case
    */
   public constructor(identifier: string) {
-    this.hashids = new Hashids(farmhash.hash64(salt + identifier));
+    super(
+      xxhash.h64(salt + identifier, 0).toString(),
+      idLength,
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
+    );
   }
 
-  public encode = this.hashids.encode;
-  public decode = this.hashids.decode;
+  /**
+   * Like decode, but only returns a single number (the first one that was
+   * decoded), not an array
+   * @param hash The hash string to be decoded
+   */
+  public decodeSingle(hash: string) {
+    return this.decode(hash)[0];
+  }
 }
 
 export default IdHasher;
