@@ -1,12 +1,13 @@
 {
-    "port": 3000,
-    "logDir": "logs",
-    "logLevel": "info",
-    "database": {
-        "type": "sqlite",
-        "database": "db.sqlite"
-    },
-    "captcha": {
-        "ttl": 120
-    }
+  "port": 3000,
+  "logDir": "logs",
+  "logLevel": "info",
+  "database": {
+    "type": "sqlite",
+    "database": "db.sqlite"
+  },
+  "captcha": {
+    "ttl": 120
+  },
+  "hashIdSalt": null
 }

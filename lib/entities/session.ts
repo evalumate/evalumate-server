@@ -11,11 +11,6 @@ class Session extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id?: number;
 
-  @Column({
-    length: 10,
-  })
-  public publicId?: string;
-
   @Column()
   public name: string;
 
@@ -34,16 +29,6 @@ class Session extends BaseEntity {
     },
   })
   public createdAt: number;
-
-  public getUri(): string | undefined {
-    return this.publicId ? `/api/sessions/{$this.publicId}` : undefined;
-  }
-
-  public static findOneByPublicId(publicId: string) {
-    return this.findOne({
-      publicId: publicId,
-    });
-  }
 }
 
 export default Session;

@@ -11,8 +11,11 @@ import validationMiddleware from "../middlewares/validation";
 import { createLogger } from "../utils/logger";
 import { CreateSessionDto } from "../dtos/session";
 import { NextFunction, Request, Response, Router } from "express";
+import IdHasher from "../utils/id-hasher";
+import HttpException from "../exceptions/HttpException";
 
 const logger = createLogger(module);
+const idhasher = new IdHasher("session");
 
 class SessionController implements Controller {
   public path = "/sessions";
@@ -34,10 +37,8 @@ class SessionController implements Controller {
     name: string,
     captchaRequired: boolean
   ): Promise<Session> {
-    logger.info("Creating new session");
+    logger.info("Creating a new session");
     const session = new Session();
-    // TODO use hashing from the id after saving
-    session.publicId = randomstring.generate({ length: 10 });
     // TODO generate cryptographically secure, user-friendly key
     session.key = "mySessionKey";
     session.name = name;
@@ -65,14 +66,16 @@ class SessionController implements Controller {
       requestData.sessionName,
       requestData.captchaRequired
     );
+    // TODO how to get rid of the TypeScript warning?
+    const publicId = idhasher.encode(session.id);
 
-    logger.info("Serving new session %s", session.publicId);
+    logger.info("Serving new session %s", session.id);
     respond.success(
       res,
       {
         session: {
-          uri: session.getUri(),
-          id: session.publicId,
+          uri: `/api/sessions/${publicId}`,
+          id: publicId,
           key: session.key,
         },
       },
