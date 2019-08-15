@@ -5,7 +5,6 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
 import sleep from "await-sleep";
-import { step } from "mocha-steps";
 
 const should = chai.should();
 chai.use(chaiAsPromised);

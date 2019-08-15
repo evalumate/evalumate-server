@@ -1,3 +1,5 @@
+import DetailHttpException from "../exceptions/DetailHttpException";
+import HttpException from "../exceptions/HttpException";
 import { Response } from "express";
 
 const apiVersion = 0.1;
@@ -28,27 +30,25 @@ export function success(res: Response, data?: any, status?: number) {
  * Reserved Property Names.
  *
  * @param res The express Response object to send the response with
- * @param status The HTTP status code
- * @param message An optional error message
- * @param name The name of an exception (if any)
+ * @param error An instance of HttpError
  */
-export function error(
-  res: Response,
-  status: number,
-  message?: string,
-  name?: string
-) {
+export function error(res: Response, error: HttpException) {
   const errorObject: any = {
-    code: status,
+    code: error.status,
+    message: error.message,
+    name: error.name,
   };
-  if (typeof message !== "undefined") {
-    errorObject.message = message;
+  if (
+    error instanceof DetailHttpException &&
+    typeof error.details !== "undefined"
+  ) {
+    errorObject.details = error.details;
   }
-  if (typeof name !== "undefined") {
-    errorObject.name = name;
+  if (res.app.get("env") === "development") {
+    errorObject.stack = error.stack;
   }
 
-  res.status(status).send({
+  res.status(error.status).send({
     apiVersion: apiVersion,
     error: errorObject,
   });

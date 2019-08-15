@@ -1,10 +1,12 @@
-import HttpException from "./HttpException";
+import DetailHttpException from "./DetailHttpException";
+import HttpStatus from "http-status-codes";
 
-class MalformedRequestException extends HttpException {
-  constructor() {
+class MalformedRequestException extends DetailHttpException {
+  constructor(details: any) {
     super(
-      403,
-      "The request's data format does not comply with the API specification."
+      HttpStatus.BAD_REQUEST,
+      "The request's data format does not comply with the API specification.",
+      details
     );
   }
 }

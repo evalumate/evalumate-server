@@ -23,5 +23,5 @@ export function apiErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  apiRespondError(res, err.status || 500, err.message, err.name);
+  apiRespondError(res, err);
 }
