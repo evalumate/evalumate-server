@@ -18,6 +18,7 @@ class CaptchaDto {
 
 export class CreateSessionDto {
   @ValidateNested()
+  @IsDefined()
   @Type(() => CaptchaDto)
   public captcha: CaptchaDto;
 
