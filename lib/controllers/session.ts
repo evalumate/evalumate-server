@@ -5,7 +5,6 @@ import config from "config";
 import Controller from "../interfaces/controller";
 import HttpStatus from "http-status-codes";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
-import randomstring from "randomstring";
 import Session from "../entities/session";
 import validationMiddleware from "../middlewares/validation";
 import { createLogger } from "../utils/logger";
@@ -15,7 +14,7 @@ import IdHasher from "../utils/id-hasher";
 import HttpException from "../exceptions/HttpException";
 
 const logger = createLogger(module);
-const idhasher = new IdHasher("session");
+const idhasher = new IdHasher("session", config.get("ids.sessionIdLength"));
 
 class SessionController implements Controller {
   public path = "/sessions";

@@ -8,11 +8,13 @@
     "synchronize": true,
     "migrationsRun": false
   },
-  "captcha": {
+  "captchas": {
     "ttl": 120
   },
   "ids": {
     "length": 4,
-    "hashSalt": null
+    "hashSalt": null,
+    "sessionIdLength": 4,
+    "userIdLength": 8
   }
 }

@@ -8,8 +8,6 @@ if (salt == null) {
   salt = cryptoRandomString({ length: 32 });
 }
 
-let idLength: number = config.get("ids.length");
-
 /**
  * A class to encode and decode ids
  */
@@ -19,10 +17,10 @@ class IdHasher extends Hashids {
    * @param identifier An arbitrary string that is unique to the IdHasher's use
    * case
    */
-  public constructor(identifier: string) {
+  public constructor(identifier: string, hashLength: number) {
     super(
       xxhash.h64(salt + identifier, 0).toString(),
-      idLength,
+      hashLength,
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
     );
   }
