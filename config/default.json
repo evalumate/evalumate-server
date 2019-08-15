@@ -4,7 +4,9 @@
   "logLevel": "info",
   "database": {
     "type": "sqlite",
-    "database": "db.sqlite"
+    "database": "db.sqlite",
+    "synchronize": true,
+    "migrationsRun": false
   },
   "captcha": {
     "ttl": 120
