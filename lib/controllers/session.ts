@@ -30,7 +30,7 @@ class SessionController implements Controller {
     );
   }
 
-  public async createSession(
+  public static async createSession(
     name: string,
     captchaRequired: boolean
   ): Promise<Session> {
@@ -61,7 +61,7 @@ class SessionController implements Controller {
       throw new InvalidCaptchaSolutionException();
     }
 
-    const session = await this.createSession(
+    const session = await SessionController.createSession(
       requestData.sessionName,
       requestData.captchaRequired
     );

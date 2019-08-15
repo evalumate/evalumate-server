@@ -28,7 +28,6 @@ class Session extends BaseEntity {
   @CreateDateColumn()
   public createdAt: Date;
 
-  // TODO make api url customizable
   public getUri(): string | undefined {
     return this.publicId ? `/api/sessions/{$this.publicId}` : undefined;
   }

@@ -4,6 +4,8 @@ import CaptchaController from "../lib/controllers/captcha";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
+import Session from "../lib/entities/session";
+import SessionController from "../lib/controllers/session";
 import sleep from "await-sleep";
 
 const should = chai.should();
@@ -92,12 +94,45 @@ describe("Unit tests", () => {
 
       it("should respect the time to live parameter", async () => {
         const captcha = await CaptchaController.createCaptcha();
-        await sleep(300);
+        await sleep(200);
         const retrievedCaptcha = await Captcha.findAliveByToken(
           captcha.token,
-          0.2
+          0.1
         );
         should.not.exist(retrievedCaptcha);
+      });
+    });
+  });
+
+  describe("SessionController", () => {
+    describe("Registered routes", () => {
+      it("should not respond with 404", () => {
+        return axios
+          .post("/api/sessions")
+          .should.eventually.not.have.property("status", 404);
+      });
+    });
+
+    describe("createSession", () => {
+      it("should return a session object", () => {
+        return SessionController.createSession(
+          "my session name",
+          false
+        ).should.eventually.be.an.instanceOf(Session);
+      });
+    });
+  });
+
+  describe("Session", () => {
+    describe("findByPublicId", () => {
+      it("should return a session by its public id", async () => {
+        const session = await SessionController.createSession(
+          "my session name",
+          false
+        );
+        return Session.findOneByPublicId(
+          session.publicId
+        ).should.eventually.be.an.instanceOf(Session);
       });
     });
   });
