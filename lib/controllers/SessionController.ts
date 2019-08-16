@@ -12,6 +12,7 @@ import validationMiddleware from "../middlewares/validation";
 import { createLogger } from "../utils/logger";
 import { CreateSessionDto } from "../dtos/session";
 import { NextFunction, Request, Response } from "express";
+import HttpException from "../exceptions/HttpException";
 
 const logger = createLogger(module);
 const sessionKeyLength: number = config.get("sessionKeyLength");
@@ -29,6 +30,7 @@ class SessionController extends Controller {
       validationMiddleware(CreateSessionDto),
       this.mCreateSession
     );
+    this.router.get(this.path + "/:sessionId", this.mGetSession);
   }
 
   public static async createSession(
@@ -77,6 +79,22 @@ class SessionController extends Controller {
       },
       HttpStatus.CREATED
     );
+  });
+
+  private mGetSession = asyncHandler(async (req: Request, res: Response) => {
+    const sessionId = idhasher.decodeSingle(req.params.sessionId);
+    const session = await Session.findOne({ id: sessionId });
+    if (!session) {
+      throw new HttpException(
+        404,
+        "A session with the requested id does not exist."
+      );
+    }
+
+    respond.success(res, {
+      sessionName: session.name,
+      captchaRequired: session.captchaRequired,
+    });
   });
 }
 

@@ -94,8 +94,20 @@ describe("Smoke test", () => {
             sessionKey = session.key;
           });
 
-          describe("The returned session uri", () => {
-            // TODO test session URI
+          describe("A GET request to the returned session uri", () => {
+            it("should return sessionName and captchaRequired", async () => {
+              const reply = await axios.get(sessionUri);
+              reply.should.have.property("status", 200);
+              const data = reply.data.data;
+              data.should.have.property(
+                "sessionName",
+                sessionPostParameters.sessionName
+              );
+              data.should.have.property(
+                "captchaRequired",
+                sessionPostParameters.captchaRequired
+              );
+            });
           });
         });
 
