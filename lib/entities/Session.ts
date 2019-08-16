@@ -1,10 +1,4 @@
-import {
-  Entity,
-  BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-} from "typeorm";
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
 class Session extends BaseEntity {
@@ -29,8 +23,8 @@ class Session extends BaseEntity {
   createdAt: number;
 
   /**
-   * The public-facing id. It is inferred from `id` and not stored in the
-   * database. Hence, it is only available on locally created session objects.
+   * The public-facing id. It is inferred from `id` and not stored in the database. Hence, it is
+   * only available on locally created session objects.
    */
   publicId: string;
 

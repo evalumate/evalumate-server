@@ -14,10 +14,9 @@ if (salt == null) {
 class IdHasher extends Hashids {
   /**
    * Creates a new IdHasher.
-   * @param identifier An arbitrary string that is unique to the IdHasher's use
-   * case
-   * @param hashLength The number of characters that each encoded id has at
-   * least
+   *
+   * @param identifier An arbitrary string that is unique to the IdHasher's use case
+   * @param hashLength The number of characters that each encoded id has at least
    */
   public constructor(identifier: string, hashLength: number) {
     super(
@@ -28,8 +27,8 @@ class IdHasher extends Hashids {
   }
 
   /**
-   * Like decode, but only returns a single number (the first one that was
-   * decoded), not an array
+   * Like decode, but only returns a single number (the first one that was decoded), not an array
+   *
    * @param hash The hash string to be decoded
    */
   public decodeSingle(hash: string) {

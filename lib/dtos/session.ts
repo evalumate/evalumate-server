@@ -1,9 +1,4 @@
-import {
-  IsString,
-  ValidateNested,
-  IsDefined,
-  IsBoolean,
-} from "class-validator";
+import { IsString, ValidateNested, IsDefined, IsBoolean } from "class-validator";
 import { Type } from "class-transformer";
 
 class CaptchaDto {

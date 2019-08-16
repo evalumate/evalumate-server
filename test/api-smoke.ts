@@ -44,14 +44,9 @@ describe("Smoke test", () => {
 
     describe("/sessions", () => {
       describe("GET", () => {
-        step(
-          "should return error 404 (express doesn't support 405 unfortunately)",
-          () => {
-            return axios
-              .get("/api/sessions")
-              .should.eventually.have.property("status", 404);
-          }
-        );
+        step("should return error 404 (express doesn't support 405 unfortunately)", () => {
+          return axios.get("/api/sessions").should.eventually.have.property("status", 404);
+        });
       });
 
       describe("POST", () => {
@@ -67,10 +62,7 @@ describe("Smoke test", () => {
               captchaRequired: false,
             };
 
-            const reply = await axios.post(
-              "/api/sessions",
-              sessionPostParameters
-            );
+            const reply = await axios.post("/api/sessions", sessionPostParameters);
 
             const session = reply.data.data.session;
             sessionUri = session.uri;
@@ -83,14 +75,8 @@ describe("Smoke test", () => {
               const reply = await axios.get(sessionUri);
               reply.should.have.property("status", 200);
               const data = reply.data.data;
-              data.should.have.property(
-                "sessionName",
-                sessionPostParameters.sessionName
-              );
-              data.should.have.property(
-                "captchaRequired",
-                sessionPostParameters.captchaRequired
-              );
+              data.should.have.property("sessionName", sessionPostParameters.sessionName);
+              data.should.have.property("captchaRequired", sessionPostParameters.captchaRequired);
             });
           });
         });

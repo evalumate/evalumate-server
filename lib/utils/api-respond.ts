@@ -5,8 +5,8 @@ import { Response } from "express";
 const apiVersion = 0.1;
 
 /**
- * Sends a success response according to the Google JSON Style Guide's Top-Level
- * Reserved Property Names.
+ * Sends a success response according to the Google JSON Style Guide's Top-Level Reserved Property
+ * Names.
  *
  * @param res The express Response object to send the response with
  * @param data An optional data object to send in the data property
@@ -26,8 +26,8 @@ export function success(res: Response, data?: any, status?: number) {
 }
 
 /**
- * Sends an error response according to the Google JSON Style Guide's Top-Level
- * Reserved Property Names.
+ * Sends an error response according to the Google JSON Style Guide's Top-Level Reserved Property
+ * Names.
  *
  * @param res The express Response object to send the response with
  * @param error An instance of HttpError
@@ -38,10 +38,7 @@ export function error(res: Response, error: HttpException) {
     message: error.message,
     name: error.name,
   };
-  if (
-    error instanceof DetailHttpException &&
-    typeof error.details !== "undefined"
-  ) {
+  if (error instanceof DetailHttpException && typeof error.details !== "undefined") {
     errorObject.details = error.details;
   }
   if (res.app.get("env") === "development") {

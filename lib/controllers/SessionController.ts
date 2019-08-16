@@ -25,20 +25,13 @@ class SessionController extends Controller {
   }
 
   initializeRoutes() {
-    this.router.post(
-      this.path,
-      validationMiddleware(CreateSessionDto),
-      this.mCreateSession
-    );
+    this.router.post(this.path, validationMiddleware(CreateSessionDto), this.mCreateSession);
     this.router.get(this.path + "/:sessionId", this.mGetSession);
     this.router.delete(this.path + "/:sessionId", this.mDeleteSession);
     this.router.get(this.path + "/:sessionId/status", this.mGetSessionStatus);
   }
 
-  static async createSession(
-    name: string,
-    captchaRequired: boolean
-  ): Promise<Session> {
+  static async createSession(name: string, captchaRequired: boolean): Promise<Session> {
     logger.info("Creating a new session");
     const session = new Session();
     session.key = generatePassword(sessionKeyLength);
@@ -54,10 +47,7 @@ class SessionController extends Controller {
     const sessionId = idhasher.decodeSingle(publicId);
     const session = await Session.findOne({ id: sessionId });
     if (!session) {
-      throw new HttpException(
-        404,
-        "A session with the requested id does not exist."
-      );
+      throw new HttpException(404, "A session with the requested id does not exist.");
     }
     return session;
   }
@@ -67,12 +57,7 @@ class SessionController extends Controller {
     const captcha = requestData.captcha;
 
     // Validate captcha solution
-    if (
-      !(await CaptchaController.validateCaptchaSolution(
-        captcha.token,
-        captcha.solution
-      ))
-    ) {
+    if (!(await CaptchaController.validateCaptchaSolution(captcha.token, captcha.solution))) {
       throw new InvalidCaptchaSolutionException();
     }
 
@@ -96,9 +81,7 @@ class SessionController extends Controller {
   });
 
   private mGetSession = asyncHandler(async (req: Request, res: Response) => {
-    const session = await SessionController.getSessionByPublicId(
-      req.params.sessionId
-    );
+    const session = await SessionController.getSessionByPublicId(req.params.sessionId);
 
     respond.success(res, {
       sessionName: session.name,
@@ -107,9 +90,7 @@ class SessionController extends Controller {
   });
 
   private mDeleteSession = asyncHandler(async (req: Request, res: Response) => {
-    const session = await SessionController.getSessionByPublicId(
-      req.params.sessionId
-    );
+    const session = await SessionController.getSessionByPublicId(req.params.sessionId);
 
     if (req.query.sessionKey !== session.key) {
       throw new HttpException(403, "The received session key is invalid");
@@ -119,19 +100,15 @@ class SessionController extends Controller {
     respond.success(res);
   });
 
-  private mGetSessionStatus = asyncHandler(
-    async (req: Request, res: Response) => {
-      const session = await SessionController.getSessionByPublicId(
-        req.params.sessionId
-      );
+  private mGetSessionStatus = asyncHandler(async (req: Request, res: Response) => {
+    const session = await SessionController.getSessionByPublicId(req.params.sessionId);
 
-      if (req.query.sessionKey !== session.key) {
-        throw new HttpException(403, "The received session key is invalid");
-      }
-
-      respond.success(res, {});
+    if (req.query.sessionKey !== session.key) {
+      throw new HttpException(403, "The received session key is invalid");
     }
-  );
+
+    respond.success(res, {});
+  });
 }
 
 export default SessionController;

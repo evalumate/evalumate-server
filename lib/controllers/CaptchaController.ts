@@ -19,9 +19,7 @@ class CaptchaController extends Controller {
   constructor() {
     super("/captcha");
     this.initializeRoutes();
-    let deleteExpiredInterval: number = config.get(
-      "captchas.deleteExpiredInterval"
-    );
+    let deleteExpiredInterval: number = config.get("captchas.deleteExpiredInterval");
     this.deleteExpiredTimeout = setInterval(
       Captcha.deleteExpired,
       deleteExpiredInterval * 1000,
@@ -59,18 +57,14 @@ class CaptchaController extends Controller {
   };
 
   /**
-   * Given a captcha token and a solution string, returns wether the solution is
-   * correct.
+   * Given a captcha token and a solution string, returns wether the solution is correct.
    * @param token The token string that specifies the captcha
    * @param solution The solution to be validated
    *
-   * @throws InvalidCaptchaTokenException if no captcha with the given token and
-   * younger than `captcha.ttl` seconds exists.
+   * @throws InvalidCaptchaTokenException if no captcha with the given token and younger than
+   * `captcha.ttl` seconds exists.
    */
-  static async validateCaptchaSolution(
-    token: string,
-    solution: string
-  ): Promise<boolean> {
+  static async validateCaptchaSolution(token: string, solution: string): Promise<boolean> {
     logger.debug("Validating captcha solution with token %s", token);
     const captcha = await Captcha.findAliveByToken(token, captchaTtl);
     if (!captcha) {

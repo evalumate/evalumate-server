@@ -1,13 +1,6 @@
 import config from "config";
 import { subSeconds } from "date-fns";
-import {
-  Entity,
-  BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  MoreThan,
-  LessThan,
-} from "typeorm";
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, MoreThan, LessThan } from "typeorm";
 
 // TypeORM query operators to check the createdAt field against a given ttl
 export const Alive = (ttl: number) => MoreThan(Date.now() / 1000 - ttl);
@@ -58,8 +51,8 @@ class Captcha extends BaseEntity {
   /**
    * The captcha image as an svg data string.
    *
-   * This field is not stored in the database and hence only defined on recently
-   * created captcha instances.
+   * This field is not stored in the database and hence only defined on recently created captcha
+   * instances.
    */
   public image: string;
 }
