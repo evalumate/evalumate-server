@@ -56,6 +56,17 @@ describe("Unit tests", () => {
       });
     });
 
+    describe("mCreateCaptcha (via GET /captcha)", () => {
+      it("should return a captcha", async () => {
+        const reply = await axios.get("/api/captcha");
+        reply.should.have.property("status", 200);
+        reply.data.should.have
+          .property("data")
+          .that.has.property("captcha")
+          .that.has.keys("image", "token");
+      });
+    });
+
     describe("validateCaptchaSolution", () => {
       it("should successfully validate a created captcha's solution", async () => {
         const captcha = await CaptchaController.createCaptcha();
@@ -134,8 +145,46 @@ describe("Unit tests", () => {
       });
     });
 
-    describe("POST /session", () => {
-      // TODO add unit tests for the /session route
+    describe("mCreateSession (via POST /session)", () => {
+      it("should reply with a new session", async () => {
+        const captcha = await CaptchaController.createCaptcha();
+
+        const reply = await axios.post("/api/sessions", {
+          captcha: {
+            token: captcha.token,
+            solution: captcha.solution,
+          },
+          sessionName: "Another session name",
+          captchaRequired: false,
+        });
+        reply.should.have.property("status", 201);
+        reply.data.should.have.property("data");
+
+        const data = reply.data.data;
+        data.should.have.property("session");
+
+        const session = data.session;
+        session.should.have.keys(["uri", "id", "key"]);
+      });
+    });
+
+    describe("mGetSession (via GET /session/:sessionId)", () => {
+      it("should reply with sessionName and captchaRequired", async () => {
+        const sessionName = "Yet another session name";
+        const captchaRequired = false;
+        const session = await SessionController.createSession(
+          sessionName,
+          captchaRequired
+        );
+
+        const reply = await axios.get(session.getUri());
+        reply.should.have.property("status", 200);
+        reply.data.should.have.property("data");
+
+        const replyData = reply.data.data;
+        replyData.should.have.property("sessionName", sessionName);
+        replyData.should.have.property("captchaRequired", captchaRequired);
+      });
     });
   });
 });

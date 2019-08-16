@@ -9,24 +9,24 @@ import { Type } from "class-transformer";
 class CaptchaDto {
   @IsString()
   @IsDefined()
-  public solution: string;
+  solution: string;
 
   @IsString()
   @IsDefined()
-  public token: string;
+  token: string;
 }
 
 export class CreateSessionDto {
   @ValidateNested()
   @IsDefined()
   @Type(() => CaptchaDto)
-  public captcha: CaptchaDto;
+  captcha: CaptchaDto;
 
   @IsString()
   @IsDefined()
-  public sessionName: string;
+  sessionName: string;
 
   @IsBoolean()
   @IsDefined()
-  public captchaRequired: boolean;
+  captchaRequired: boolean;
 }

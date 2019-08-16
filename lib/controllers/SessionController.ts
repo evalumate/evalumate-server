@@ -24,7 +24,7 @@ class SessionController extends Controller {
     this.initializeRoutes();
   }
 
-  public initializeRoutes() {
+  initializeRoutes() {
     this.router.post(
       this.path,
       validationMiddleware(CreateSessionDto),
@@ -33,7 +33,7 @@ class SessionController extends Controller {
     this.router.get(this.path + "/:sessionId", this.mGetSession);
   }
 
-  public static async createSession(
+  static async createSession(
     name: string,
     captchaRequired: boolean
   ): Promise<Session> {
@@ -42,8 +42,21 @@ class SessionController extends Controller {
     session.key = generatePassword(sessionKeyLength);
     session.name = name;
     session.captchaRequired = captchaRequired;
-    await session.save();
 
+    await session.save();
+    session.publicId = idhasher.encode(session.id!);
+    return session;
+  }
+
+  static async getSessionByPublicId(publicId: string) {
+    const sessionId = idhasher.decodeSingle(publicId);
+    const session = await Session.findOne({ id: sessionId });
+    if (!session) {
+      throw new HttpException(
+        404,
+        "A session with the requested id does not exist."
+      );
+    }
     return session;
   }
 
@@ -65,15 +78,14 @@ class SessionController extends Controller {
       requestData.sessionName,
       requestData.captchaRequired
     );
-    const publicId = idhasher.encode(session.id!);
 
     logger.info("Serving new session %s", session.id);
     respond.success(
       res,
       {
         session: {
-          uri: `/api/sessions/${publicId}`,
-          id: publicId,
+          uri: session.getUri(),
+          id: session.publicId,
           key: session.key,
         },
       },
@@ -82,14 +94,9 @@ class SessionController extends Controller {
   });
 
   private mGetSession = asyncHandler(async (req: Request, res: Response) => {
-    const sessionId = idhasher.decodeSingle(req.params.sessionId);
-    const session = await Session.findOne({ id: sessionId });
-    if (!session) {
-      throw new HttpException(
-        404,
-        "A session with the requested id does not exist."
-      );
-    }
+    const session = await SessionController.getSessionByPublicId(
+      req.params.sessionId
+    );
 
     respond.success(res, {
       sessionName: session.name,

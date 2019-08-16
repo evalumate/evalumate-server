@@ -9,16 +9,16 @@ import {
 @Entity()
 class Session extends BaseEntity {
   @PrimaryGeneratedColumn()
-  public id?: number;
+  id?: number;
 
   @Column()
-  public name: string;
+  name: string;
 
   @Column()
-  public key: string;
+  key: string;
 
   @Column()
-  public captchaRequired: boolean;
+  captchaRequired: boolean;
 
   /**
    * A column storing the creation time as a UNIX timestamp
@@ -26,7 +26,20 @@ class Session extends BaseEntity {
   @Column({
     default: () => Date.now() / 1000,
   })
-  public createdAt: number;
+  createdAt: number;
+
+  /**
+   * The public-facing id. It is inferred from `id` and not stored in the
+   * database. Hence, it is only available on locally created session objects.
+   */
+  publicId: string;
+
+  /**
+   * If `publicId` is defined, returns the session's REST API URI.
+   */
+  getUri() {
+    return this.publicId ? `/api/sessions/${this.publicId}` : undefined;
+  }
 }
 
 export default Session;

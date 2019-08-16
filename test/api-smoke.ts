@@ -25,21 +25,12 @@ describe("Smoke test", () => {
   describe("/api", () => {
     describe("/captcha", () => {
       describe("GET", () => {
-        step(
-          "should return a proper captcha object (image and token)",
-          async () => {
-            const reply = await axios.get("/api/captcha");
-            reply.should.have.property("status", 200);
-            reply.data.should.have.property("data");
-
-            const data = reply.data.data;
-            data.should.have
-              .property("captcha")
-              .that.has.keys("image", "token");
-
-            captchaToken = data.captcha.token;
-          }
-        );
+        step("should return a captcha object (image and token)", async () => {
+          const reply = await axios.get("/api/captcha");
+          reply.should.have.property("status", 200);
+          reply.data.should.have.property("data").that.has.property("captcha");
+          captchaToken = reply.data.data.captcha.token;
+        });
 
         describe("The captcha token", () => {
           step("should have an entry in the database", async () => {
@@ -80,15 +71,8 @@ describe("Smoke test", () => {
               "/api/sessions",
               sessionPostParameters
             );
-            reply.should.have.property("status", 201);
-            reply.data.should.have.property("data");
 
-            const data = reply.data.data;
-            data.should.have.property("session");
-
-            const session = data.session;
-            session.should.have.keys(["uri", "id", "key"]);
-
+            const session = reply.data.data.session;
             sessionUri = session.uri;
             sessionId = session.id;
             sessionKey = session.key;
