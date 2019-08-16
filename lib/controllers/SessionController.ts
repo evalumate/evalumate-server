@@ -31,6 +31,8 @@ class SessionController extends Controller {
       this.mCreateSession
     );
     this.router.get(this.path + "/:sessionId", this.mGetSession);
+    this.router.delete(this.path + "/:sessionId", this.mDeleteSession);
+    this.router.get(this.path + "/:sessionId/status", this.mGetSessionStatus);
   }
 
   static async createSession(
@@ -103,6 +105,33 @@ class SessionController extends Controller {
       captchaRequired: session.captchaRequired,
     });
   });
+
+  private mDeleteSession = asyncHandler(async (req: Request, res: Response) => {
+    const session = await SessionController.getSessionByPublicId(
+      req.params.sessionId
+    );
+
+    if (req.query.sessionKey !== session.key) {
+      throw new HttpException(403, "The received session key is invalid");
+    }
+
+    await session.remove();
+    respond.success(res);
+  });
+
+  private mGetSessionStatus = asyncHandler(
+    async (req: Request, res: Response) => {
+      const session = await SessionController.getSessionByPublicId(
+        req.params.sessionId
+      );
+
+      if (req.query.sessionKey !== session.key) {
+        throw new HttpException(403, "The received session key is invalid");
+      }
+
+      respond.success(res, {});
+    }
+  );
 }
 
 export default SessionController;

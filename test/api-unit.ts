@@ -7,6 +7,7 @@ import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenE
 import Session from "../lib/entities/Session";
 import SessionController from "../lib/controllers/SessionController";
 import sleep from "await-sleep";
+import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
 
 const should = chai.should();
 chai.use(chaiAsPromised);
@@ -184,6 +185,74 @@ describe("Unit tests", () => {
         const replyData = reply.data.data;
         replyData.should.have.property("sessionName", sessionName);
         replyData.should.have.property("captchaRequired", captchaRequired);
+      });
+    });
+
+    describe("mDeleteSession (via DELETE /session/:sessionId)", () => {
+      describe("with invalid session key", () => {
+        it("should reply with status code 403", async () => {
+          const session = await SessionController.createSession(
+            "session name",
+            false
+          );
+
+          const reply = await axios.delete(
+            session.getUri() + "?sessionKey=foo"
+          );
+          reply.status.should.equal(403);
+        });
+      });
+
+      describe("with valid session key", () => {
+        it("should reply with status code 200 and delete the session", async () => {
+          const sessionName = "What a beautiful name for a session";
+          const captchaRequired = false;
+          const session = await SessionController.createSession(
+            sessionName,
+            captchaRequired
+          );
+
+          const reply = await axios.delete(
+            session.getUri() + "?sessionKey=" + session.key
+          );
+          reply.should.have.property("status", 200);
+
+          session.reload().should.be.rejectedWith(EntityNotFoundError);
+        });
+      });
+    });
+
+    describe("mGetSessionStatus (via GET /session/:sessionId/status)", () => {
+      describe("with invalid session key", () => {
+        it("should reply with status code 403", async () => {
+          const session = await SessionController.createSession(
+            "My session name",
+            false
+          );
+
+          const reply = await axios.get(
+            session.getUri() + "/status?sessionKey=bar"
+          );
+          reply.should.have.property("status", 403);
+        });
+      });
+
+      describe("with valid session key", () => {
+        it("should reply with session status data", async () => {
+          const sessionName = "My session";
+          const captchaRequired = false;
+          const session = await SessionController.createSession(
+            sessionName,
+            captchaRequired
+          );
+
+          const reply = await axios.get(
+            session.getUri() + "/status?sessionKey=" + session.key
+          );
+          reply.should.have.property("status", 200);
+
+          // TODO Add assertions on the data object (once defined in the API)
+        });
       });
     });
   });
