@@ -24,9 +24,7 @@ class Session extends BaseEntity {
    * A column storing the creation time as a UNIX timestamp
    */
   @Column({
-    default: () => {
-      return Date.now() / 1000;
-    },
+    default: () => Date.now() / 1000,
   })
   public createdAt: number;
 }

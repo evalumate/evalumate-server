@@ -17,5 +17,6 @@
     "hashSalt": null,
     "sessionIdLength": 4,
     "userIdLength": 8
-  }
+  },
+  "sessionKeyLength": 10
 }

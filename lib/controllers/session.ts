@@ -3,17 +3,18 @@ import asyncHandler from "express-async-handler";
 import CaptchaController from "./captcha";
 import config from "config";
 import Controller from "../interfaces/controller";
+import generatePassword from "password-generator";
 import HttpStatus from "http-status-codes";
+import IdHasher from "../utils/id-hasher";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import Session from "../entities/session";
 import validationMiddleware from "../middlewares/validation";
 import { createLogger } from "../utils/logger";
 import { CreateSessionDto } from "../dtos/session";
 import { NextFunction, Request, Response, Router } from "express";
-import IdHasher from "../utils/id-hasher";
-import HttpException from "../exceptions/HttpException";
 
 const logger = createLogger(module);
+const sessionKeyLength: number = config.get("sessionKeyLength");
 const idhasher = new IdHasher("session", config.get("ids.sessionIdLength"));
 
 class SessionController implements Controller {
@@ -38,8 +39,7 @@ class SessionController implements Controller {
   ): Promise<Session> {
     logger.info("Creating a new session");
     const session = new Session();
-    // TODO generate cryptographically secure, user-friendly key
-    session.key = "mySessionKey";
+    session.key = generatePassword(sessionKeyLength);
     session.name = name;
     session.captchaRequired = captchaRequired;
     await session.save();

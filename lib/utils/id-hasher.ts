@@ -16,6 +16,8 @@ class IdHasher extends Hashids {
    * Creates a new IdHasher.
    * @param identifier An arbitrary string that is unique to the IdHasher's use
    * case
+   * @param hashLength The number of characters that each encoded id has at
+   * least
    */
   public constructor(identifier: string, hashLength: number) {
     super(
