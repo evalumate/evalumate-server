@@ -1,11 +1,11 @@
 import axios from "axios";
-import Captcha from "../lib/entities/captcha";
-import CaptchaController from "../lib/controllers/captcha";
+import Captcha from "../lib/entities/Captcha";
+import CaptchaController from "../lib/controllers/CaptchaController";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
-import Session from "../lib/entities/session";
-import SessionController from "../lib/controllers/session";
+import Session from "../lib/entities/Session";
+import SessionController from "../lib/controllers/SessionController";
 import sleep from "await-sleep";
 
 const should = chai.should();

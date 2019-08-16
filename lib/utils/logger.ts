@@ -45,20 +45,23 @@ if (!["test", "production"].includes(nodeEnv)) {
 const rootModulePath = path.resolve(module.id, "../../");
 
 // Add module id to log messages
-export function createLogger(module: NodeModule) {
-  const filename = path.relative(rootModulePath, module.id);
+export function createLogger(module?: NodeModule) {
+  if (typeof module === "undefined") {
+    return logger;
+  }
+  const filenamePrefix = path.relative(rootModulePath, module.id) + ": ";
   return {
     debug: function(msg: string, meta?: any) {
-      logger.debug(filename + ": " + msg, meta);
+      logger.debug(filenamePrefix + msg, meta);
     },
     info: function(msg: string, meta?: any) {
-      logger.info(filename + ": " + msg, meta);
+      logger.info(filenamePrefix + msg, meta);
     },
     warn: function(msg: string, meta?: any) {
-      logger.warn(filename + ": " + msg, meta);
+      logger.warn(filenamePrefix + msg, meta);
     },
     error: function(msg: string, meta?: any) {
-      logger.error(filename + ": " + msg, meta);
+      logger.error(filenamePrefix + msg, meta);
     },
   };
 }

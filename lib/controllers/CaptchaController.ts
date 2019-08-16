@@ -1,39 +1,39 @@
 import * as respond from "../utils/api-respond";
-import Captcha from "../entities/captcha";
+import Captcha from "../entities/Captcha";
 import config from "config";
-import Controller from "../interfaces/controller";
+import Controller from "./Controller";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
 import randomstring from "randomstring";
 import svgCaptcha from "svg-captcha";
+import { clearInterval, setInterval } from "timers";
 import { createLogger } from "../utils/logger";
-import { Request, Response, Router } from "express";
-import { setInterval } from "timers";
+import { Request, Response } from "express";
 
 const logger = createLogger(module);
 
 const captchaTtl: number = config.get("captchas.ttl");
 
-class CaptchaController implements Controller {
-  public path = "/captcha";
-  public router = Router();
+class CaptchaController extends Controller {
+  private deleteExpiredTimeout: NodeJS.Timeout;
 
   constructor() {
+    super("/captcha");
     this.initializeRoutes();
     let deleteExpiredInterval: number = config.get(
       "captchas.deleteExpiredInterval"
     );
-    setInterval(
+    this.deleteExpiredTimeout = setInterval(
       Captcha.deleteExpired,
       deleteExpiredInterval * 1000,
       captchaTtl
     );
   }
 
-  public initializeRoutes() {
+  initializeRoutes() {
     this.router.get(this.path, this.mGetNewCaptcha);
   }
 
-  public static async createCaptcha(): Promise<Captcha> {
+  static async createCaptcha(): Promise<Captcha> {
     logger.debug("Generating new captcha");
     const generatedCaptcha = svgCaptcha.create();
 
@@ -67,7 +67,7 @@ class CaptchaController implements Controller {
    * @throws InvalidCaptchaTokenException if no captcha with the given token and
    * younger than `captcha.ttl` seconds exists.
    */
-  public static async validateCaptchaSolution(
+  static async validateCaptchaSolution(
     token: string,
     solution: string
   ): Promise<boolean> {
@@ -82,6 +82,10 @@ class CaptchaController implements Controller {
       await captcha.remove();
     }
     return valid;
+  }
+
+  async shutDown() {
+    clearInterval(this.deleteExpiredTimeout);
   }
 }
 

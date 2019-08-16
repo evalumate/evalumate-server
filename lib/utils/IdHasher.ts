@@ -1,6 +1,6 @@
 import config from "config";
-import Hashids from "hashids";
 import cryptoRandomString from "crypto-random-string";
+import Hashids from "hashids";
 import xxhash from "xxhashjs";
 
 let salt: string = config.get("ids.hashSalt");

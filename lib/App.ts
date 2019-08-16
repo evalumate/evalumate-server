@@ -1,25 +1,26 @@
 import * as express from "express";
-import { createConnection } from "typeorm";
-import http from "http";
-import createError from "http-errors";
-import path from "path";
+import Controller from "./controllers/Controller";
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
-import { createLogger, logStream } from "./utils/logger";
-
-import Controller from "./interfaces/controller";
-import { frontendErrorHandler, apiErrorHandler } from "./middlewares/errors";
+import createError from "http-errors";
 import databaseConfig from "./ormconfig";
-
+import Destructable from "./interfaces/Destructable";
+import http from "http";
 import mainRouter from "./routes";
+import morgan from "morgan";
+import path from "path";
+import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
+import { Connection, createConnection } from "typeorm";
+import { createLogger, logStream } from "./utils/logger";
 
 let logger = createLogger(module);
 
-class App {
+class App implements Destructable {
   public app: express.Application;
   public port: number;
   public server: http.Server;
-  public up: Promise<boolean>;
+
+  private dbConnection: Connection;
+  private apiControllers: Controller[];
 
   constructor(apiControllers: Controller[], port: number) {
     this.port = port;
@@ -75,20 +76,35 @@ class App {
 
   private initializeApiControllers(apiControllers: Controller[]) {
     logger.debug("Initializing API controllers");
+    this.apiControllers = apiControllers;
     apiControllers.forEach(controller => {
       this.app.use("/api", controller.router);
     });
   }
 
+  private destructApiControllers() {
+    logger.debug("Shutting down API controllers");
+    return Promise.all(
+      this.apiControllers.map(controller => {
+        controller.shutDown();
+      })
+    );
+  }
+
   private async connectToDatabase() {
     logger.debug("Connecting to database");
-    await createConnection(databaseConfig);
+    this.dbConnection = await createConnection(databaseConfig);
     logger.info("Connected to database");
   }
 
-  private listen(): Promise<undefined> {
+  private async disconnectFromDatabase() {
+    logger.debug("Closing database connection");
+    await this.dbConnection.close();
+  }
+
+  private listen(): Promise<void> {
     return new Promise((resolve, reject) => {
-      logger.debug("Calling Server.listen");
+      logger.debug("Calling Server.listen()");
       this.server.listen(this.port);
 
       this.server.on("error", (error: NodeJS.ErrnoException) => {
@@ -120,9 +136,31 @@ class App {
     });
   }
 
+  private close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      logger.debug("Calling Server.close()");
+      this.server.close();
+
+      this.server.on("error", (error: NodeJS.ErrnoException) => {
+        reject(error);
+      });
+
+      this.server.on("close", () => {
+        logger.info("Server closed");
+        resolve();
+      });
+    });
+  }
+
   public async run() {
     await this.connectToDatabase();
     await this.listen();
+  }
+
+  public async shutDown() {
+    await this.close();
+    await this.destructApiControllers();
+    await this.disconnectFromDatabase();
   }
 }
 

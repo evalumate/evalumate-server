@@ -14,5 +14,5 @@ before(() => {
 });
 
 after(() => {
-  return app.server.close();
+  return app.shutDown();
 });

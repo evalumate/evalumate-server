@@ -1,5 +1,5 @@
 import axios from "axios";
-import Captcha from "../lib/entities/captcha";
+import Captcha from "../lib/entities/Captcha";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 
