@@ -1,9 +1,14 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
+import Member from "./Member";
+import PublicIdEntity from "./PublicIdEntity";
+import IdHasher from "../utils/IdHasher";
+import config from "config";
+import { Column, Entity, OneToMany } from "typeorm";
+
+const idHasher = new IdHasher("session", config.get("ids.sessionIdLength"));
 
 @Entity()
-class Session extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id?: number;
+export default class Session extends PublicIdEntity {
+  protected static idHasher = idHasher;
 
   @Column()
   name: string;
@@ -14,26 +19,20 @@ class Session extends BaseEntity {
   @Column()
   captchaRequired: boolean;
 
+  @OneToMany(type => Member, member => member.session)
+  members: Member[];
+
   /**
-   * A column storing the creation time as a UNIX timestamp
+   * The creation time as a UNIX timestamp
    */
-  @Column({
-    default: () => Date.now() / 1000,
-  })
+  @Column({ default: () => Date.now() / 1000 })
   createdAt: number;
 
   /**
-   * The public-facing id. It is inferred from `id` and not stored in the database. Hence, it is
-   * only available on locally created session objects.
+   * The session's REST API URI or undefined, if the session has no id yet.
    */
-  publicId: string;
-
-  /**
-   * If `publicId` is defined, returns the session's REST API URI.
-   */
-  getUri() {
-    return this.publicId ? `/api/sessions/${this.publicId}` : undefined;
+  get uri() {
+    if (!this.publicId) return undefined;
+    return `/api/sessions/${this.publicId}`;
   }
 }
-
-export default Session;
