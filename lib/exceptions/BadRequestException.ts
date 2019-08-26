@@ -1,7 +1,7 @@
 import DetailHttpException from "./DetailHttpException";
 import HttpStatus from "http-status-codes";
 
-class MalformedRequestException extends DetailHttpException {
+export default class MalformedRequestException extends DetailHttpException {
   constructor(details: any) {
     super(
       HttpStatus.BAD_REQUEST,
@@ -10,5 +10,3 @@ class MalformedRequestException extends DetailHttpException {
     );
   }
 }
-
-export default MalformedRequestException;

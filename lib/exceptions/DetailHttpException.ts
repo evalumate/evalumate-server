@@ -1,6 +1,6 @@
 import HttpException from "./HttpException";
 
-class DetailHttpException extends HttpException {
+export default class DetailHttpException extends HttpException {
   details: any;
 
   constructor(status: number, message: string, details?: any) {
@@ -10,5 +10,3 @@ class DetailHttpException extends HttpException {
     }
   }
 }
-
-export default DetailHttpException;
