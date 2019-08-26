@@ -1,16 +1,24 @@
-import axios from "axios";
-import Captcha from "../lib/entities/Captcha";
+import { CaptchaFixture, MemberFixture, SessionFixture } from "./fixtures/models";
 import CaptchaController from "../lib/controllers/CaptchaController";
+import MemberController from "../lib/controllers/MemberController";
+import SessionController from "../lib/controllers/SessionController";
+import Captcha from "../lib/entities/Captcha";
+import Member from "../lib/entities/Member";
+import Session from "../lib/entities/Session";
+import InvalidCaptchaSolutionException from "../lib/exceptions/InvalidCaptchaSolutionException";
+import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
+import sleep from "await-sleep";
+import axios from "axios";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
-import Session from "../lib/entities/Session";
-import SessionController from "../lib/controllers/SessionController";
-import sleep from "await-sleep";
 import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
 
 const should = chai.should();
 chai.use(chaiAsPromised);
+
+const captchaFixture = new CaptchaFixture();
+const sessionFixture = new SessionFixture();
+const memberFixture = new MemberFixture();
 
 describe("Unit tests", () => {
   describe("HTTP", () => {
@@ -28,7 +36,7 @@ describe("Unit tests", () => {
         describe("GET", () => {
           it("should return 404 and have a proper error format", async () => {
             const result = await axios.get("/api/non-existing/resource");
-            result.should.have.property("status", 404);
+            result.status.should.equal(404);
             result.data.should.have.property("error");
             const error = result.data.error;
             error.should.have.property("code", 404);
@@ -41,44 +49,45 @@ describe("Unit tests", () => {
   });
 
   describe("CaptchaController", () => {
-    describe("Registered routes", () => {
-      it("should not respond with 404", () => {
-        return axios.get("/api/captcha").should.eventually.not.have.property("status", 404);
-      });
-    });
-
     describe("createCaptcha", () => {
-      it("should return a captcha object", () => {
-        return CaptchaController.createCaptcha().should.eventually.be.an.instanceOf(Captcha);
+      it("should return a captcha object", async () => {
+        const captcha = await CaptchaController.createCaptcha();
+        captcha.should.be.an.instanceOf(Captcha);
+        await captcha.remove();
       });
     });
 
     describe("mCreateCaptcha (via GET /captcha)", () => {
       it("should return a captcha", async () => {
         const reply = await axios.get("/api/captcha");
-        reply.should.have.property("status", 200);
+        reply.status.should.equal(200);
         reply.data.should.have
           .property("data")
           .that.has.property("captcha")
           .that.has.keys("image", "token");
+
+        // The captcha should be in the database
+        const captchaFromDb = await Captcha.findOne({ token: reply.data.data.captcha.token });
+        should.exist(captchaFromDb);
+        await captchaFromDb.remove();
       });
     });
 
     describe("validateCaptchaSolution", () => {
       it("should successfully validate a created captcha's solution", async () => {
-        const captcha = await CaptchaController.createCaptcha();
-        return CaptchaController.validateCaptchaSolution(
-          captcha.token,
-          captcha.solution
-        ).should.eventually.equal(true);
+        const captcha = await captchaFixture.setUp();
+        CaptchaController.validateCaptchaSolution(captcha.token, captcha.solution).should.not.be
+          .rejected;
+        await captchaFixture.tearDown();
       });
 
-      it("should not successfully validate a wrong solution", async () => {
-        const captcha = await CaptchaController.createCaptcha();
-        return CaptchaController.validateCaptchaSolution(
+      it("should throw InvalidCaptchaSolutionException with a wrong solution", async () => {
+        const captcha = await captchaFixture.setUp();
+        CaptchaController.validateCaptchaSolution(
           captcha.token,
           "my not-so-right solution"
-        ).should.eventually.equal(false);
+        ).should.be.rejectedWith(InvalidCaptchaSolutionException);
+        await captchaFixture.tearDown();
       });
 
       it("should throw InvalidCaptchaTokenException with an invalid token", async () => {
@@ -93,50 +102,43 @@ describe("Unit tests", () => {
   describe("Captcha", () => {
     describe("findAliveByToken", () => {
       it("should return a captcha by its token", async () => {
-        const captcha = await CaptchaController.createCaptcha();
-        return Captcha.findAliveByToken(captcha.token, 120).should.eventually.be.an.instanceOf(
-          Captcha
-        );
+        const captcha = await captchaFixture.setUp();
+        const captchaFromDb = await Captcha.findAliveByToken(captcha.token, 120);
+        captchaFromDb.should.be.an.instanceOf(Captcha);
+        await captchaFixture.tearDown();
       });
 
       it("should respect the time to live parameter", async () => {
-        const captcha = await CaptchaController.createCaptcha();
+        const captcha = await captchaFixture.setUp();
         await sleep(200);
-        const retrievedCaptcha = await Captcha.findAliveByToken(captcha.token, 0.1);
-        should.not.exist(retrievedCaptcha);
+        const captchaFromDb = await Captcha.findAliveByToken(captcha.token, 0.1);
+        should.not.exist(captchaFromDb);
       });
     });
 
     describe("deleteExpired", () => {
       it("should delete an expired captcha", async () => {
-        const captcha = await CaptchaController.createCaptcha();
+        const captcha = await captchaFixture.setUp();
         await sleep(200);
         await Captcha.deleteExpired(0.1);
-        const retrievedCaptcha = await Captcha.findOne({
+        const captchaFromDb = await Captcha.findOne({
           token: captcha.token,
         });
-        should.not.exist(retrievedCaptcha);
+        should.not.exist(captchaFromDb);
       });
     });
   });
 
   describe("SessionController", () => {
-    describe("Registered routes", () => {
-      it("should not respond with 404", () => {
-        return axios.post("/api/sessions").should.eventually.not.have.property("status", 404);
-      });
-    });
-
     describe("createSession", () => {
-      it("should return a session object", () => {
-        return SessionController.createSession(
-          "my session name",
-          false
-        ).should.eventually.be.an.instanceOf(Session);
+      it("should return a session object", async () => {
+        const session = await SessionController.createSession("My Session Name", false);
+        session.should.be.an.instanceOf(Session);
+        await session.remove();
       });
     });
 
-    describe("mCreateSession (via POST /session)", () => {
+    describe("mCreateSession (via POST /sessions)", () => {
       it("should reply with a new session", async () => {
         const captcha = await CaptchaController.createCaptcha();
 
@@ -148,7 +150,7 @@ describe("Unit tests", () => {
           sessionName: "Another session name",
           captchaRequired: false,
         });
-        reply.should.have.property("status", 201);
+        reply.status.should.equal(201);
         reply.data.should.have.property("data");
 
         const data = reply.data.data;
@@ -156,69 +158,204 @@ describe("Unit tests", () => {
 
         const session = data.session;
         session.should.have.keys(["uri", "id", "key"]);
+
+        const sessionFromDb = await Session.findOneByPublicId(session.id);
+        should.exist(sessionFromDb);
+        sessionFromDb.remove();
       });
     });
 
-    describe("mGetSession (via GET /session/:sessionId)", () => {
-      it("should reply with sessionName and captchaRequired", async () => {
-        const sessionName = "Yet another session name";
-        const captchaRequired = false;
-        const session = await SessionController.createSession(sessionName, captchaRequired);
+    describe("mGetSession (via GET /sessions/:sessionId)", () => {
+      describe("with a valid sessionId", () => {
+        it("should reply with sessionName and captchaRequired", async () => {
+          const session = await sessionFixture.setUp();
 
-        const reply = await axios.get(session.getUri());
-        reply.should.have.property("status", 200);
-        reply.data.should.have.property("data");
+          const reply = await axios.get(session.uri);
+          reply.status.should.equal(200);
+          reply.data.should.have.property("data");
 
-        const replyData = reply.data.data;
-        replyData.should.have.property("sessionName", sessionName);
-        replyData.should.have.property("captchaRequired", captchaRequired);
+          const replyData = reply.data.data;
+          replyData.should.have.property("sessionName", session.name);
+          replyData.should.have.property("captchaRequired", session.captchaRequired);
+
+          await sessionFixture.tearDown();
+        });
+      });
+
+      describe("with an invalid sessionId", () => {
+        it("should reply with status 404", async () => {
+          const reply = await axios.get("/api/sessions/non-existing-session");
+          reply.status.should.equal(404);
+        });
       });
     });
 
-    describe("mDeleteSession (via DELETE /session/:sessionId)", () => {
+    describe("mDeleteSession (via DELETE /sessions/:sessionId)", () => {
       describe("with invalid session key", () => {
         it("should reply with status code 403", async () => {
-          const session = await SessionController.createSession("session name", false);
+          const session = await sessionFixture.setUp();
 
-          const reply = await axios.delete(session.getUri() + "?sessionKey=foo");
+          const reply = await axios.delete(session.uri + "?sessionKey=foo");
           reply.status.should.equal(403);
+
+          await sessionFixture.tearDown();
         });
       });
 
       describe("with valid session key", () => {
         it("should reply with status code 200 and delete the session", async () => {
-          const sessionName = "What a beautiful name for a session";
-          const captchaRequired = false;
-          const session = await SessionController.createSession(sessionName, captchaRequired);
+          const session = await sessionFixture.setUp();
 
-          const reply = await axios.delete(session.getUri() + "?sessionKey=" + session.key);
-          reply.should.have.property("status", 200);
-
+          const reply = await axios.delete(session.uri + "?sessionKey=" + session.key);
+          reply.status.should.equal(200);
           session.reload().should.be.rejectedWith(EntityNotFoundError);
+
+          await sessionFixture.tearDown();
         });
       });
     });
 
-    describe("mGetSessionStatus (via GET /session/:sessionId/status)", () => {
-      describe("with invalid session key", () => {
-        it("should reply with status code 403", async () => {
-          const session = await SessionController.createSession("My session name", false);
+    describe("mGetSessionStatus (via GET /sessions/:sessionId/status)", () => {
+      describe("with valid session key", () => {
+        it("should reply with session status data", async () => {
+          const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.getUri() + "/status?sessionKey=bar");
-          reply.should.have.property("status", 403);
+          const reply = await axios.get(session.uri + "/status?sessionKey=" + session.key);
+          reply.status.should.equal(200);
+
+          // TODO Add assertions on the data object (once defined in the API)
+
+          await sessionFixture.tearDown();
         });
       });
 
-      describe("with valid session key", () => {
-        it("should reply with session status data", async () => {
-          const sessionName = "My session";
-          const captchaRequired = false;
-          const session = await SessionController.createSession(sessionName, captchaRequired);
+      describe("with invalid session key", () => {
+        it("should reply with status code 403", async () => {
+          const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.getUri() + "/status?sessionKey=" + session.key);
-          reply.should.have.property("status", 200);
+          const reply = await axios.get(session.uri + "/status?sessionKey=bar");
+          reply.status.should.equal(403);
 
-          // TODO Add assertions on the data object (once defined in the API)
+          await sessionFixture.tearDown();
+        });
+      });
+    });
+  });
+
+  describe("MemberController", () => {
+    describe("createMember", () => {
+      it("should return a member object", async () => {
+        const session = await sessionFixture.setUp();
+
+        const member = await MemberController.createMember(session);
+        member.should.be.an.instanceOf(Member);
+
+        await sessionFixture.tearDown(); // Also deletes the member
+
+        const session2 = await sessionFixture.setUp();
+
+        const member2 = await MemberController.createMember(session2);
+        member.should.be.an.instanceOf(Member);
+
+        await sessionFixture.tearDown(); // Also deletes the member
+      });
+    });
+
+    describe("mCreateMember (via POST /sessions/:sessionId/members)", () => {
+      describe("when joining the session requires a captcha", () => {
+        describe("and a captcha is provided", () => {
+          it("should reply with a new member", async () => {
+            const session = await sessionFixture.setUp(true); // Require a captcha
+            const captcha = await captchaFixture.setUp();
+
+            const reply = await axios.post(`${session.uri}/members`, {
+              captcha: {
+                token: captcha.token,
+                solution: captcha.solution,
+              },
+            });
+            reply.status.should.equal(201);
+            reply.data.should.have.property("data");
+
+            const data = reply.data.data;
+            data.should.have.property("member");
+
+            const member = data.member;
+            member.should.have.keys(["uri", "id", "secret"]);
+
+            await Promise.all([sessionFixture.tearDown(), captchaFixture.tearDown()]);
+          });
+        });
+
+        describe("and no captcha is provided", () => {
+          it("should reply with status 403", async () => {
+            const session = await sessionFixture.setUp(true); // Require a captcha
+
+            const reply = await axios.post(`${session.uri}/members`);
+            reply.status.should.equal(403);
+
+            await sessionFixture.tearDown();
+          });
+        });
+      });
+
+      describe("when joining the session requires no captcha", () => {
+        it("should reply with a new member", async () => {
+          const session = await sessionFixture.setUp(false); // Do not require a captcha
+
+          const reply = await axios.post(`${session.uri}/members`);
+          reply.status.should.equal(201);
+          reply.data.should.have
+            .property("data")
+            .that.has.property("member")
+            .that.has.property("id");
+
+          const publicId = reply.data.data.member.id;
+          const member = Member.findOneByPublicId(publicId);
+          should.exist(member);
+
+          await sessionFixture.tearDown(); // The member is deleted with the session automatically
+        });
+      });
+    });
+
+    describe("mDeleteMember (via DELETE /sessions/:sessionId/members/:memberId)", () => {
+      describe("with an invalid member id", () => {
+        it("should reply with status 403", async () => {
+          const session = await sessionFixture.setUp();
+
+          const reply = await axios.delete(session.uri + "/members/my-invalid-member-id");
+          reply.status.should.equal(403);
+
+          sessionFixture.tearDown();
+        });
+      });
+
+      describe("with a valid member id", () => {
+        describe("with no or an invalid member secret", () => {
+          it("should reply with status 403", async () => {
+            const member = await memberFixture.setUp();
+
+            let reply = await axios.delete(member.uri);
+            reply.status.should.equal(403);
+            reply = await axios.delete(member.uri + "?memberSecret=anInvalidSecret");
+            reply.status.should.equal(403);
+
+            await memberFixture.tearDown();
+          });
+        });
+
+        describe("with a valid member secret", () => {
+          it("should reply with status 200", async () => {
+            const member = await memberFixture.setUp();
+
+            const reply = await axios.delete(`${member.uri}?memberSecret=${member.secret}`);
+            reply.status.should.equal(200);
+
+            member.reload().should.be.rejectedWith(EntityNotFoundError);
+
+            memberFixture.tearDown();
+          });
         });
       });
     });
