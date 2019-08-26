@@ -4,14 +4,14 @@ import { BaseEntity, BeforeInsert, PrimaryColumn } from "typeorm";
 
 /**
  * An abstract base class for TypeORM entities that expose an `id` primary key column which is a
- * random id string of a specifiable length and alphabet
+ * unique random id string of a specifiable length and alphabet
  */
 export default abstract class RandomIdEntity extends BaseEntity {
   protected static randomIdLength: number = 21;
   protected static randomIdAlphabet: string;
 
   /**
-   * A random id of a specifiable length and alphabet (auto-generated on insert)
+   * A unique random id of a specifiable length and alphabet (auto-generated on insert)
    */
   @PrimaryColumn({ unique: true })
   id: string;

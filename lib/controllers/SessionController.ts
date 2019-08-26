@@ -114,15 +114,17 @@ class SessionController extends Controller {
     });
   };
 
-  private mDeleteSession = async (req: Request, res: Response) => {
-    await req.session!.remove();
+  private mDeleteSession = asyncHandler(async (req: Request, res: Response) => {
+    const session = req.session!;
+    logger.info("Deleting session %s", session.id);
+    await session.remove();
     respond.success(res);
-  };
+  });
 
-  private mGetSessionStatus = async (req: Request, res: Response) => {
+  private mGetSessionStatus = asyncHandler(async (req: Request, res: Response) => {
     const session = req.session!;
     respond.success(res, {}); // TODO add status data
-  };
+  });
 }
 
 export default SessionController;

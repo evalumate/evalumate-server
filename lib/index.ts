@@ -1,16 +1,20 @@
 import App from "./App";
 import CaptchaController from "./controllers/CaptchaController";
-import config from "config";
-import nodeCleanup from "node-cleanup";
+import MemberController from "./controllers/MemberController";
 import SessionController from "./controllers/SessionController";
 import { createLogger } from "./utils/logger";
+import config from "config";
 import { sign } from "crypto";
+import nodeCleanup from "node-cleanup";
 import "reflect-metadata";
 
 const logger = createLogger();
 const port: number = config.get("port");
 
-const app = new App([new CaptchaController(), new SessionController()], port);
+const app = new App(
+  [new CaptchaController(), new SessionController(), new MemberController()],
+  port
+);
 
 // Do not run the app in a test environment as the test script does this for us
 if (process.env.NODE_ENV !== "test") {

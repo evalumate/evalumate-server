@@ -184,8 +184,7 @@ describe("Unit tests", () => {
 
       describe("with an invalid sessionId", () => {
         it("should reply with status 404", async () => {
-          const reply = await axios.get("/api/sessions/non-existing-session");
-          reply.status.should.equal(404);
+          (await axios.get("/api/sessions/non-existing-session")).status.should.equal(404);
         });
       });
     });
@@ -248,13 +247,6 @@ describe("Unit tests", () => {
         const session = await sessionFixture.setUp();
 
         const member = await MemberController.createMember(session);
-        member.should.be.an.instanceOf(Member);
-
-        await sessionFixture.tearDown(); // Also deletes the member
-
-        const session2 = await sessionFixture.setUp();
-
-        const member2 = await MemberController.createMember(session2);
         member.should.be.an.instanceOf(Member);
 
         await sessionFixture.tearDown(); // Also deletes the member
@@ -321,13 +313,13 @@ describe("Unit tests", () => {
 
     describe("mDeleteMember (via DELETE /sessions/:sessionId/members/:memberId)", () => {
       describe("with an invalid member id", () => {
-        it("should reply with status 403", async () => {
+        it("should reply with status 404", async () => {
           const session = await sessionFixture.setUp();
 
           const reply = await axios.delete(session.uri + "/members/my-invalid-member-id");
-          reply.status.should.equal(403);
+          reply.status.should.equal(404);
 
-          sessionFixture.tearDown();
+          await sessionFixture.tearDown();
         });
       });
 
@@ -354,9 +346,29 @@ describe("Unit tests", () => {
 
             member.reload().should.be.rejectedWith(EntityNotFoundError);
 
-            memberFixture.tearDown();
+            await memberFixture.tearDown();
           });
         });
+      });
+    });
+
+    describe("mSetUnderstanding (via PUT /sessions/:sessionId/members/:memberId/status)", () => {
+      it("should modify a member's understanding property in the database", async () => {
+        const member = await memberFixture.setUp();
+        const statusUri = `${member.uri}/status?memberSecret=${member.secret}`;
+
+        let setAndAssertStatus = async (status: boolean) => {
+          const reply = await axios.put(statusUri, { understanding: status });
+          reply.status.should.equal(200);
+          await member.reload();
+          member.understanding.should.equal(status);
+        };
+
+        for (const status of [false, true, true, false]) {
+          await setAndAssertStatus(status);
+        }
+
+        await memberFixture.tearDown();
       });
     });
   });

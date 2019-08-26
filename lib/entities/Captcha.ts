@@ -1,6 +1,6 @@
 import config from "config";
 import { subSeconds } from "date-fns";
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, MoreThan, LessThan } from "typeorm";
+import { BaseEntity, Column, Entity, LessThan, MoreThan, PrimaryGeneratedColumn } from "typeorm";
 
 // TypeORM query operators to check the createdAt field against a given ttl
 export const Alive = (ttl: number) => MoreThan(Date.now() / 1000 - ttl);
@@ -20,12 +20,10 @@ class Captcha extends BaseEntity {
   public solution: string;
 
   /**
-   * A column storing the creation time as a UNIX timestamp
+   * The creation time as a UNIX timestamp
    */
-  @Column({
-    default: () => Date.now() / 1000,
-  })
-  public createdAt: number;
+  @Column({ default: () => Date.now() / 1000 })
+  createdAt: number;
 
   public static findAliveByToken(token: string, ttl: number) {
     return this.findOne({

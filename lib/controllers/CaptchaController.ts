@@ -2,6 +2,7 @@ import * as respond from "../utils/api-respond";
 import Captcha from "../entities/Captcha";
 import config from "config";
 import Controller from "./Controller";
+import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
 import randomstring from "randomstring";
 import svgCaptcha from "svg-captcha";
@@ -57,25 +58,26 @@ class CaptchaController extends Controller {
   };
 
   /**
-   * Given a captcha token and a solution string, returns wether the solution is correct.
-   * @param token The token string that specifies the captcha
+   * Given a captcha token and a solution, throws an appropriate exception if the token or the
+   * solution is incorrect.
+   *
+   * @param token The token string of the captcha
    * @param solution The solution to be validated
    *
    * @throws InvalidCaptchaTokenException if no captcha with the given token and younger than
    * `captcha.ttl` seconds exists.
+   * @throws InvalidCaptchaSolutionException if the provided solution is incorrect.
    */
-  static async validateCaptchaSolution(token: string, solution: string): Promise<boolean> {
+  static async validateCaptchaSolution(token: string, solution: string) {
     logger.debug("Validating captcha solution with token %s", token);
     const captcha = await Captcha.findAliveByToken(token, captchaTtl);
     if (!captcha) {
       throw new InvalidCaptchaTokenException();
     }
-
-    const valid = solution === captcha.solution;
-    if (valid) {
-      await captcha.remove();
+    if (solution !== captcha.solution) {
+      throw new InvalidCaptchaSolutionException();
     }
-    return valid;
+    await captcha.remove();
   }
 
   async shutDown() {

@@ -1,14 +1,14 @@
 import Member from "./Member";
-import PublicIdEntity from "./PublicIdEntity";
+import RandomIdEntity from "./RandomIdEntity";
 import config from "config";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 const sessionIdLength: number = config.get("ids.sessionIdLength");
 
 @Entity()
-export default class Session extends PublicIdEntity {
-  protected static publicIdLength = sessionIdLength;
-  protected static publicIdAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstwxyz"; // No lookalikes
+export default class Session extends RandomIdEntity {
+  protected static randomIdLength = sessionIdLength;
+  protected static randomIdAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstwxyz"; // No lookalikes
 
   @Column()
   name: string;
@@ -32,7 +32,7 @@ export default class Session extends PublicIdEntity {
    * The session's REST API URI or undefined, if the session has no id yet.
    */
   get uri() {
-    if (!this.publicId) return undefined;
-    return `/api/sessions/${this.publicId}`;
+    if (!this.id) return undefined;
+    return `/api/sessions/${this.id}`;
   }
 }
