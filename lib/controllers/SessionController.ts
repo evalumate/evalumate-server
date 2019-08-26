@@ -5,7 +5,6 @@ import config from "config";
 import Controller from "./Controller";
 import CreateSessionDto from "../dtos/CreateSessionDto";
 import generatePassword from "password-generator";
-import HttpException from "../exceptions/HttpException";
 import HttpStatus from "http-status-codes";
 import Session from "../entities/Session";
 import validationMiddleware from "../middlewares/validation";
@@ -51,42 +50,18 @@ class SessionController extends Controller {
     return session;
   }
 
-  static async getSessionByPublicId(publicId: string) {
-    const session = await Session.findOneByPublicId(publicId);
+  static async getSession(id: string) {
+    const session = await Session.findOne(id);
     if (!session) throw new EntityNotFoundException("Session");
     return session;
   }
-
-  private mCreateSession = asyncHandler(async (req: Request, res: Response) => {
-    const requestBody: CreateSessionDto = req.body;
-    const captcha = requestBody.captcha;
-    await CaptchaController.validateCaptchaSolution(captcha.token, captcha.solution);
-
-    const session = await SessionController.createSession(
-      requestBody.sessionName,
-      requestBody.captchaRequired
-    );
-
-    logger.info("Serving new session %s", session.publicId);
-    respond.success(
-      res,
-      {
-        session: {
-          uri: session.uri,
-          id: session.publicId,
-          key: session.key,
-        },
-      },
-      HttpStatus.CREATED
-    );
-  });
 
   /**
    * Tries to load a session with the public id from `req.params.sessionId` and responds with an
    * error on failure. On success, a `Session` object is made available via `req.session`.
    */
   static mLoadSession = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    req.session = await SessionController.getSessionByPublicId(req.params.sessionId);
+    req.session = await SessionController.getSession(req.params.sessionId);
     next();
   });
 
@@ -106,6 +81,30 @@ class SessionController extends Controller {
       next();
     }
   );
+
+  private mCreateSession = asyncHandler(async (req: Request, res: Response) => {
+    const requestBody: CreateSessionDto = req.body;
+    const captcha = requestBody.captcha;
+    await CaptchaController.validateCaptchaSolution(captcha.token, captcha.solution);
+
+    const session = await SessionController.createSession(
+      requestBody.sessionName,
+      requestBody.captchaRequired
+    );
+
+    logger.info("Serving new session %s", session.id);
+    respond.success(
+      res,
+      {
+        session: {
+          uri: session.uri,
+          id: session.id,
+          key: session.key,
+        },
+      },
+      HttpStatus.CREATED
+    );
+  });
 
   private mGetSession = async (req: Request, res: Response) => {
     const session = req.session!;

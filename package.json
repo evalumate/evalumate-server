@@ -48,7 +48,7 @@
     "reflect-metadata": "0.1.13",
     "sqlite3": "4.0.9",
     "svg-captcha": "1.4.0",
-    "typeorm": "0.3.0-alpha.23",
+    "typeorm": "0.2.18",
     "winston": "3.2.1",
     "xxhashjs": "0.2.2"
   },

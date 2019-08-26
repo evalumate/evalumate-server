@@ -159,7 +159,7 @@ describe("Unit tests", () => {
         const session = data.session;
         session.should.have.keys(["uri", "id", "key"]);
 
-        const sessionFromDb = await Session.findOneByPublicId(session.id);
+        const sessionFromDb = await Session.findOne(session.id);
         should.exist(sessionFromDb);
         sessionFromDb.remove();
       });
@@ -310,8 +310,8 @@ describe("Unit tests", () => {
             .that.has.property("member")
             .that.has.property("id");
 
-          const publicId = reply.data.data.member.id;
-          const member = Member.findOneByPublicId(publicId);
+          const id = reply.data.data.member.id;
+          const member = Member.findOne({ id, sessionId: session.id });
           should.exist(member);
 
           await sessionFixture.tearDown(); // The member is deleted with the session automatically
