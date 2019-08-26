@@ -1,14 +1,14 @@
 import Member from "./Member";
 import PublicIdEntity from "./PublicIdEntity";
-import IdHasher from "../utils/IdHasher";
 import config from "config";
 import { Column, Entity, OneToMany } from "typeorm";
 
-const idHasher = new IdHasher("session", config.get("ids.sessionIdLength"));
+const sessionIdLength: number = config.get("ids.sessionIdLength");
 
 @Entity()
 export default class Session extends PublicIdEntity {
-  protected static idHasher = idHasher;
+  protected static publicIdLength = sessionIdLength;
+  protected static publicIdAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstwxyz"; // No lookalikes
 
   @Column()
   name: string;

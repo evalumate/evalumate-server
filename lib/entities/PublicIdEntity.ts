@@ -1,34 +1,54 @@
-import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import IdHasher from "../utils/IdHasher";
+import generateUuid from "nanoid/async";
+import generateUuidWithCustomAlphabet from "nanoid/async/generate";
 import { ObjectType } from "typeorm/common/ObjectType";
-import { AfterInsert, AfterLoad, BaseEntity, PrimaryGeneratedColumn, FindOptions } from "typeorm";
+import {
+  BaseEntity,
+  BeforeInsert,
+  FindOptions,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+} from "typeorm";
 
 /**
- * An abstract base class for TypeORM entities that expose a `publicId` which is generated from the
- * `id` column's value.
+ * An abstract base class for TypeORM entities that expose a `publicId` which is a unique, indexed
+ * random id string of a specifiable length and alphabet
  */
 export default abstract class PublicIdEntity extends BaseEntity {
-  protected static idHasher: IdHasher;
+  protected static publicIdLength: number = 21;
+  protected static publicIdAlphabet: string;
 
   @PrimaryGeneratedColumn()
   id?: number;
 
   /**
-   * The public-facing id (generated from `id` on insert or load)
+   * The public-facing id (auto-generated on insert)
    */
+  @Index()
+  @Column({ unique: true })
   publicId: string;
 
-  @AfterInsert()
-  @AfterLoad()
-  protected generatePublicId() {
-    const idHasher: IdHasher = Object.getPrototypeOf(this).constructor.idHasher;
-    this.publicId = idHasher.encode((this as any).id!);
+  @BeforeInsert()
+  protected async generatePublicId() {
+    const idLength = Object.getPrototypeOf(this).constructor.publicIdLength;
+    const alphabet = Object.getPrototypeOf(this).constructor.publicIdAlphabet;
+
+    do {
+      if (alphabet) {
+        this.publicId = await generateUuidWithCustomAlphabet(alphabet, idLength);
+      } else {
+        this.publicId = await generateUuid(idLength);
+      }
+    } while (await Object.getPrototypeOf(this).constructor.publicIdExists(this.publicId));
   }
 
-  static getIdByPublicId<T extends PublicIdEntity>(this: ObjectType<T>, publicId: string) {
-    const idHasher: IdHasher = (this as any).idHasher;
-    const id = idHasher.decodeSingle(publicId);
-    return id;
+  protected static async publicIdExists<T extends PublicIdEntity>(
+    this: ObjectType<T>,
+    publicId: string
+  ): Promise<Boolean> {
+    const findOptions = { publicId };
+    const count = await (this as any).count(findOptions);
+    return count > 0;
   }
 
   static findOneByPublicId<T extends PublicIdEntity>(
@@ -36,11 +56,9 @@ export default abstract class PublicIdEntity extends BaseEntity {
     publicId: string,
     additionalFindOptions?: FindOptions<T>
   ): Promise<T | undefined> {
-    const id = (this as any).getIdByPublicId(publicId);
-    if (typeof id === "undefined") {
-      throw new EntityNotFoundException((this as any).name);
-    }
-    const findOptions = additionalFindOptions ? { id, ...additionalFindOptions } : { id };
+    const findOptions = additionalFindOptions
+      ? { publicId, ...additionalFindOptions }
+      : { publicId };
     return (this as any).findOne(findOptions);
   }
 }
