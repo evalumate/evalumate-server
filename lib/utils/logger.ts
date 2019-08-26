@@ -20,9 +20,9 @@ const options: LoggerOptions = {
   defaultMeta: { service: "evalumate" },
   transports: [
     new transports.File({
-      level: config.get("logLevel"),
-      filename: config.get("logDir") + "/app.log",
-      handleExceptions: true,
+      level: config.get("logging.level"),
+      filename: config.get("logging.directory") + "/app.log",
+      handleExceptions: config.get("logging.handleExceptions"),
       maxsize: 5242880, //5MB
       maxFiles: 5,
     }),

@@ -1,3 +1,6 @@
 {
-  "logLevel": "debug"
+  "logging": {
+    "level": "debug",
+    "handleExceptions": false
+  }
 }

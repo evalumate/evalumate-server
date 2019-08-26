@@ -1,7 +1,10 @@
 {
   "port": 3000,
-  "logDir": "logs",
-  "logLevel": "info",
+  "logging": {
+    "directory": "logs",
+    "level": "info",
+    "handleExceptions": true
+  },
   "database": {
     "type": "sqlite",
     "database": "db.sqlite",
@@ -13,10 +16,10 @@
     "deleteExpiredInterval": 120
   },
   "ids": {
-    "length": 4,
     "hashSalt": null,
     "sessionIdLength": 4,
-    "userIdLength": 8
+    "memberIdLength": 8
   },
-  "sessionKeyLength": 10
+  "sessionKeyLength": 10,
+  "memberSecretLength": 32
 }
