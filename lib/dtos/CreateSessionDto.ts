@@ -1,17 +1,8 @@
-import { IsString, ValidateNested, IsDefined, IsBoolean } from "class-validator";
+import CaptchaDto from "./CaptchaDto";
+import { IsBoolean, IsDefined, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
-class CaptchaDto {
-  @IsString()
-  @IsDefined()
-  solution: string;
-
-  @IsString()
-  @IsDefined()
-  token: string;
-}
-
-export class CreateSessionDto {
+export default class CreateSessionDto {
   @ValidateNested()
   @IsDefined()
   @Type(() => CaptchaDto)
