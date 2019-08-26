@@ -8,11 +8,7 @@
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/nodemon",
       "args": ["${workspaceRoot}/lib/index.ts"],
-      "runtimeArgs": [
-        "--nolazy",
-        "--require",
-        "${workspaceRoot}/babel-register.js"
-      ],
+      "runtimeArgs": ["--nolazy", "--require", "${workspaceRoot}/babel-register.js"],
       "restart": true,
       "protocol": "inspector",
       "sourceMaps": true,
@@ -44,7 +40,8 @@
       ],
       "runtimeArgs": ["--nolazy"],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true
     }
   ]
 }
