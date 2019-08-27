@@ -9,6 +9,8 @@ import {
   Repository,
 } from "typeorm";
 
+const badWordFilter = new (require("bad-words") as any)();
+
 /**
  * An abstract base class for TypeORM entities that expose an `id` primary key column which is a
  * unique random id string of a specifiable length and alphabet
@@ -16,6 +18,7 @@ import {
 export default abstract class RandomIdEntity extends BaseEntity {
   protected static randomIdLength: number = 21;
   protected static randomIdAlphabet: string;
+  protected static randomIdNoBadWords: boolean = false;
 
   /**
    * A unique random id of a specifiable length and alphabet (auto-generated on insert)
@@ -24,15 +27,18 @@ export default abstract class RandomIdEntity extends BaseEntity {
   id: string;
 
   @BeforeInsert()
-  protected async generatePublicId() {
+  protected async generateId() {
     const length = Object.getPrototypeOf(this).constructor.randomIdLength;
     const alphabet = Object.getPrototypeOf(this).constructor.randomIdAlphabet;
+    const noBadWords = Object.getPrototypeOf(this).constructor.randomIdNoBadWords;
 
-    if (alphabet) {
-      this.id = await generateUuidWithCustomAlphabet(alphabet, length);
-    } else {
-      this.id = await generateUuid(length);
-    }
+    do {
+      if (alphabet) {
+        this.id = await generateUuidWithCustomAlphabet(alphabet, length);
+      } else {
+        this.id = await generateUuid(length);
+      }
+    } while (noBadWords && badWordFilter.isProfane(this.id));
   }
 
   save(options?: SaveOptions): Promise<this> {
@@ -51,10 +57,10 @@ export default abstract class RandomIdEntity extends BaseEntity {
       }
     };
 
-    return saveWithRetry(3); // On duplicate ids, regenerate the id up to three times before failing
+    return saveWithRetry(5); // On duplicate ids, regenerate the id up to 5 times before failing
   }
 
-  protected async idExists(id: string): Promise<Boolean> {
+  async idExists(id: string): Promise<Boolean> {
     return (await Object.getPrototypeOf(this).constructor.count({ id })) > 0;
   }
 }
