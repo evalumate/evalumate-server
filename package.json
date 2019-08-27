@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "NODE_ENV=development nodemon lib/index.ts --exec babel-node --extensions \".ts\"",
-    "build": "babel lib -d dist --extensions \".ts\"",
-    "serve": "NODE_ENV=production node dist/index.js",
+    "build": "babel lib -d dist-node --extensions \".ts\"",
+    "serve": "NODE_ENV=production dist-node node-dist/index.js",
     "check-types": "tsc",
     "test": "NODE_ENV=test mocha --timeout 15000 --require babel-register.js test/*.ts",
     "generate-migration": "typeorm migration:generate"
