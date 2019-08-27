@@ -1,5 +1,6 @@
 import RandomIdEntity from "./RandomIdEntity";
 import Session from "./Session";
+import { getUnixTimestamp } from "../utils/time";
 import { Column, Entity, Index, ManyToOne, PrimaryColumn } from "typeorm";
 
 /**
@@ -29,10 +30,10 @@ export default class Member extends RandomIdEntity {
   /**
    * The creation time as a UNIX timestamp
    */
-  @Column({ default: () => Date.now() / 1000 })
+  @Column("int", { default: getUnixTimestamp })
   createdAt: number;
 
-  protected async idExists(id: string): Promise<Boolean> {
+  async idExists(id: string): Promise<Boolean> {
     return (await Member.count({ id, sessionId: this.sessionId })) > 0;
   }
 

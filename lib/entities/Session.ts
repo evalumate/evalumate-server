@@ -1,7 +1,8 @@
 import Member from "./Member";
 import RandomIdEntity from "./RandomIdEntity";
+import { getUnixTimestamp } from "../utils/time";
 import config from "config";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 
 const sessionIdLength: number = config.get("ids.sessionIdLength");
 
@@ -9,6 +10,7 @@ const sessionIdLength: number = config.get("ids.sessionIdLength");
 export default class Session extends RandomIdEntity {
   protected static randomIdLength = sessionIdLength;
   protected static randomIdAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstwxyz"; // No lookalikes
+  protected static randomIdNoBadWords = true;
 
   @Column()
   name: string;
@@ -25,7 +27,7 @@ export default class Session extends RandomIdEntity {
   /**
    * The creation time as a UNIX timestamp
    */
-  @Column({ default: () => Date.now() / 1000 })
+  @Column("int", { default: getUnixTimestamp })
   createdAt: number;
 
   /**

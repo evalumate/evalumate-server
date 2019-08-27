@@ -1,9 +1,10 @@
-import { BaseEntity, Column, Entity, LessThan, MoreThan, PrimaryGeneratedColumn } from "typeorm";
 import RandomIdEntity from "./RandomIdEntity";
+import { getUnixTimestamp } from "../utils/time";
+import { Column, Entity, LessThan, MoreThan } from "typeorm";
 
 // TypeORM query operators to check the createdAt field against a given ttl
-export const Alive = (ttl: number) => MoreThan(Date.now() / 1000 - ttl);
-export const Expired = (ttl: number) => LessThan(Date.now() / 1000 - ttl);
+export const Alive = (ttl: number) => MoreThan(getUnixTimestamp() - ttl);
+export const Expired = (ttl: number) => LessThan(getUnixTimestamp() - ttl);
 
 @Entity()
 class Captcha extends RandomIdEntity {
@@ -13,7 +14,7 @@ class Captcha extends RandomIdEntity {
   /**
    * The creation time as a UNIX timestamp
    */
-  @Column({ default: () => Date.now() / 1000 })
+  @Column("int", { default: getUnixTimestamp })
   createdAt: number;
 
   public static findAliveById(id: string, ttl: number) {
@@ -27,11 +28,7 @@ class Captcha extends RandomIdEntity {
    * @param ttl The time to live for a captcha in seconds
    */
   public static deleteExpired(ttl: number) {
-    return Captcha.createQueryBuilder()
-      .delete()
-      .from(Captcha)
-      .where(Expired(ttl))
-      .execute();
+    return Captcha.getRepository().delete({ createdAt: Expired(ttl) });
   }
 
   /**
