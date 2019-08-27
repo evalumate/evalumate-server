@@ -39,7 +39,6 @@ class CaptchaController extends Controller {
     const captcha = new Captcha();
     captcha.image = generatedCaptcha.data;
     captcha.solution = generatedCaptcha.text;
-    captcha.token = randomstring.generate({ length: 32 });
 
     await captcha.save();
     return captcha;
@@ -48,29 +47,29 @@ class CaptchaController extends Controller {
   private mGetNewCaptcha = async (req: Request, res: Response) => {
     const captcha = await CaptchaController.createCaptcha();
 
-    logger.debug("Serving captcha with token %s", captcha.token);
+    logger.debug("Serving captcha with token %s", captcha.id);
     respond.success(res, {
       captcha: {
         image: captcha.image,
-        token: captcha.token,
+        token: captcha.id,
       },
     });
   };
 
   /**
-   * Given a captcha token and a solution, throws an appropriate exception if the token or the
-   * solution is incorrect.
+   * Given a captcha id and a solution, throws an appropriate exception if the id or the solution is
+   * invalid.
    *
-   * @param token The token string of the captcha
+   * @param id The captcha's id
    * @param solution The solution to be validated
    *
-   * @throws InvalidCaptchaTokenException if no captcha with the given token and younger than
-   * `captcha.ttl` seconds exists.
+   * @throws InvalidCaptchaTokenException if no captcha with the given id and younger than
+   * `captchas.ttl` (config option) seconds exists.
    * @throws InvalidCaptchaSolutionException if the provided solution is incorrect.
    */
-  static async validateCaptchaSolution(token: string, solution: string) {
-    logger.debug("Validating captcha solution with token %s", token);
-    const captcha = await Captcha.findAliveByToken(token, captchaTtl);
+  static async validateCaptchaSolution(id: string, solution: string) {
+    logger.debug("Validating captcha solution with token %s", id);
+    const captcha = await Captcha.findAliveById(id, captchaTtl);
     if (!captcha) {
       throw new InvalidCaptchaTokenException();
     }

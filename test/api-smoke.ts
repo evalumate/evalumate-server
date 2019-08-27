@@ -34,7 +34,7 @@ describe("Smoke test", () => {
 
         describe("The captcha token", () => {
           step("should have an entry in the database", async () => {
-            const captcha = await Captcha.findOne({ token: captchaToken });
+            const captcha = await Captcha.findOne({ id: captchaToken });
             should.exist(captcha);
             captchaSolution = captcha.solution;
           });

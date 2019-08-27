@@ -67,7 +67,7 @@ describe("Unit tests", () => {
           .that.has.keys("image", "token");
 
         // The captcha should be in the database
-        const captchaFromDb = await Captcha.findOne({ token: reply.data.data.captcha.token });
+        const captchaFromDb = await Captcha.findOne({ id: reply.data.data.captcha.token });
         should.exist(captchaFromDb);
         await captchaFromDb.remove();
       });
@@ -76,7 +76,7 @@ describe("Unit tests", () => {
     describe("validateCaptchaSolution", () => {
       it("should successfully validate a created captcha's solution", async () => {
         const captcha = await captchaFixture.setUp();
-        CaptchaController.validateCaptchaSolution(captcha.token, captcha.solution).should.not.be
+        CaptchaController.validateCaptchaSolution(captcha.id, captcha.solution).should.not.be
           .rejected;
         await captchaFixture.tearDown();
       });
@@ -84,7 +84,7 @@ describe("Unit tests", () => {
       it("should throw InvalidCaptchaSolutionException with a wrong solution", async () => {
         const captcha = await captchaFixture.setUp();
         CaptchaController.validateCaptchaSolution(
-          captcha.token,
+          captcha.id,
           "my not-so-right solution"
         ).should.be.rejectedWith(InvalidCaptchaSolutionException);
         await captchaFixture.tearDown();
@@ -103,15 +103,15 @@ describe("Unit tests", () => {
     describe("findAliveByToken", () => {
       it("should return a captcha by its token", async () => {
         const captcha = await captchaFixture.setUp();
-        const captchaFromDb = await Captcha.findAliveByToken(captcha.token, 120);
-        captchaFromDb.should.be.an.instanceOf(Captcha);
+        const captchaFromDb = await Captcha.findAliveById(captcha.id, 120);
+        should.exist(captchaFromDb);
         await captchaFixture.tearDown();
       });
 
       it("should respect the time to live parameter", async () => {
         const captcha = await captchaFixture.setUp();
         await sleep(200);
-        const captchaFromDb = await Captcha.findAliveByToken(captcha.token, 0.1);
+        const captchaFromDb = await Captcha.findAliveById(captcha.id, 0.1);
         should.not.exist(captchaFromDb);
       });
     });
@@ -121,10 +121,14 @@ describe("Unit tests", () => {
         const captcha = await captchaFixture.setUp();
         await sleep(200);
         await Captcha.deleteExpired(0.1);
-        const captchaFromDb = await Captcha.findOne({
-          token: captcha.token,
-        });
-        should.not.exist(captchaFromDb);
+        captcha.reload().should.be.rejectedWith(EntityNotFoundError);
+      });
+
+      it("should not delete a living captcha", async () => {
+        const captcha = await captchaFixture.setUp();
+        await sleep(50);
+        await Captcha.deleteExpired(0.1);
+        captcha.reload().should.not.be.rejected;
       });
     });
   });
@@ -144,7 +148,7 @@ describe("Unit tests", () => {
 
         const reply = await axios.post("/api/sessions", {
           captcha: {
-            token: captcha.token,
+            token: captcha.id,
             solution: captcha.solution,
           },
           sessionName: "Another session name",
@@ -262,7 +266,7 @@ describe("Unit tests", () => {
 
             const reply = await axios.post(`${session.uri}/members`, {
               captcha: {
-                token: captcha.token,
+                token: captcha.id,
                 solution: captcha.solution,
               },
             });
