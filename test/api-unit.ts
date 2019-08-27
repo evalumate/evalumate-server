@@ -7,10 +7,10 @@ import Member from "../lib/entities/Member";
 import Session from "../lib/entities/Session";
 import InvalidCaptchaSolutionException from "../lib/exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
-import sleep from "await-sleep";
 import axios from "axios";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
+import delay from "delay";
 import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
 
 const should = chai.should();
@@ -48,6 +48,78 @@ describe("Unit tests", () => {
     });
   });
 
+  describe("RandomIdEntity", () => {
+    describe("save() on a subclass with a small id range", () => {
+      it("should fail at the latest when all ids are taken", async () => {
+        // Temporarily modifying the Captcha class to use a tiny id range
+        const initialRandomIdLength = Captcha["randomIdLength"];
+        const initialRandomIdAlphabet = Captcha["randomIdAlphabet"];
+        Captcha["randomIdLength"] = 1;
+        Captcha["randomIdAlphabet"] = "ab";
+
+        async function createCaptcha() {
+          const captcha = new Captcha();
+          captcha.solution = "solution";
+          await captcha.save();
+          return captcha;
+        }
+
+        const captcha1 = await createCaptcha();
+        captcha1.id.should.be.oneOf(["a", "b"]);
+
+        let captcha2: Captcha;
+        while (!captcha2) {
+          try {
+            captcha2 = await createCaptcha();
+            captcha2.id.should.be.oneOf(["a", "b"]).and.not.equal(captcha1.id);
+          } catch (error) {}
+        }
+        await createCaptcha().should.be.rejected;
+
+        await captcha1.remove();
+        await captcha2.remove();
+
+        // Restore Captcha id range
+        Captcha["randomIdLength"] = initialRandomIdLength;
+        Captcha["randomIdAlphabet"] = initialRandomIdAlphabet;
+      });
+    });
+  });
+
+  describe("Captcha", () => {
+    describe("findAliveByToken", () => {
+      it("should return a captcha by its token", async () => {
+        const captcha = await captchaFixture.setUp();
+        const captchaFromDb = await Captcha.findAliveById(captcha.id, 120);
+        should.exist(captchaFromDb);
+        await captchaFixture.tearDown();
+      });
+
+      it("should respect the time to live parameter", async () => {
+        const captcha = await captchaFixture.setUp();
+        await delay(200);
+        const captchaFromDb = await Captcha.findAliveById(captcha.id, 0.1);
+        should.not.exist(captchaFromDb);
+      });
+    });
+
+    describe("deleteExpired", () => {
+      it("should delete an expired captcha", async () => {
+        const captcha = await captchaFixture.setUp();
+        await delay(200);
+        await Captcha.deleteExpired(0.1);
+        return captcha.reload().should.be.rejectedWith(EntityNotFoundError);
+      });
+
+      it("should not delete a living captcha", async () => {
+        const captcha = await captchaFixture.setUp();
+        await Captcha.deleteExpired(1);
+        await captcha.reload().should.not.be.rejected;
+        await captchaFixture.tearDown();
+      });
+    });
+  });
+
   describe("CaptchaController", () => {
     describe("createCaptcha", () => {
       it("should return a captcha object", async () => {
@@ -76,14 +148,14 @@ describe("Unit tests", () => {
     describe("validateCaptchaSolution", () => {
       it("should successfully validate a created captcha's solution", async () => {
         const captcha = await captchaFixture.setUp();
-        CaptchaController.validateCaptchaSolution(captcha.id, captcha.solution).should.not.be
+        await CaptchaController.validateCaptchaSolution(captcha.id, captcha.solution).should.not.be
           .rejected;
         await captchaFixture.tearDown();
       });
 
       it("should throw InvalidCaptchaSolutionException with a wrong solution", async () => {
         const captcha = await captchaFixture.setUp();
-        CaptchaController.validateCaptchaSolution(
+        await CaptchaController.validateCaptchaSolution(
           captcha.id,
           "my not-so-right solution"
         ).should.be.rejectedWith(InvalidCaptchaSolutionException);
@@ -91,44 +163,10 @@ describe("Unit tests", () => {
       });
 
       it("should throw InvalidCaptchaTokenException with an invalid token", async () => {
-        CaptchaController.validateCaptchaSolution(
+        await CaptchaController.validateCaptchaSolution(
           "an invalid token",
           "my probably right solution"
         ).should.be.rejectedWith(InvalidCaptchaTokenException);
-      });
-    });
-  });
-
-  describe("Captcha", () => {
-    describe("findAliveByToken", () => {
-      it("should return a captcha by its token", async () => {
-        const captcha = await captchaFixture.setUp();
-        const captchaFromDb = await Captcha.findAliveById(captcha.id, 120);
-        should.exist(captchaFromDb);
-        await captchaFixture.tearDown();
-      });
-
-      it("should respect the time to live parameter", async () => {
-        const captcha = await captchaFixture.setUp();
-        await sleep(200);
-        const captchaFromDb = await Captcha.findAliveById(captcha.id, 0.1);
-        should.not.exist(captchaFromDb);
-      });
-    });
-
-    describe("deleteExpired", () => {
-      it("should delete an expired captcha", async () => {
-        const captcha = await captchaFixture.setUp();
-        await sleep(200);
-        await Captcha.deleteExpired(0.1);
-        captcha.reload().should.be.rejectedWith(EntityNotFoundError);
-      });
-
-      it("should not delete a living captcha", async () => {
-        const captcha = await captchaFixture.setUp();
-        await sleep(50);
-        await Captcha.deleteExpired(0.1);
-        captcha.reload().should.not.be.rejected;
       });
     });
   });
@@ -211,7 +249,7 @@ describe("Unit tests", () => {
 
           const reply = await axios.delete(session.uri + "?sessionKey=" + session.key);
           reply.status.should.equal(200);
-          session.reload().should.be.rejectedWith(EntityNotFoundError);
+          await session.reload().should.be.rejectedWith(EntityNotFoundError);
 
           await sessionFixture.tearDown();
         });
@@ -348,7 +386,7 @@ describe("Unit tests", () => {
             const reply = await axios.delete(`${member.uri}?memberSecret=${member.secret}`);
             reply.status.should.equal(200);
 
-            member.reload().should.be.rejectedWith(EntityNotFoundError);
+            await member.reload().should.be.rejectedWith(EntityNotFoundError);
 
             await memberFixture.tearDown();
           });
