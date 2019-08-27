@@ -7,7 +7,7 @@
       "name": "Node",
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/nodemon",
-      "args": ["${workspaceRoot}/lib/index.ts"],
+      "args": ["${workspaceRoot}/src/server/index.ts"],
       "runtimeArgs": ["--nolazy", "--require", "${workspaceRoot}/babel-register.js"],
       "restart": true,
       "protocol": "inspector",
@@ -36,7 +36,7 @@
         "--timeout",
         "999999",
         "--colors",
-        "'${workspaceRoot}/test/*.ts'"
+        "'${workspaceRoot}/src/test/*.ts'"
       ],
       "runtimeArgs": ["--nolazy"],
       "console": "integratedTerminal",

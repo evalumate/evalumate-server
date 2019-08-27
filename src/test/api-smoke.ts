@@ -1,5 +1,5 @@
 import axios from "axios";
-import Captcha from "../lib/entities/Captcha";
+import Captcha from "../server/entities/Captcha";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import config from "config";
@@ -36,7 +36,7 @@ describe("Smoke test", () => {
           step("should have an entry in the database", async () => {
             const captcha = await Captcha.findOne({ id: captchaToken });
             should.exist(captcha);
-            captchaSolution = captcha.solution;
+            captchaSolution = captcha!.solution;
           });
         });
       });

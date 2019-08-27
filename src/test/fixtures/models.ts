@@ -1,11 +1,11 @@
 import Fixture from "./Fixture";
-import CaptchaController from "../../lib/controllers/CaptchaController";
-import SessionController from "../../lib/controllers/SessionController";
-import Captcha from "../../lib/entities/Captcha";
-import Session from "../../lib/entities/Session";
+import CaptchaController from "../../server/controllers/CaptchaController";
+import SessionController from "../../server/controllers/SessionController";
+import Captcha from "../../server/entities/Captcha";
+import Session from "../../server/entities/Session";
 import faker from "faker";
-import MemberController from "../../lib/controllers/MemberController";
-import Member from "../../lib/entities/Member";
+import MemberController from "../../server/controllers/MemberController";
+import Member from "../../server/entities/Member";
 
 export class CaptchaFixture extends Fixture<Captcha> {
   private instance: Captcha;
@@ -41,7 +41,7 @@ export class SessionFixture extends Fixture<Session> {
 
 export class MemberFixture extends Fixture<Member> {
   private sessionFixture: SessionFixture;
-  private session: Session;
+  private session?: Session;
   private instances: Member[];
 
   constructor() {

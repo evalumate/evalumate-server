@@ -1,12 +1,12 @@
 import { CaptchaFixture, MemberFixture, SessionFixture } from "./fixtures/models";
-import CaptchaController from "../lib/controllers/CaptchaController";
-import MemberController from "../lib/controllers/MemberController";
-import SessionController from "../lib/controllers/SessionController";
-import Captcha from "../lib/entities/Captcha";
-import Member from "../lib/entities/Member";
-import Session from "../lib/entities/Session";
-import InvalidCaptchaSolutionException from "../lib/exceptions/InvalidCaptchaSolutionException";
-import InvalidCaptchaTokenException from "../lib/exceptions/InvalidCaptchaTokenException";
+import CaptchaController from "../server/controllers/CaptchaController";
+import MemberController from "../server/controllers/MemberController";
+import SessionController from "../server/controllers/SessionController";
+import Captcha from "../server/entities/Captcha";
+import Member from "../server/entities/Member";
+import Session from "../server/entities/Session";
+import InvalidCaptchaSolutionException from "../server/exceptions/InvalidCaptchaSolutionException";
+import InvalidCaptchaTokenException from "../server/exceptions/InvalidCaptchaTokenException";
 import axios from "axios";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -67,7 +67,7 @@ describe("Unit tests", () => {
         const captcha1 = await createCaptcha();
         captcha1.id.should.be.oneOf(["a", "b"]);
 
-        let captcha2: Captcha;
+        let captcha2: Captcha | undefined = undefined;
         while (!captcha2) {
           try {
             captcha2 = await createCaptcha();
@@ -141,7 +141,7 @@ describe("Unit tests", () => {
         // The captcha should be in the database
         const captchaFromDb = await Captcha.findOne({ id: reply.data.data.captcha.token });
         should.exist(captchaFromDb);
-        await captchaFromDb.remove();
+        await captchaFromDb!.remove();
       });
     });
 
@@ -203,7 +203,7 @@ describe("Unit tests", () => {
 
         const sessionFromDb = await Session.findOne(session.id);
         should.exist(sessionFromDb);
-        sessionFromDb.remove();
+        sessionFromDb!.remove();
       });
     });
 
@@ -212,7 +212,7 @@ describe("Unit tests", () => {
         it("should reply with sessionName and captchaRequired", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.uri);
+          const reply = await axios.get(session.uri!);
           reply.status.should.equal(200);
           reply.data.should.have.property("data");
 
@@ -370,7 +370,7 @@ describe("Unit tests", () => {
           it("should reply with status 403", async () => {
             const member = await memberFixture.setUp();
 
-            let reply = await axios.delete(member.uri);
+            let reply = await axios.delete(member.uri!);
             reply.status.should.equal(403);
             reply = await axios.delete(member.uri + "?memberSecret=anInvalidSecret");
             reply.status.should.equal(403);

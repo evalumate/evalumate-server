@@ -19,6 +19,6 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false
   },
-  "include": ["lib"],
-  "files": ["lib/custom-types.d.ts"]
+  "include": ["src"],
+  "files": ["src/server/custom-types.d.ts"]
 }
