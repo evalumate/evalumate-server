@@ -12,8 +12,9 @@ module.exports = {
     filename: "[name].js",
   },
   target: "node",
+  mode: "production",
   resolve: {
-    extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js", ".json"],
+    extensions: [".ts", ".js", ".json"],
   },
   node: {
     // Need this when working with express, otherwise the build fails

@@ -1,5 +1,5 @@
-import React from 'react';
+import React from "react";
 
 export default function App() {
-  return <p>Babel + TypeScript + React = ❤️</p>;
+  return <p>Babel + TypeScript + React + Express + devMiddleware + hotMiddleware = ❤️</p>;
 }

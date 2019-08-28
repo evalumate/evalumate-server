@@ -6,7 +6,7 @@
     "start": "NODE_ENV=development nodemon src/backend/index.ts --exec babel-node --extensions \".ts\"",
     "build-backend": "rm -rf dist/backend && webpack --config webpack.backend.config.js",
     "build-frontend": "rm -rf dist/frontend && webpack --mode=production",
-    "build": "npm run build-frontend && npm run build-backend",
+    "build": "npm run build-backend && npm run build-frontend",
     "serve": "NODE_ENV=production node dist/backend/index.js",
     "check-types": "cd src/backend/ && tsc",
     "test": "NODE_ENV=test mocha --timeout 15000 --require babel-register.js src/test/*.ts",
@@ -75,6 +75,9 @@
     "@types/mocha": "5.2.7",
     "@types/react": "16.9.2",
     "@types/react-dom": "16.9.0",
+    "@types/webpack": "4.39.1",
+    "@types/webpack-dev-middleware": "2.0.3",
+    "@types/webpack-hot-middleware": "2.16.5",
     "axios": "0.19.0",
     "babel-loader": "8.0.6",
     "babel-preset-latest-node": "3.2.1",
@@ -98,6 +101,7 @@
     "webpack": "4.39.3",
     "webpack-cli": "3.3.7",
     "webpack-dev-middleware": "3.7.0",
+    "webpack-hot-middleware": "2.25.0",
     "webpack-node-externals": "1.7.2"
   }
 }

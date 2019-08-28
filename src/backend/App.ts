@@ -4,6 +4,7 @@ import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
 import databaseConfig from "./ormconfig";
 import mainRouter from "./routes";
 import { createLogger, logStream } from "./utils/logger";
+import webpackDevConfig from "../../webpack.dev.config.js";
 import cookieParser from "cookie-parser";
 import express from "express";
 import http from "http";
@@ -11,6 +12,9 @@ import createError from "http-errors";
 import morgan from "morgan";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
+import webpack from "webpack";
+import webpackDevMiddleware from "webpack-dev-middleware";
+import webpackHotMiddleware from "webpack-hot-middleware";
 
 let logger = createLogger(module);
 
@@ -52,6 +56,10 @@ class App implements Destructable {
     this.app.use(morgan("combined", { stream: logStream }));
 
     logger.debug("Initializing middlewares");
+    // Setup webpack-dev-middleware in development
+    if (this.app.get("env") == "development") {
+      this.setupWebpack();
+    }
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
@@ -78,6 +86,20 @@ class App implements Destructable {
     logger.debug("Setting up pug");
     this.app.set("views", path.join(__dirname, "../views"));
     this.app.set("view engine", "pug");
+  }
+
+  private setupWebpack() {
+    const compiler = webpack({
+      ...(webpackDevConfig as webpack.Configuration),
+      mode: "development",
+    });
+
+    this.app.use(
+      webpackDevMiddleware(compiler, {
+        publicPath: webpackDevConfig.output.publicPath,
+      })
+    );
+    this.app.use(webpackHotMiddleware(compiler));
   }
 
   private initializeApiControllers(apiControllers: Controller[]) {
