@@ -2,7 +2,7 @@ import config from "config";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import axios from "axios";
-import app from "../server/index";
+import app from "../backend/index";
 
 const should = chai.should();
 chai.use(chaiAsPromised);

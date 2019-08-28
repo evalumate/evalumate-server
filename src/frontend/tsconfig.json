@@ -1,9 +1,10 @@
+// Client-side TypeScript configuration
 {
   "compilerOptions": {
     // Target latest version of ECMAScript.
     "target": "esnext",
     // Search under node_modules for non-relative imports.
-    "moduleResolution": "node",
+    "moduleResolution": "classic",
     // Process & infer types from .js files.
     "allowJs": true,
     // Don't emit; allow Babel to transform files.
@@ -14,11 +15,7 @@
     "isolatedModules": true,
     // Import non-ES modules as default imports.
     "esModuleInterop": true,
-    // For TypeORM:
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "strictPropertyInitialization": false
-  },
-  "include": ["src"],
-  "files": ["src/server/custom-types.d.ts"]
+    // React .tsx files
+    "jsx": "react",
+  }
 }

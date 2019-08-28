@@ -1,16 +1,16 @@
-import * as express from "express";
 import Controller from "./controllers/Controller";
-import cookieParser from "cookie-parser";
-import createError from "http-errors";
-import databaseConfig from "./ormconfig";
 import Destructable from "./interfaces/Destructable";
-import http from "http";
+import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
+import databaseConfig from "./ormconfig";
 import mainRouter from "./routes";
+import { createLogger, logStream } from "./utils/logger";
+import cookieParser from "cookie-parser";
+import express from "express";
+import http from "http";
+import createError from "http-errors";
 import morgan from "morgan";
 import path from "path";
-import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
 import { Connection, createConnection } from "typeorm";
-import { createLogger, logStream } from "./utils/logger";
 
 let logger = createLogger(module);
 
@@ -21,14 +21,20 @@ class App implements Destructable {
 
   private dbConnection: Connection;
   private apiControllers: Controller[];
+  private staticFilesPath: string;
 
   constructor(apiControllers: Controller[], port: number) {
     this.port = port;
 
     logger.info("Initializing App");
 
-    this.app = express.default();
+    this.app = express();
     this.app.set("port", this.port);
+
+    this.staticFilesPath = path.join(
+      __dirname,
+      `../${this.app.get("env") !== "production" ? "../dist/" : ""}frontend`
+    );
 
     this.setupViewEngine();
     this.initializeMiddlewares();
@@ -49,7 +55,7 @@ class App implements Destructable {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
-    this.app.use(express.static(path.join(__dirname, "../public")));
+    this.app.use(express.static(this.staticFilesPath));
   }
 
   private initializeRoutes() {

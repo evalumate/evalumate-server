@@ -1,11 +1,11 @@
 import Fixture from "./Fixture";
-import CaptchaController from "../../server/controllers/CaptchaController";
-import SessionController from "../../server/controllers/SessionController";
-import Captcha from "../../server/entities/Captcha";
-import Session from "../../server/entities/Session";
+import CaptchaController from "../../backend/controllers/CaptchaController";
+import SessionController from "../../backend/controllers/SessionController";
+import Captcha from "../../backend/entities/Captcha";
+import Session from "../../backend/entities/Session";
 import faker from "faker";
-import MemberController from "../../server/controllers/MemberController";
-import Member from "../../server/entities/Member";
+import MemberController from "../../backend/controllers/MemberController";
+import Member from "../../backend/entities/Member";
 
 export class CaptchaFixture extends Fixture<Captcha> {
   private instance: Captcha;
