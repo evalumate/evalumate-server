@@ -35,17 +35,6 @@ module.exports = {
         loader: "babel-loader",
       },
       {
-        // Loads the JavaScript into html template provided.
-        // Entry point is set below in HtmlWebPackPlugin in Plugins
-        test: /\.html$/,
-        use: [
-          {
-            loader: "html-loader",
-            options: { minimize: true },
-          },
-        ],
-      },
-      {
         // Loads images into CSS and Javascript files
         test: /\.jpg$/,
         use: [{ loader: "url-loader" }],
@@ -54,7 +43,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: "./src/frontend/html/index.html",
+      title: "EvaluMate",
+      template: "!!prerender-loader?string!./src/frontend/html/index.html",
       filename: "./index.html",
       excludeChunks: ["server"],
     }),
