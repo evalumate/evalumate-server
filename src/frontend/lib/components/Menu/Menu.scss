@@ -1,0 +1,31 @@
+@import "../../settings";
+@import "~foundation-sites/scss/foundation.scss";
+
+div.title-bar {
+  background-color: darken($dark-green, 10);
+
+  .title-bar-title {
+    padding-left: 0.5rem;
+
+    &:after {
+      content: "EvaluMate";
+    }
+  }
+}
+
+div.top-bar {
+  background-color: $dark-green;
+  color: $white;
+
+  .top-bar-title {
+    @include show-for(medium);
+  }
+}
+
+ul.main-menu {
+  background-color: transparent;
+
+  a {
+    color: $white;
+  }
+}

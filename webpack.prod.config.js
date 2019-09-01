@@ -28,11 +28,25 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.scss$/, use: ["style-loader", "css-loader", "sass-loader"] },
+      {
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
       {
         test: [/\.jsx?$/, /\.tsx?$/],
         exclude: /node_modules/,
         loader: "babel-loader",
+      },
+      {
+        test: /\.html$/,
+        use: [
+          {
+            loader: "html-loader",
+            options: {
+              minimize: true,
+            },
+          },
+        ],
       },
       {
         // Loads images into CSS and Javascript files
@@ -43,7 +57,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      title: "EvaluMate",
       template: "!!prerender-loader?string!./src/frontend/html/index.html",
       filename: "./index.html",
       excludeChunks: ["server"],
