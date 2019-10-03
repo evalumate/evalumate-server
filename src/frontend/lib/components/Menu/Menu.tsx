@@ -1,26 +1,28 @@
 import "./Menu.scss";
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Menu as FoundationMenu,
   MenuItem,
   ResponsiveNavigation,
-  TitleBarTitle,
   TopBarTitle,
 } from "react-foundation";
 
 export default function() {
   return (
     <ResponsiveNavigation>
-      <TopBarTitle>EvaluMate</TopBarTitle>
+      <TopBarTitle>
+        <Link to="/">EvaluMate</Link>
+      </TopBarTitle>
       <FoundationMenu className="vertical medium-horizontal main-menu">
         <MenuItem>
-          <a>Join Session</a>
+          <Link to="/client">Join Session</Link>
         </MenuItem>
         <MenuItem>
-          <a>Create Session</a>
+          <Link to="/master">Create Session</Link>
         </MenuItem>
         <MenuItem>
-          <a>About</a>
+          <Link to="/about">About</Link>
         </MenuItem>
       </FoundationMenu>
     </ResponsiveNavigation>

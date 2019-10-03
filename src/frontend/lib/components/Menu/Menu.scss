@@ -2,10 +2,10 @@
 @import "~foundation-sites/scss/foundation.scss";
 
 div.title-bar {
-  background-color: darken($dark-green, 10);
+  background-color: $dark-green;
 
   .title-bar-title {
-    padding-left: 0.5rem;
+    padding-left: 0.25rem;
 
     &:after {
       content: "EvaluMate";
@@ -15,10 +15,16 @@ div.title-bar {
 
 div.top-bar {
   background-color: $dark-green;
-  color: $white;
 
   .top-bar-title {
+    a {
+      color: $white;
+    }
     @include show-for(medium);
+  }
+
+  @include breakpoint(small only) {
+    background-color: lighten($dark-green, 5);
   }
 }
 

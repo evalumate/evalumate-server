@@ -4,7 +4,7 @@
     // Target latest version of ECMAScript.
     "target": "esnext",
     // Search under node_modules for non-relative imports.
-    "moduleResolution": "classic",
+    "moduleResolution": "node",
     // Process & infer types from .js files.
     "allowJs": true,
     // Don't emit; allow Babel to transform files.
@@ -16,6 +16,6 @@
     // Import non-ES modules as default imports.
     "esModuleInterop": true,
     // React .tsx files
-    "jsx": "react",
+    "jsx": "react"
   }
 }

@@ -9,6 +9,10 @@ chai.use(chaiAsPromised);
 
 axios.defaults.baseURL = "http://127.0.0.1:" + config.get("port");
 
+axios.defaults.validateStatus = (status: number) => {
+  return true; // Do not throw errors on HTTP error statuses
+};
+
 before(() => {
   return app.run();
 });

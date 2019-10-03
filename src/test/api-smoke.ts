@@ -8,10 +8,6 @@ import { step } from "mocha-steps";
 const should = chai.should();
 chai.use(chaiAsPromised);
 
-axios.defaults.validateStatus = (status: number) => {
-  return true; // Do not throw errors on HTTP error statuses
-};
-
 // Variables to store captcha details for session creation
 let captchaToken: string, captchaSolution: string;
 

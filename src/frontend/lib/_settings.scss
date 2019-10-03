@@ -65,6 +65,8 @@
 // Colors
 $green: #4caf50;
 $dark-green: darken($green, 14);
+$medium-green: darken($green, 10);
+$light-green: lighten($green, 15);
 
 // 1. Global
 // ---------
@@ -84,7 +86,7 @@ $medium-gray: #cacaca;
 $dark-gray: #8a8a8a;
 $black: #0a0a0a;
 $white: #fefefe;
-$body-background: $green;
+$body-background: $light-green;
 $body-font-color: $black;
 $body-font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 $body-antialiased: true;
@@ -456,7 +458,7 @@ $select-background: $white;
 $select-triangle-color: $dark-gray;
 $select-radius: $global-radius;
 $input-color: $black;
-$input-placeholder-color: $medium-gray;
+$input-placeholder-color: $dark-gray;
 $input-font-family: inherit;
 $input-font-size: rem-calc(16);
 $input-font-weight: $global-weight-normal;
@@ -478,7 +480,7 @@ $form-button-radius: $global-radius;
 // 21. Label
 // ---------
 
-$label-background: $primary-color;
+$label-background: transparent;
 $label-color: $white;
 $label-color-alt: $black;
 $label-palette: $foundation-palette;

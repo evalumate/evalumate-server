@@ -25,7 +25,11 @@ class App implements Destructable {
 
   private dbConnection: Connection;
   private apiControllers: Controller[];
-  private staticFilesPath: string;
+
+  static staticFilesPath = path.join(
+    __dirname,
+    `../${process.env.NODE_ENV !== "production" ? "../dist/" : ""}frontend`
+  );
 
   constructor(apiControllers: Controller[], port: number) {
     this.port = port;
@@ -35,12 +39,6 @@ class App implements Destructable {
     this.app = express();
     this.app.set("port", this.port);
 
-    this.staticFilesPath = path.join(
-      __dirname,
-      `../${this.app.get("env") !== "production" ? "../dist/" : ""}frontend`
-    );
-
-    this.setupViewEngine();
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeApiControllers(apiControllers);
@@ -63,7 +61,7 @@ class App implements Destructable {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
-    this.app.use(express.static(this.staticFilesPath));
+    this.app.use(express.static(App.staticFilesPath));
   }
 
   private initializeRoutes() {
@@ -80,12 +78,6 @@ class App implements Destructable {
     // Error middlewares
     this.app.use("/api", apiErrorHandler);
     this.app.use(frontendErrorHandler);
-  }
-
-  private setupViewEngine() {
-    logger.debug("Setting up pug");
-    this.app.set("views", path.join(__dirname, "../views"));
-    this.app.set("view engine", "pug");
   }
 
   private setupWebpack() {
