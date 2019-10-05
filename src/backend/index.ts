@@ -4,7 +4,6 @@ import MemberController from "./controllers/MemberController";
 import SessionController from "./controllers/SessionController";
 import { createLogger } from "./utils/logger";
 import config from "config";
-import { sign } from "crypto";
 import nodeCleanup from "node-cleanup";
 import "reflect-metadata";
 

@@ -4,32 +4,30 @@ import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
 import databaseConfig from "./ormconfig";
 import mainRouter from "./routes";
 import { createLogger, logStream } from "./utils/logger";
-import webpackDevConfig from "../../webpack.dev.config.js";
-import cookieParser from "cookie-parser";
 import express from "express";
 import http from "http";
 import createError from "http-errors";
 import morgan from "morgan";
+import nextJs from "next";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
-import webpack from "webpack";
-import webpackDevMiddleware from "webpack-dev-middleware";
-import webpackHotMiddleware from "webpack-hot-middleware";
 
-let logger = createLogger(module);
+const dev = process.env.NODE_ENV !== "production";
+
+const logger = createLogger(module);
 
 class App implements Destructable {
   public app: express.Application;
   public port: number;
   public server: http.Server;
 
+  static nextJsApp = nextJs({
+    dev,
+    dir: path.join(__dirname, `../${!dev ? "../src/" : ""}frontend`),
+  });
+
   private dbConnection: Connection;
   private apiControllers: Controller[];
-
-  static staticFilesPath = path.join(
-    __dirname,
-    `../${process.env.NODE_ENV !== "production" ? "../dist/" : ""}frontend`
-  );
 
   constructor(apiControllers: Controller[], port: number) {
     this.port = port;
@@ -43,6 +41,7 @@ class App implements Destructable {
     this.initializeRoutes();
     this.initializeApiControllers(apiControllers);
     this.initializeErrorHandling();
+    this.initializeNextJsRequestHandling();
 
     // Create HTTP server
     logger.debug("Creating HTTP server");
@@ -54,44 +53,13 @@ class App implements Destructable {
     this.app.use(morgan("combined", { stream: logStream }));
 
     logger.debug("Initializing middlewares");
-    // Setup webpack-dev-middleware in development
-    if (this.app.get("env") == "development") {
-      this.setupWebpack();
-    }
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
-    this.app.use(cookieParser());
-    this.app.use(express.static(App.staticFilesPath));
   }
 
   private initializeRoutes() {
     logger.debug("Initializing routes");
     this.app.use(mainRouter);
-  }
-
-  private initializeErrorHandling() {
-    // Create Error 404 if no previously added middleware has responded
-    this.app.use((req, res, next) => {
-      next(createError(404));
-    });
-
-    // Error middlewares
-    this.app.use("/api", apiErrorHandler);
-    this.app.use(frontendErrorHandler);
-  }
-
-  private setupWebpack() {
-    const compiler = webpack({
-      ...(webpackDevConfig as webpack.Configuration),
-      mode: "development",
-    });
-
-    this.app.use(
-      webpackDevMiddleware(compiler, {
-        publicPath: webpackDevConfig.output.publicPath,
-      })
-    );
-    this.app.use(webpackHotMiddleware(compiler));
   }
 
   private initializeApiControllers(apiControllers: Controller[]) {
@@ -102,6 +70,25 @@ class App implements Destructable {
     });
   }
 
+  private initializeErrorHandling() {
+    // Create Error 404 if no previously added middleware has responded to an API route
+    this.app.use("/api", (req, res, next) => {
+      next(createError(404));
+    });
+
+    // Error middlewares
+    this.app.use("/api", apiErrorHandler);
+    this.app.use(frontendErrorHandler);
+  }
+
+  private initializeNextJsRequestHandling() {
+    // Make Next.js handle the frontend
+    const requestHandler = App.nextJsApp.getRequestHandler();
+    this.app.use((req, res) => {
+      return requestHandler(req, res);
+    });
+  }
+
   private destructApiControllers() {
     logger.debug("Shutting down API controllers");
     return Promise.all(
@@ -109,6 +96,11 @@ class App implements Destructable {
         controller.shutDown();
       })
     );
+  }
+
+  private async prepareNextJsApp() {
+    logger.debug("Preparing Next.js app");
+    return App.nextJsApp.prepare();
   }
 
   private async connectToDatabase() {
@@ -173,6 +165,7 @@ class App implements Destructable {
   }
 
   public async run() {
+    await this.prepareNextJsApp();
     await this.connectToDatabase();
     await this.listen();
   }

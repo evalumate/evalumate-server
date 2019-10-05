@@ -1,6 +1,6 @@
 import { success as respondSuccess } from "../utils/api-respond";
 import * as express from "express";
-let router = express.Router();
+const router = express.Router();
 
 /* GET API root */
 router.get("/", function(req, res, next) {
