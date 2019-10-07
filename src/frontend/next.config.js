@@ -1,12 +1,20 @@
 const withPlugins = require("next-compose-plugins");
-const withSass = require("@zeit/next-sass");
+const withCss = require("@zeit/next-css");
+const config = require("config"); // Server config access
 
 const configuration = {
   distDir: "../../dist/frontend",
-  webpack: config => {
-    // Webpack config could be modified here
+  webpack: (config, options) => {
     return config;
+  },
+  serverRuntimeConfig: {
+    port: config.get("port"),
+  },
+  publicRuntimeConfig: {
+    captchaSolutionLength: config.get("captchas.solutionLength"),
+    sessionIdLength: config.get("ids.sessionIdLength"),
+    sessionNameMaxLength: config.get("sessionNameMaxLength"),
   },
 };
 
-module.exports = withPlugins([withSass], configuration);
+module.exports = withPlugins([withCss], configuration);

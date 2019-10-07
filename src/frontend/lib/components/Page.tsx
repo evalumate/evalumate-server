@@ -1,16 +1,10 @@
-import "./Page.scss";
+import { Menu } from "./Menu";
+import theme from "../theme";
+import { MuiThemeProvider } from "@material-ui/core/styles";
 import Head from "next/head";
 import * as React from "react";
-
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#4CAF50",
-    },
-  },
-});
+import { MainGrid } from "./layout/MainGrid";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 type PageProps = {
   hideMenu?: boolean;
@@ -34,9 +28,12 @@ export const Page: React.FunctionComponent<PageProps> = ({
     <div id="page">
       <Head>
         <title>{title + (titleAddHomepageTitle ? " – EvaluMate" : "")}</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <MuiThemeProvider theme={theme}>Test</MuiThemeProvider>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {!hideMenu && <Menu />}
+        <MainGrid>{children}</MainGrid>
+      </MuiThemeProvider>
     </div>
   );
 };

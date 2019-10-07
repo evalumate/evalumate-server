@@ -13,7 +13,8 @@
   },
   "captchas": {
     "ttl": 120,
-    "deleteExpiredInterval": 120
+    "deleteExpiredInterval": 120,
+    "solutionLength": 4
   },
   "ids": {
     "hashSalt": null,
@@ -21,5 +22,6 @@
     "memberIdLength": 8
   },
   "sessionKeyLength": 10,
+  "sessionNameMaxLength": 30,
   "memberSecretLength": 32
 }
