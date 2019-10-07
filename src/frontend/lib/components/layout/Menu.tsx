@@ -13,8 +13,8 @@ import {
   SwipeableDrawer,
   Typography,
 } from "@material-ui/core";
-import { ButtonLink } from "./links/ButtonLink";
-import { ListItemLink } from "./links/ListItemLink";
+import { ButtonLink } from "../links/ButtonLink";
+import { ListItemLink } from "../links/ListItemLink";
 
 const useStyles = makeStyles(theme => ({
   root: {

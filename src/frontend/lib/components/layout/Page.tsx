@@ -1,9 +1,9 @@
 import { Menu } from "./Menu";
-import theme from "../theme";
+import theme from "../../theme";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Head from "next/head";
 import * as React from "react";
-import { MainGrid } from "./layout/MainGrid";
+import { MainGrid } from "./MainGrid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 type PageProps = {
