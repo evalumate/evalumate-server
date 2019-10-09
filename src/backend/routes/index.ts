@@ -8,8 +8,4 @@ const router = express.Router();
 /* Delegate GET /api to the api router */
 router.use("/api", apiRouter);
 
-router.use("/test", (req, res, next) => {
-  next(new HttpException(503, "Something happened"));
-});
-
 export default router;
