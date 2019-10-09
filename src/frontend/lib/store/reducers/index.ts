@@ -1,7 +1,9 @@
-import master from "./master";
+import global from "./global";
+import owner from "./owner";
 import { combineReducers } from "redux";
 
-// Export a single reducer that combines all the others
+// Export a root reducer that combines all the others
 export default combineReducers({
-  master,
+  global,
+  owner,
 });

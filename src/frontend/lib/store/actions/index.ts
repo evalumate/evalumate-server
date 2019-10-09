@@ -1,6 +1,8 @@
-import * as MasterActions from "./master";
+import * as GlobalActions from "./global";
+import * as OwnerActions from "./owner";
 
 // Export all actions for usage in type definitions
 export default {
-  master: MasterActions,
+  global: GlobalActions,
+  owner: OwnerActions,
 };
