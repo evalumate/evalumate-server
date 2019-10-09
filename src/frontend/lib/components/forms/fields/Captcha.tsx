@@ -66,7 +66,6 @@ const InternalCaptcha: React.ComponentType<
           name="captcha.solution"
           label="What letters do you see?"
           validate={validateSolution}
-          isInvalid={true}
           inputProps={{ maxLength: captchaSolutionLength }}
           component={TextField}
         />
