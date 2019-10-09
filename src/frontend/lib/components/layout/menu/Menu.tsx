@@ -1,20 +1,16 @@
 import { makeStyles } from "@material-ui/core/styles";
-import { Mail as MailIcon, Menu as MenuIcon, SvgIconComponent } from "@material-ui/icons";
+import { Menu as MenuIcon } from "@material-ui/icons";
 import * as React from "react";
 import {
   IconButton,
-  Divider,
-  List,
-  ListItemIcon,
-  ListItemText,
   Toolbar,
   Hidden,
   AppBar,
   SwipeableDrawer,
   Typography,
 } from "@material-ui/core";
-import { ButtonLink } from "../links/ButtonLink";
-import { ListItemLink } from "../links/ListItemLink";
+import { DrawerContent } from "../../content/menu/DrawerContent";
+import { Buttons } from "../../content/menu/Buttons";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,51 +23,6 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
 }));
-
-interface LinkedMenuButtonProps {
-  text: string;
-  href: string;
-}
-
-const LinkedMenuButton: React.FunctionComponent<LinkedMenuButtonProps> = props => (
-  <ButtonLink size="large" color="inherit" href={props.href}>
-    {props.text}
-  </ButtonLink>
-);
-
-const MenuButtons: React.FunctionComponent = () => (
-  <>
-    <LinkedMenuButton text="Join Session" href="/client" />
-    <LinkedMenuButton text="Create Session" href="/master" />
-    <LinkedMenuButton text="About" href="/about" />
-  </>
-);
-
-interface LinkedListItemProps {
-  text: string;
-  href: string;
-  icon: SvgIconComponent;
-}
-
-const LinkedListItem: React.FunctionComponent<LinkedListItemProps> = props => (
-  <ListItemLink button color="inherit" key={props.text} href={props.href}>
-    <ListItemIcon>{<props.icon />}</ListItemIcon>
-    <ListItemText primary={props.text} />
-  </ListItemLink>
-);
-
-const MenuDrawerContent: React.FunctionComponent = () => (
-  <>
-    <List>
-      <LinkedListItem icon={MailIcon} text="Join session" href="/client" />
-      <LinkedListItem icon={MailIcon} text="Create session" href="/master" />
-    </List>
-    <Divider />
-    <List>
-      <LinkedListItem icon={MailIcon} text="About" href="/about" />
-    </List>
-  </>
-);
 
 /**
  * A React hook that returns a drawer JSX component and a function `toggleMenuDrawer()` that, given
@@ -121,7 +72,7 @@ function useMenuDrawer(): [
         onClick={toggleMenuDrawer(false)}
         onKeyDown={toggleMenuDrawer(false)}
       >
-        <MenuDrawerContent />
+        <DrawerContent />
       </div>
     </SwipeableDrawer>
   );
@@ -153,7 +104,7 @@ export const Menu: React.FunctionComponent = () => {
             EvaluMate
           </Typography>
           <Hidden implementation="css" smDown>
-            <MenuButtons />
+            <Buttons />
           </Hidden>
         </Toolbar>
       </AppBar>

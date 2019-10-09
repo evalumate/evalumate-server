@@ -1,4 +1,4 @@
-import { Menu } from "./Menu";
+import { Menu } from "./menu/Menu";
 import theme from "../../theme";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Head from "next/head";
