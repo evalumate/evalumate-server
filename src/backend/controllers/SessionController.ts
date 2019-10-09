@@ -1,17 +1,17 @@
-import * as respond from "../utils/api-respond";
-import asyncHandler from "express-async-handler";
 import CaptchaController from "./CaptchaController";
-import config from "config";
 import Controller from "./Controller";
 import CreateSessionDto from "../dtos/CreateSessionDto";
-import generatePassword from "password-generator";
-import HttpStatus from "http-status-codes";
 import Session from "../entities/Session";
-import validationMiddleware from "../middlewares/validation";
-import { createLogger } from "../utils/logger";
-import { NextFunction, Request, Response } from "express";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import InvalidSessionKeyException from "../exceptions/InvalidSessionKeyException";
+import validationMiddleware from "../middlewares/validation";
+import * as respond from "../utils/api-respond";
+import { createLogger } from "../utils/logger";
+import config from "config";
+import { NextFunction, Request, Response } from "express";
+import asyncHandler from "express-async-handler";
+import HttpStatus from "http-status-codes";
+import generatePassword from "password-generator";
 
 const logger = createLogger(module);
 const sessionKeyLength: number = config.get("sessionKeyLength");
@@ -99,6 +99,7 @@ class SessionController extends Controller {
         session: {
           uri: session.uri,
           id: session.id,
+          name: session.name,
           key: session.key,
         },
       },
