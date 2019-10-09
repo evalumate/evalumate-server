@@ -1,13 +1,13 @@
 import { getApiUrl } from ".";
 import axios from "axios";
-
-export type Session = { uri: string; id: string; key: string };
+import { Session } from "../models/Session";
 
 /**
  * Given an object with session options, tries to create a new session.
  * @param sessionOptions The options passed to the API
  *
- * @returns The session object returned by the server or null if the server replied with 403
+ * @returns The Session object with the information returned by the server or null if the server
+ * replied with an error (most likely 403)
  */
 export async function createSession(sessionOptions: {
   sessionName: string;
