@@ -1,7 +1,7 @@
 import { setUserRole } from "../actions/global";
-import { getType } from "typesafe-actions";
+import { createReducer } from "typesafe-actions";
 import { combineReducers } from "redux";
-import { RootAction } from "StoreTypes";
+import { RootAction, RootState } from "StoreTypes";
 
 /**
  * The role of the app user
@@ -29,13 +29,9 @@ const initialState: GlobalState = {
   userRole: UserRole.Visitor,
 };
 
-export const userRoleReducer = (state: UserRole = initialState.userRole, action: RootAction) => {
-  switch (action.type) {
-    case getType(setUserRole):
-      return Object.assign({}, state, action.payload);
-    default:
-      return state;
-  }
-};
+const globalReducer = createReducer<GlobalState, RootAction>(initialState).handleAction(
+  setUserRole,
+  (state, action) => Object.assign({}, state, { userRole: action.payload })
+);
 
-export default combineReducers({ userRole: userRoleReducer });
+export default globalReducer;
