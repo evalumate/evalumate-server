@@ -20,5 +20,5 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false
   },
-  "include": ["backend/custom-types.d.ts", "backend/**/*.ts"]
+  "include": ["custom-types.d.ts", "backend/custom-types.d.ts", "backend/**/*.ts"]
 }

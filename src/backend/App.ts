@@ -11,6 +11,7 @@ import morgan from "morgan";
 import nextJs from "next";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
+import { cookieReduxStoreCreator } from "./middlewares/redux";
 
 const dev = process.env.NODE_ENV !== "production";
 
@@ -49,8 +50,8 @@ class App implements Destructable {
   }
 
   private initializeMiddlewares() {
-    logger.debug("Configuring morgan for request logging");
-    this.app.use(morgan("combined", { stream: logStream }));
+    // logger.debug("Configuring morgan for request logging");
+    // this.app.use(morgan("combined", { stream: logStream }));
 
     logger.debug("Initializing middlewares");
     this.app.use(express.json());
@@ -82,9 +83,12 @@ class App implements Destructable {
   }
 
   private initializeNextJsRequestHandling() {
-    // Make Next.js handle the frontend
+    // Create redux store with state from cookies and store it in the request object
+    this.app.use(cookieReduxStoreCreator);
+
+    // Render page with Next.js
     const requestHandler = App.nextJsApp.getRequestHandler();
-    this.app.use((req, res) => {
+    this.app.use(async (req, res) => {
       return requestHandler(req, res);
     });
   }

@@ -1,11 +1,9 @@
+import { makeStore } from "../lib/store";
+import withRedux from "next-redux-wrapper";
+import NextApp, { AppInitialProps } from "next/app";
 import React from "react";
 import { Provider } from "react-redux";
-import NextApp, { AppInitialProps } from "next/app";
-import withRedux from "next-redux-wrapper";
-import { makeStore } from "../lib/store";
-import { Store } from "redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { REHYDRATE } from "redux-persist";
+import { Store } from "StoreTypes";
 
 type AppProps = AppInitialProps & { store: Store };
 
@@ -21,9 +19,7 @@ class App extends NextApp<AppProps> {
 
     return (
       <Provider store={store}>
-        <PersistGate persistor={store.persistor} loading={<div>Loading</div>}>
-          <Component {...pageProps} />
-        </PersistGate>
+        <Component {...pageProps} />
       </Provider>
     );
   }
