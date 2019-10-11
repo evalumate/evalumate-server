@@ -17,7 +17,7 @@ export async function cookieReduxStoreCreator(req: Request, res: Response, next:
     storage: new CookieStorage(cookieJar),
   };
 
-  let state;
+  let state: any | undefined;
   try {
     state = await getStoredState(persistConfig);
   } catch (e) {
@@ -26,12 +26,15 @@ export async function cookieReduxStoreCreator(req: Request, res: Response, next:
   }
 
   // Removing the state's _persist key for the server-side (non-persisted) redux store
-  //@ts-ignore: Typescript does not know about the _persist key
-  const { _persist, ...cleanedState } = state;
+  //ts-ignore: Typescript does not know about the _persist key
+  if (state && typeof state._persist !== undefined) {
+    const { _persist, ...cleanedState } = state;
+    state = cleanedState;
+  }
 
   // Not persisting the store here since state changes will not be sent via cookies directly. Instead,
   // the serialized state will be attached to the browser's window object.
-  req.reduxStore = createStore(rootReducer, cleanedState);
+  req.reduxStore = createStore(rootReducer, state);
 
   next();
 }
