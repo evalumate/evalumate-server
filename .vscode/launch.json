@@ -6,7 +6,6 @@
       "request": "launch",
       "name": "Node",
       "cwd": "${workspaceRoot}",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/nodemon",
       "args": ["${workspaceRoot}/src/backend/index.ts"],
       "runtimeArgs": ["--nolazy", "--require", "${workspaceRoot}/babel-register.js"],
       "restart": true,
