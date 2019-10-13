@@ -38,7 +38,6 @@ export const makeStore = (initialState: RootState, { isServer, req = null }) => 
     const { composeWithDevTools } = require("redux-devtools-extension/logOnlyInProduction");
 
     const reducer = persistReducer(persistConfig, rootReducer);
-    console.log(initialState);
     const store = createStore(reducer, initialState, composeWithDevTools());
 
     // Since a store with the current state is present during SSR, we do not need a persist Gate.
