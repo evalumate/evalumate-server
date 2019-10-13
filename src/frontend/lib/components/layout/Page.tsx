@@ -1,4 +1,4 @@
-import { Menu } from "./menu/Menu";
+import { ToolBar } from "./toolbar/ToolBar";
 import theme from "../../theme";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Head from "next/head";
@@ -31,7 +31,7 @@ export const Page: React.FunctionComponent<PageProps> = ({
       </Head>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        {!hideMenu && <Menu />}
+        {!hideMenu && <ToolBar />}
         <MainGrid>{children}</MainGrid>
       </MuiThemeProvider>
     </div>

@@ -1,4 +1,4 @@
-import { LinkedMenuButton } from "../../layout/menu/LinkedMenuButton";
+import { LinkedMenuButton } from "../../layout/toolbar/LinkedMenuButton";
 import * as React from "react";
 
 export const VisitorButtons: React.FunctionComponent = () => (

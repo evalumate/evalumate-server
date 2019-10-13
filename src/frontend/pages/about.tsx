@@ -1,6 +1,9 @@
-import * as React from "react";
 import { Page } from "../lib/components/layout/Page";
+import { NextReduxPage } from "NextReduxTypes";
+import * as React from "react";
 
-export default function AboutPage() {
+const AboutPage: NextReduxPage<{}, void> = () => {
   return <Page title="About"></Page>;
-}
+};
+
+export default AboutPage;

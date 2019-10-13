@@ -1,9 +1,9 @@
-import { LinkedListItem } from "../../layout/menu/LinkedListItem";
+import { LinkedListItem } from "../../layout/toolbar/LinkedListItem";
 import { Divider, List } from "@material-ui/core";
 import { Mail as MailIcon } from "@material-ui/icons";
 import * as React from "react";
 
-export const VisitorDrawerContent: React.FunctionComponent = () => (
+export const MenuDrawerContent: React.FunctionComponent = () => (
   <>
     <List>
       <LinkedListItem icon={MailIcon} text="Join session" href="/client" />
