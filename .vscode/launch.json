@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Node",
+      "name": "Node.js: Server",
       "cwd": "${workspaceRoot}",
       "args": ["${workspaceRoot}/src/backend/index.ts"],
       "runtimeArgs": ["--nolazy", "--require", "${workspaceRoot}/babel-register.js"],
@@ -23,7 +23,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Mocha",
+      "name": "Node.js: Tests",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "env": {
         "BABEL_ENV": "debug",
@@ -41,6 +41,19 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "sourceMaps": true
+    },
+    {
+      "name": "Frontend with Firefox",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "reloadOnAttach": true,
+      "url": "localhost:3000",
+      "webRoot": "${workspaceFolder}/src/frontend/",
+      "pathMappings": [
+        { "url": "webpack://${workspaceFolder}/", "path": "${workspaceFolder}/" },
+        { "url": "webpack:///", "path": "${webRoot}/" }
+      ]
     }
   ]
 }
