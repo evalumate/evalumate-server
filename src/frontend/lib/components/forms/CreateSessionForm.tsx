@@ -1,12 +1,17 @@
 import { Captcha, CaptchaSolution } from "./fields/Captcha";
 import { createSession } from "../../api/session";
+import { Session } from "../../models/Session";
+import { setUserRole } from "../../store/actions/global";
+import { setSession } from "../../store/actions/owner";
+import { UserRole } from "../../store/reducers/global";
 import { Box, Button, FormControlLabel, Grid, Tooltip, Typography } from "@material-ui/core";
 import { Field, Form, Formik, FormikActions } from "formik";
 import { Switch, TextField } from "formik-material-ui";
 import getConfig from "next/config";
+import { useRouter } from "next/router";
 import * as React from "react";
+import { connect, ConnectedProps } from "react-redux";
 import * as Yup from "yup";
-import { Session } from "../../models/Session";
 
 const { publicRuntimeConfig } = getConfig();
 const sessionNameMaxLength: number = publicRuntimeConfig.sessionNameMaxLength;
@@ -24,12 +29,17 @@ const FormSchema = Yup.object().shape({
     .required("Required"),
 });
 
-type Props = {
-  onSessionCreated: (session: Session) => void;
-};
+type Props = ConnectedProps<typeof connectToRedux>;
 
-export const CreateSessionForm: React.FunctionComponent<Props> = ({ onSessionCreated }) => {
+export const InternalCreateSessionForm: React.FunctionComponent<Props> = props => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
+  const router = useRouter();
+
+  const onSessionCreated = (session: Session) => {
+    props.setSession(session);
+    props.setUserRole(UserRole.Owner);
+    router.push(`/master/${session.id}`);
+  };
 
   const onCreateFormSubmit = async (values: FormValues, actions: FormikActions<FormValues>) => {
     const session = await createSession(values);
@@ -88,3 +98,15 @@ export const CreateSessionForm: React.FunctionComponent<Props> = ({ onSessionCre
     </Formik>
   );
 };
+
+const mapDispatchToProps = {
+  setUserRole,
+  setSession,
+};
+
+const connectToRedux = connect(
+  null,
+  mapDispatchToProps
+);
+
+export const CreateSessionForm = connectToRedux(InternalCreateSessionForm);
