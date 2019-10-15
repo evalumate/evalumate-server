@@ -1,8 +1,7 @@
-import { setSession } from "../actions/owner";
-import { createReducer } from "typesafe-actions";
-import { combineReducers } from "redux";
-import { RootAction, RootState } from "StoreTypes";
 import { Session } from "../../models/Session";
+import { setSession } from "../actions/owner";
+import { combineReducers } from "redux";
+import { createReducer } from "typesafe-actions";
 
 export type OwnerState = Readonly<{
   /**
@@ -15,7 +14,7 @@ const initialState: OwnerState = {
   session: null,
 };
 
-const sessionReducer = createReducer<Session, RootAction>(initialState.session).handleAction(
+const sessionReducer = createReducer(initialState.session).handleAction(
   setSession,
   (state, action) => Object.assign({}, action.payload)
 );
