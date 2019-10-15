@@ -7,7 +7,7 @@ export type OwnerState = Readonly<{
   /**
    * The session that the app is attached to as a master
    */
-  session?: Readonly<Session>;
+  session: Readonly<Session> | null;
 }>;
 
 const initialState: OwnerState = {
