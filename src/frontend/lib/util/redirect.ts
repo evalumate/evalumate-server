@@ -1,6 +1,5 @@
-import { UserRole } from "../store/reducers/global";
-import { selectUserRole } from "../store/selectors/global";
-import { selectSession } from "../store/selectors/owner";
+import { UserRole } from "../models/UserRole";
+import { selectSession, selectUserRole } from "../store/selectors/global";
 import { ServerResponse } from "http";
 import { Store } from "StoreTypes";
 

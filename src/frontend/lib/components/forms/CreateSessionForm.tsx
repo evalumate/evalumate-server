@@ -1,9 +1,9 @@
-import { Captcha, CaptchaSolution } from "./fields/Captcha";
+import { Captcha } from "./fields/Captcha";
 import { createSession } from "../../api/session";
+import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Session } from "../../models/Session";
-import { setUserRole } from "../../store/actions/global";
-import { setSession } from "../../store/actions/owner";
-import { UserRole } from "../../store/reducers/global";
+import { UserRole } from "../../models/UserRole";
+import { setSession, setUserRole } from "../../store/actions/global";
 import { Box, Button, FormControlLabel, Grid, Tooltip, Typography } from "@material-ui/core";
 import { Field, Form, Formik, FormikActions } from "formik";
 import { Switch, TextField } from "formik-material-ui";
