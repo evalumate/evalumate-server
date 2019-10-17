@@ -1,6 +1,8 @@
+import { CaptchaSolution } from "../models/CaptchaSolution";
+import { Member } from "../models/Member";
+import { Session } from "../models/Session";
 import { getApiUrl } from ".";
 import axios from "axios";
-import { Session } from "../models/Session";
 
 /**
  * Given an object with session options, tries to create a new session.
@@ -12,8 +14,39 @@ import { Session } from "../models/Session";
 export async function createSession(sessionOptions: {
   sessionName: string;
   captchaRequired: boolean;
-  captcha: { solution: string; token: string };
-}): Promise<Session | null> {
+  captcha: CaptchaSolution;
+}): Promise<Session> {
   const reply = await axios.post(getApiUrl("sessions"), sessionOptions);
   return reply.data.error ? null : reply.data.data.session;
+}
+
+/**
+ * Fetches session information based on a session id.
+ *
+ * @param sessionId The id of the session to retrieve information for.
+ *
+ * @returns A `Session` object or `null` if the session id does not exist. Note: The `Session`
+ * object does not contain a sessionKey.
+ *
+ */
+export async function getSession(sessionId: string): Promise<Session> {
+  const reply = await axios.get(getApiUrl(`sessions/${sessionId}`));
+  return reply.data.error ? null : reply.data.data.session;
+}
+
+/**
+ * Tries to join a session and returns a `Member` object on success.
+ *
+ * @param sessionId The id of the session to be joined
+ * @param captcha A `CaptchaSolution` object if joining the session requires a captcha
+ *
+ * @returns A `Member` object on success, or `null` if the session does not exist (error 404) or the
+ * captcha solution is invalid (error 403).
+ */
+export async function joinSession(sessionId: string, captcha?: CaptchaSolution): Promise<Member> {
+  const reply = await axios.post(
+    getApiUrl(`sessions/${sessionId}/members`),
+    captcha ? { captcha } : {}
+  );
+  return reply.data.error ? null : reply.data.data.member;
 }
