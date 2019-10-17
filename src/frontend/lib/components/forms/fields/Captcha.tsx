@@ -5,25 +5,25 @@ import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
 import InlineSVG from "svg-inline-react";
+import { CaptchaSolution } from "../../../models/CaptchaSolution";
 
 const { publicRuntimeConfig } = getConfig();
 const captchaSolutionLength: number = publicRuntimeConfig.captchaSolutionLength;
 
-type CaptchaProps = {
+type Props = {
   /**
    * The number of invalid captcha solutions entered yet. Should initially be 0.
    */
   invalidSolutionCount?: number;
-};
-
-export type CaptchaSolution = {
-  token: string;
-  solution: string;
+  /**
+   * Whether or not to stack the fields (text input and captcha) on medium (and upwards) screen sizes.
+   */
+  stack?: boolean;
 };
 
 const InternalCaptcha: React.ComponentType<
-  CaptchaProps & { formik: FormikContext<any> }
-> = props => {
+  Props & { formik: FormikContext<any & { captcha: CaptchaSolution }> }
+> = ({ formik, invalidSolutionCount, stack = false }) => {
   const [captcha, setCaptcha] = React.useState({ image: "", token: "" });
   const [showRetryMessage, setShowRetryMessage] = React.useState(false);
 
@@ -32,15 +32,17 @@ const InternalCaptcha: React.ComponentType<
     getCaptcha().then(setCaptcha);
 
     // Reset the solution if invalidSolutionCount was changed
-    if (props.invalidSolutionCount && props.invalidSolutionCount > 0) {
+    if (invalidSolutionCount && invalidSolutionCount > 0) {
       setShowRetryMessage(true);
-      props.formik.setFieldValue("captcha.solution", "", true); // Revalidate to show retry message
+      formik.setFieldValue("captcha.solution", "", true); // Revalidate to show retry message
     }
-  }, [props.invalidSolutionCount]);
+  }, [invalidSolutionCount]);
 
   React.useEffect(() => {
     // Set the captcha token as a formik field on captcha updates
-    if (captcha.token !== "") props.formik.setFieldValue("captcha.token", captcha.token, false);
+    if (captcha.token !== "") {
+      formik.setFieldValue("captcha.token", captcha.token, false);
+    }
   }, [captcha]);
 
   const validateSolution = (value: string) => {
@@ -59,9 +61,11 @@ const InternalCaptcha: React.ComponentType<
     }
   };
 
+  const smallScreenFieldWidth = stack ? 12 : 6;
+
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={smallScreenFieldWidth}>
         <Field
           name="captcha.solution"
           label="What letters do you see?"
@@ -70,7 +74,7 @@ const InternalCaptcha: React.ComponentType<
           component={TextField}
         />
       </Grid>
-      <Grid item xs={12} sm={6} container alignItems="center" justify="center">
+      <Grid item xs={12} sm={smallScreenFieldWidth} container alignItems="center" justify="center">
         <InlineSVG src={captcha.image} />
       </Grid>
     </Grid>
@@ -81,4 +85,4 @@ const InternalCaptcha: React.ComponentType<
  * To be used within a Formik form. A component rendering a captcha and a formik field `captcha` of
  * type `CaptchaSolution` that is populated with the captcha's token and the user-entered solution.
  */
-export const Captcha = connect<CaptchaProps>(InternalCaptcha);
+export const Captcha = connect<Props>(InternalCaptcha);
