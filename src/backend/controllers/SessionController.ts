@@ -11,6 +11,7 @@ import config from "config";
 import { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import HttpStatus from "http-status-codes";
+import pick from "lodash/pick";
 import generatePassword from "password-generator";
 
 const logger = createLogger(module);
@@ -96,12 +97,7 @@ class SessionController extends Controller {
     respond.success(
       res,
       {
-        session: {
-          uri: session.uri,
-          id: session.id,
-          name: session.name,
-          key: session.key,
-        },
+        session: pick(session, ["uri", "id", "name", "captchaRequired", "key"]),
       },
       HttpStatus.CREATED
     );
@@ -110,8 +106,7 @@ class SessionController extends Controller {
   private mGetSession = async (req: Request, res: Response) => {
     const session = req.session!;
     respond.success(res, {
-      sessionName: session.name,
-      captchaRequired: session.captchaRequired,
+      session: pick(session, ["uri", "id", "name", "captchaRequired"]),
     });
   };
 
