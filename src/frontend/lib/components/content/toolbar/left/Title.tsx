@@ -1,11 +1,10 @@
+import { UserRole } from "../../../../models/UserRole";
+import { selectSession, selectUserRole } from "../../../../store/selectors/global";
+import { Box, Hidden, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
-import { Typography, Hidden, Box } from "@material-ui/core";
-import { ConnectedProps, connect } from "react-redux";
-import { selectUserRole } from "../../../store/selectors/global";
+import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
-import { selectSession } from "../../../store/selectors/owner";
-import { UserRole } from "../../../store/reducers/global";
 
 const useStyles = makeStyles(() => ({
   root: { flexGrow: 1 },
@@ -22,7 +21,7 @@ export const InternalTitle: React.FunctionComponent<Props> = props => {
   return (
     <Typography variant="h6" className={classes.root}>
       {role == UserRole.Visitor && appTitle}
-      {role == UserRole.Owner && (
+      {[UserRole.Owner, UserRole.Member].includes(role) && (
         <>
           <Hidden implementation="css" smDown>
             {appTitle}

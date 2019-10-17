@@ -1,16 +1,9 @@
+import { MenuDrawerContent } from "./MenuDrawerContent";
+import { useMenuDrawer } from "../../../../hooks/menuDrawer";
 import { makeStyles } from "@material-ui/core/styles";
 import { Menu as MenuIcon } from "@material-ui/icons";
 import * as React from "react";
-import {
-  IconButton,
-  Toolbar,
-  Hidden,
-  AppBar,
-  SwipeableDrawer,
-  Typography,
-} from "@material-ui/core";
-import { useMenuDrawer } from "../../../hooks/menuDrawer";
-import { MenuDrawerContent } from "./MenuDrawerContent";
+import { IconButton } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {},

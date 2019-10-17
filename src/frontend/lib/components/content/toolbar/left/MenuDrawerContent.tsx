@@ -1,4 +1,4 @@
-import { LinkedListItem } from "../../layout/toolbar/LinkedListItem";
+import { LinkedListItem } from "../../../layout/toolbar/LinkedListItem";
 import { Divider, List } from "@material-ui/core";
 import { Mail as MailIcon } from "@material-ui/icons";
 import * as React from "react";

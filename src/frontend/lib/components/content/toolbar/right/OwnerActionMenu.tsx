@@ -1,10 +1,10 @@
-import { selectSession } from "../../../store/selectors/owner";
-import { IconButton, Menu, MenuItem, Typography, Hidden } from "@material-ui/core";
+import { useMenuHandler } from "../../../../hooks/menuHandler";
+import { selectSession } from "../../../../store/selectors/global";
+import { Hidden, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert } from "@material-ui/icons";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
-import { useMenuHandler } from "../../../hooks/menuHandler";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 
@@ -15,9 +15,6 @@ const InternalOwnerActionMenu: React.FunctionComponent<Props> = props => {
 
   return (
     <>
-      <Hidden implementation="css" smDown>
-        <Typography variant="h6">{props.session.name}</Typography>
-      </Hidden>
       <IconButton {...buttonProps} color="inherit">
         <MoreVert />
       </IconButton>
