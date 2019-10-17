@@ -33,7 +33,7 @@ export default class Member extends RandomIdEntity {
   @Column("int", { default: getUnixTimestamp })
   createdAt: number;
 
-  async idExists(id: string): Promise<Boolean> {
+  async idExists(id: string): Promise<boolean> {
     return (await Member.count({ id, sessionId: this.sessionId })) > 0;
   }
 

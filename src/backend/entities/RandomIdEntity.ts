@@ -60,7 +60,7 @@ export default abstract class RandomIdEntity extends BaseEntity {
     return saveWithRetry(5); // On duplicate ids, regenerate the id up to 5 times before failing
   }
 
-  async idExists(id: string): Promise<Boolean> {
+  async idExists(id: string): Promise<boolean> {
     return (await Object.getPrototypeOf(this).constructor.count({ id })) > 0;
   }
 }
