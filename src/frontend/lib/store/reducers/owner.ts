@@ -1,22 +1,9 @@
-import { Session } from "../../models/Session";
-import { setSession } from "../actions/owner";
-import { combineReducers } from "redux";
 import { createReducer } from "typesafe-actions";
 
-export type OwnerState = Readonly<{
-  /**
-   * The session that the app is attached to as a master
-   */
-  session: Readonly<Session> | null;
-}>;
+export type OwnerState = Readonly<{}>;
 
-const initialState: OwnerState = {
-  session: null,
-};
+const initialState: OwnerState = {};
 
-const sessionReducer = createReducer(initialState.session).handleAction(
-  setSession,
-  (state, action) => Object.assign({}, action.payload)
-);
+const ownerReducer = createReducer(initialState);
 
-export default combineReducers({ session: sessionReducer });
+export default ownerReducer;
