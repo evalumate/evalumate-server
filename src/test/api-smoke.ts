@@ -70,9 +70,15 @@ describe("Smoke test", () => {
             it("should return sessionName and captchaRequired", async () => {
               const reply = await axios.get(sessionUri);
               reply.should.have.property("status", 200);
+
               const data = reply.data.data;
-              data.should.have.property("sessionName", sessionPostParameters.sessionName);
-              data.should.have.property("captchaRequired", sessionPostParameters.captchaRequired);
+              data.should.have.property("session");
+
+              data.session.should.have.property("name", sessionPostParameters.sessionName);
+              data.session.should.have.property(
+                "captchaRequired",
+                sessionPostParameters.captchaRequired
+              );
             });
           });
         });

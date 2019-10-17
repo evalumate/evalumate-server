@@ -199,7 +199,7 @@ describe("Unit tests", () => {
         data.should.have.property("session");
 
         const session = data.session;
-        session.should.have.keys(["uri", "id", "key"]);
+        session.should.have.keys(["uri", "id", "name", "key", "captchaRequired"]);
 
         const sessionFromDb = await Session.findOne(session.id);
         should.exist(sessionFromDb);
@@ -217,8 +217,9 @@ describe("Unit tests", () => {
           reply.data.should.have.property("data");
 
           const replyData = reply.data.data;
-          replyData.should.have.property("sessionName", session.name);
-          replyData.should.have.property("captchaRequired", session.captchaRequired);
+          replyData.should.have.property("session");
+          replyData.session.should.have.property("name", session.name);
+          replyData.session.should.have.property("captchaRequired", session.captchaRequired);
 
           await sessionFixture.tearDown();
         });
