@@ -32,11 +32,8 @@ const InternalSessionIdField: React.ComponentType<
   }, [session]);
 
   const validateSessionId = async (sessionId: string) => {
+    let error: string = null;
     if (sessionId.length == sessionIdLength) {
-      if (!formik.touched.sessionId) {
-        // Set the field to touched to show error messages from now on
-        formik.setFieldTouched("sessionId", true);
-      }
       // Skip validation if the sessionId has not changed since the last successful validation
       if (!(session && session.id == sessionId)) {
         // Check if session exists
@@ -47,11 +44,15 @@ const InternalSessionIdField: React.ComponentType<
             // Unset any previously fetched session
             setSession(null);
           }
-          return "Invalid";
+          error = "Invalid";
         } else {
           // sessionId is valid
           setSession(fetchedSession);
         }
+      }
+      if (!formik.touched.sessionId) {
+        // Set the field to touched to show any error messages from now on
+        formik.setFieldTouched("sessionId", true);
       }
     } else {
       // sessionId is shorter than sessionIdLength
@@ -59,8 +60,9 @@ const InternalSessionIdField: React.ComponentType<
         // Unset any previously fetched session
         setSession(null);
       }
-      return sessionId.length > 0 ? "Too short" : "Required";
+      error = sessionId.length > 0 ? "Too short" : "Required";
     }
+    return error;
   };
 
   return (
