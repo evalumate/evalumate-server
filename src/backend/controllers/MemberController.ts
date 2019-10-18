@@ -2,6 +2,7 @@ import CaptchaController from "./CaptchaController";
 import Controller from "./Controller";
 import SessionController from "./SessionController";
 import CreateMemberDto from "../dtos/CreateMemberDto";
+import SetUnderstandingDto from "../dtos/SetUnderstandingDto";
 import Member from "../entities/Member";
 import Session from "../entities/Session";
 import CaptchaRequiredException from "../exceptions/CaptchaRequiredException";
@@ -15,7 +16,7 @@ import cryptoRandomString from "crypto-random-string";
 import { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import HttpStatus from "http-status-codes";
-import SetUnderstandingDto from "../dtos/SetUnderstandingDto";
+import pick from "lodash/pick";
 
 const logger = createLogger(module);
 
@@ -53,7 +54,7 @@ export default class MemberController extends Controller {
     logger.info("Registering a new member in session %s", session.id);
     const member = new Member();
     member.session = session;
-    member.secret = cryptoRandomString({ length: 16 });
+    member.secret = cryptoRandomString({ length: memberSecretLength });
     await member.save();
     return member;
   }
@@ -114,11 +115,7 @@ export default class MemberController extends Controller {
     respond.success(
       res,
       {
-        member: {
-          uri: member.uri,
-          id: member.id,
-          secret: member.secret,
-        },
+        member: pick(member, ["uri", "id", "key"]),
       },
       HttpStatus.CREATED
     );
