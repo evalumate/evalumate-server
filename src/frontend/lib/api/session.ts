@@ -16,7 +16,7 @@ export async function createSession(sessionOptions: {
   captchaRequired: boolean;
   captcha: CaptchaSolution;
 }): Promise<Session> {
-  const reply = await axios.post(getApiUrl("sessions"), sessionOptions);
+  const reply = await axios.post(getApiUrl("/sessions"), sessionOptions);
   return reply.data.error ? null : reply.data.data.session;
 }
 
@@ -30,7 +30,7 @@ export async function createSession(sessionOptions: {
  *
  */
 export async function getSession(sessionId: string): Promise<Session> {
-  const reply = await axios.get(getApiUrl(`sessions/${sessionId}`));
+  const reply = await axios.get(getApiUrl(`/sessions/${sessionId}`));
   return reply.data.error ? null : reply.data.data.session;
 }
 
@@ -45,7 +45,7 @@ export async function getSession(sessionId: string): Promise<Session> {
  */
 export async function joinSession(sessionId: string, captcha?: CaptchaSolution): Promise<Member> {
   const reply = await axios.post(
-    getApiUrl(`sessions/${sessionId}/members`),
+    getApiUrl(`/sessions/${sessionId}/members`),
     captcha ? { captcha } : {}
   );
   return reply.data.error ? null : reply.data.data.member;

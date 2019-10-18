@@ -11,7 +11,7 @@ import getConfig from "next/config";
 export function getApiUrl(endpoint: string = "") {
   const { serverRuntimeConfig } = getConfig();
   const prefix = process.browser ? "" : `http://localhost:${serverRuntimeConfig.port}`;
-  return `${prefix}/api/${endpoint}`;
+  return `${prefix}/api${endpoint}`;
 }
 
 axios.defaults.validateStatus = (status: number) => {
