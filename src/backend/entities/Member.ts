@@ -2,6 +2,9 @@ import RandomIdEntity from "./RandomIdEntity";
 import Session from "./Session";
 import { getUnixTimestamp } from "../utils/time";
 import { Column, Entity, Index, ManyToOne, PrimaryColumn } from "typeorm";
+import config from "config";
+
+const memberIdLength: number = config.get("member.idLength");
 
 /**
  * Note: Member keys are composed of `id` and `sessionId`.
@@ -9,6 +12,8 @@ import { Column, Entity, Index, ManyToOne, PrimaryColumn } from "typeorm";
 @Entity()
 @Index(["id", "sessionId"], { unique: true })
 export default class Member extends RandomIdEntity {
+  protected static randomIdLength = memberIdLength;
+
   /**
    * A random id string (auto-generated on insert)
    */
