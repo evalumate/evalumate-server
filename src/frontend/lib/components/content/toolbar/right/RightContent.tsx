@@ -7,7 +7,7 @@ import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
 import { ExitToApp } from "@material-ui/icons";
-import { MemberExitSessionButton } from "../MemberExitSessionButton";
+import { MemberExitSessionButton } from "./MemberExitSessionButton";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 

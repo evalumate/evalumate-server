@@ -1,10 +1,10 @@
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
-import { selectSession, selectUserRole } from "../../../store/selectors/global";
+import { selectSession, selectUserRole } from "../../../../store/selectors/global";
 import { IconButton } from "@material-ui/core";
-import { setUserRole, setSession } from "../../../store/actions/global";
-import { UserRole } from "../../../models/UserRole";
+import { setUserRole, setSession } from "../../../../store/actions/global";
+import { UserRole } from "../../../../models/UserRole";
 import { useRouter } from "next/router";
 
 type Props = ConnectedProps<typeof connectToRedux>;
@@ -26,7 +26,12 @@ const InternalMemberExitSessionButton: React.FunctionComponent<Props> = ({
   };
 
   return (
-    <IconButton aria-label="leave session" title="Leave session" onClick={exitSession}>
+    <IconButton
+      aria-label="leave session"
+      title="Leave session"
+      color="inherit"
+      onClick={exitSession}
+    >
       {children}
     </IconButton>
   );
