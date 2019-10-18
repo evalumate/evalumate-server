@@ -8,16 +8,11 @@ import { RootState } from "StoreTypes";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 
-const InternalLeftContent: React.FunctionComponent<Props> = ({ role }) => {
-  if (role == UserRole.Visitor) {
-    return (
-      <Hidden implementation="css" mdUp>
-        <MenuDrawer />
-      </Hidden>
-    );
-  }
-  return null;
-};
+const InternalLeftContent: React.FunctionComponent<Props> = ({ role }) => (
+  <Hidden implementation="css" mdUp>
+    {role == UserRole.Visitor && <MenuDrawer />}
+  </Hidden>
+);
 
 const mapStateToProps = (state: RootState) => ({
   role: selectUserRole(state),

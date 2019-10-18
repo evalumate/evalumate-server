@@ -12,10 +12,9 @@ const useStyles = makeStyles(() => ({
 
 type Props = ConnectedProps<typeof connectToRedux>;
 
-export const InternalTitle: React.FunctionComponent<Props> = props => {
+const InternalTitle: React.FunctionComponent<Props> = ({ role, session }) => {
   const classes = useStyles({});
 
-  const role = props.userRole;
   const appTitle = "EvaluMate";
 
   return (
@@ -29,7 +28,7 @@ export const InternalTitle: React.FunctionComponent<Props> = props => {
           <Hidden implementation="css" mdUp>
             {/* TODO: Make text overflow work */}
             <Box component="div" style={{ whiteSpace: "nowrap" }} textOverflow="ellipsis">
-              {props.session && props.session.name}
+              {session && session.name}
             </Box>
           </Hidden>
         </>
@@ -39,7 +38,7 @@ export const InternalTitle: React.FunctionComponent<Props> = props => {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  userRole: selectUserRole(state),
+  role: selectUserRole(state),
   session: selectSession(state),
 });
 
