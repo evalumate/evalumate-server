@@ -43,8 +43,8 @@ export default class Member extends RandomIdEntity {
   }
 
   /**
-   * The member's REST API URI or undefined, if the member or its session has no id yet or no
-   * session has been assigned.
+   * The member's REST API URI (relative to the API root) or undefined, if the member or its session
+   * has no id yet or no session has been assigned.
    */
   get uri() {
     if (!this.id || !this.session) return undefined;

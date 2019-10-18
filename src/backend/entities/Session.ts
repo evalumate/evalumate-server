@@ -31,10 +31,11 @@ export default class Session extends RandomIdEntity {
   createdAt: number;
 
   /**
-   * The session's REST API URI or undefined, if the session has no id yet.
+   * The session's REST API URI (relative to the API root) or undefined, if the session has no id
+   * yet.
    */
   get uri() {
     if (!this.id) return undefined;
-    return `/api/sessions/${this.id}`;
+    return `/sessions/${this.id}`;
   }
 }
