@@ -12,7 +12,7 @@ import { Request, Response } from "express";
 
 const logger = createLogger(module);
 
-const captchaTtl: number = config.get("captchas.ttl");
+const captchaTtl: number = config.get("captcha.ttl");
 
 class CaptchaController extends Controller {
   private deleteExpiredTimeout: NodeJS.Timeout;
@@ -20,7 +20,7 @@ class CaptchaController extends Controller {
   constructor() {
     super("/captcha");
     this.initializeRoutes();
-    let deleteExpiredInterval: number = config.get("captchas.deleteExpiredInterval");
+    let deleteExpiredInterval: number = config.get("captcha.deleteExpiredInterval");
     this.deleteExpiredTimeout = setInterval(
       Captcha.deleteExpired,
       deleteExpiredInterval * 1000,

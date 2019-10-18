@@ -1,27 +1,31 @@
 {
   "port": 3000,
-  "logging": {
-    "directory": "logs",
-    "level": "info",
-    "handleExceptions": true
-  },
   "database": {
     "type": "sqlite",
     "database": "db.sqlite",
     "synchronize": true,
     "migrationsRun": false
   },
-  "captchas": {
+  "logging": {
+    "directory": "logs",
+    "level": "info",
+    "handleExceptions": true
+  },
+  "captcha": {
     "ttl": 120,
     "deleteExpiredInterval": 120,
     "solutionLength": 4
   },
-  "ids": {
-    "hashSalt": null,
-    "sessionIdLength": 4,
-    "memberIdLength": 8
+  "session": {
+    "idLength": 4,
+    "keyLength": 10,
+    "nameMaxLength": 30
   },
-  "sessionKeyLength": 10,
-  "sessionNameMaxLength": 30,
-  "memberSecretLength": 32
+  "member": {
+    "idLength": 8,
+    "secretLength": 16
+  },
+  "client": {
+    "memberPingInterval": 30
+  }
 }

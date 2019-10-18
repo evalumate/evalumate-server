@@ -19,7 +19,7 @@ import SetUnderstandingDto from "../dtos/SetUnderstandingDto";
 
 const logger = createLogger(module);
 
-const memberSecretLength: number = config.get("memberSecretLength");
+const memberSecretLength: number = config.get("member.secretLength");
 
 export default class MemberController extends Controller {
   constructor() {

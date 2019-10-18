@@ -4,7 +4,7 @@ import { getUnixTimestamp } from "../utils/time";
 import config from "config";
 import { Column, Entity, OneToMany } from "typeorm";
 
-const sessionIdLength: number = config.get("ids.sessionIdLength");
+const sessionIdLength: number = config.get("session.idLength");
 
 @Entity()
 export default class Session extends RandomIdEntity {

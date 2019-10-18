@@ -15,7 +15,7 @@ import pick from "lodash/pick";
 import generatePassword from "password-generator";
 
 const logger = createLogger(module);
-const sessionKeyLength: number = config.get("sessionKeyLength");
+const sessionKeyLength: number = config.get("session.keyLength");
 
 class SessionController extends Controller {
   constructor() {

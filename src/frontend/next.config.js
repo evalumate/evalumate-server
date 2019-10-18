@@ -11,9 +11,9 @@ const configuration = {
     port: config.get("port"),
   },
   publicRuntimeConfig: {
-    captchaSolutionLength: config.get("captchas.solutionLength"),
-    sessionIdLength: config.get("ids.sessionIdLength"),
-    sessionNameMaxLength: config.get("sessionNameMaxLength"),
+    captchaSolutionLength: config.get("captcha.solutionLength"),
+    sessionIdLength: config.get("session.idLength"),
+    sessionNameMaxLength: config.get("session.nameMaxLength"),
   },
 };
 
