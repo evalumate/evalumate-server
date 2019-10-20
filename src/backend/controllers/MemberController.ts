@@ -115,7 +115,7 @@ export default class MemberController extends Controller {
     respond.success(
       res,
       {
-        member: pick(member, ["uri", "id", "key"]),
+        member: pick(member, ["uri", "id", "secret"]),
       },
       HttpStatus.CREATED
     );
