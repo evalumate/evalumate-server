@@ -1,16 +1,12 @@
-import { setUserRole, setSession } from "../actions/global";
-import { combineReducers } from "redux";
-import { createReducer, action } from "typesafe-actions";
-import { Session } from "../../models/Session";
-import { UserRole } from "../../models/UserRole";
 import { Member } from "../../models/Member";
 import { setMember, setUnderstanding } from "../actions/member";
+import { createReducer } from "typesafe-actions";
 
 export type MemberState = Readonly<{
   /**
    * The `Member` object identifying the user in the current session
    */
-  member: Member;
+  member: Readonly<Member> | null;
   /**
    * The user's understanding state
    */

@@ -1,12 +1,9 @@
-import { getCaptcha } from "../../../api/captcha";
-import { Grid } from "@material-ui/core";
+import { getSession } from "../../../api/session";
+import { Session } from "../../../models/Session";
 import { connect, Field, FormikContext } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
-import InlineSVG from "svg-inline-react";
-import { Session } from "../../../models/Session";
-import { getSession } from "../../../api/session";
 
 const { publicRuntimeConfig } = getConfig();
 const sessionIdLength: number = publicRuntimeConfig.sessionIdLength;
@@ -18,13 +15,14 @@ type Props = {
    * to the callback. When the session id is changed to be invalid afterwards, the callback is
    * invoked again with `null`.
    */
-  onSessionChange: (session: Session) => void;
+  onSessionChange: (session: Session | null) => void;
 };
 
-const InternalSessionIdField: React.ComponentType<
-  Props & { formik: FormikContext<{ sessionId: string }> }
-> = ({ formik, onSessionChange }) => {
-  const [session, setSession] = React.useState<Session>(null);
+const InternalSessionIdField: React.ComponentType<Props & { formik: FormikContext<any> }> = ({
+  formik,
+  onSessionChange,
+}) => {
+  const [session, setSession] = React.useState<Session | null>(null);
 
   // Call onSessionChange when `session` is updated
   React.useEffect(() => {
@@ -32,7 +30,7 @@ const InternalSessionIdField: React.ComponentType<
   }, [session]);
 
   const validateSessionId = async (sessionId: string) => {
-    let error: string = null;
+    let error: string | null = null;
     if (sessionId.length == sessionIdLength) {
       // Skip validation if the sessionId has not changed since the last successful validation
       if (!(session && session.id == sessionId)) {

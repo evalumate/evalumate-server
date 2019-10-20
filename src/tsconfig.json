@@ -20,5 +20,8 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": ["custom-types.d.ts", "backend/custom-types.d.ts", "backend/**/*.ts"]
 }

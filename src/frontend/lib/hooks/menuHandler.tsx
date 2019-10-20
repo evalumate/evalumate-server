@@ -41,7 +41,7 @@ export function useMenuHandler(
   menuButtonAriaLabelText: string
 ): [ButtonProps, MenuProps, CreateCloseHandlerFunction] {
   const [menuId] = React.useState(uniqueId("useMenuHandlers-"));
-  const [anchorElement, setAnchorElement] = React.useState(null);
+  const [anchorElement, setAnchorElement] = React.useState<Element | null>(null);
 
   const closeMenu = () => {
     setAnchorElement(null);

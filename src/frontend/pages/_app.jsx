@@ -1,14 +1,14 @@
+// This file does not use TypeScript as setting it up with next-redux-wrapper was too much of a
+// hassle for too little value
+
 import { makeStore } from "../lib/store";
 import { redirectIfApplicable } from "../lib/util/redirect";
 import withRedux from "next-redux-wrapper";
-import NextApp, { AppInitialProps } from "next/app";
+import NextApp from "next/app";
 import React from "react";
 import { Provider } from "react-redux";
-import { Store } from "StoreTypes";
 
-type AppProps = AppInitialProps & { store: Store };
-
-class App extends NextApp<AppProps> {
+class App extends NextApp {
   static async getInitialProps({ Component, ctx }) {
     redirectIfApplicable(ctx.store, ctx.pathname, ctx.res);
     return {

@@ -4,14 +4,14 @@ import { joinSession } from "../../api/session";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
+import { UserRole } from "../../models/UserRole";
 import { setSession, setUserRole } from "../../store/actions/global";
+import { setMember } from "../../store/actions/member";
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { Form, Formik, FormikActions } from "formik";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { UserRole } from "../../models/UserRole";
-import { setMember } from "../../store/actions/member";
 
 type FormValues = {
   sessionId: string;
@@ -28,9 +28,9 @@ type Props = ConnectedProps<typeof connectToRedux> & {
 };
 
 export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => {
-  const sessionIsPredefined = typeof props.session !== "undefined";
-
-  const [session, setSession] = React.useState<Session>(sessionIsPredefined ? props.session : null);
+  const [session, setSession] = React.useState<Session | null>(
+    typeof props.session !== "undefined" ? props.session : null
+  );
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
 
@@ -39,29 +39,25 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     captcha: { token: "", solution: "" },
   };
 
-  const onSessionChanged = (session: Session) => {
-    setSession(session);
-  };
-
   const onSessionJoined = (member: Member) => {
     props.setSession(session);
     props.setMember(member);
     props.setUserRole(UserRole.Member);
-    router.push(`/client/${session.id}`);
+    router.push(`/client/${session!.id}`);
   };
 
   const onJoinFormSubmit = async (values: FormValues, actions: FormikActions<FormValues>) => {
     // Session cannot be null at this point, because the Formik validation of the SessionIdField has
     // succeeded.
     let member: Member;
-    if (session.captchaRequired) {
-      member = await joinSession(session.id, values.captcha);
+    if (session!.captchaRequired) {
+      member = await joinSession(session!.id, values.captcha);
       if (!member) {
         // Captcha solution was invalid
         setInvalidCaptchaSolutionCount(invalidCaptchaSolutionCount + 1);
       }
     } else {
-      member = await joinSession(session.id);
+      member = await joinSession(session!.id);
     }
 
     if (member) {
@@ -80,7 +76,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <SessionIdField onSessionChange={onSessionChanged} />
+            <SessionIdField onSessionChange={setSession} />
           </Grid>
           {session && session.captchaRequired && (
             <Grid item xs={12}>

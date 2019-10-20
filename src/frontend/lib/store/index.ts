@@ -1,8 +1,12 @@
 import rootReducer from "./reducers";
 import { createStore } from "redux";
-import { RootState } from "StoreTypes";
+import { RootState, Store } from "StoreTypes";
+import { Request } from "express";
 
-export const makeStore = (initialState: RootState, { isServer, req = null }) => {
+export const makeStore = (
+  initialState: RootState,
+  { isServer, req = null }: { isServer: boolean; req: Request & { reduxStore: Store } | null }
+) => {
   if (isServer) {
     if (req) {
       // An express middleware has already created a redux store with the client state for us. We

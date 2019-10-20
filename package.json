@@ -5,11 +5,13 @@
   "scripts": {
     "start": "NODE_ENV=development nodemon --watch src/backend src/backend/index.ts --exec babel-node --extensions \".ts\"",
     "test": "NODE_ENV=test mocha --timeout 15000 --require babel-register.js src/test/*.ts",
-    "build-backend": "rm -rf dist/backend && webpack --config webpack.backend.config.js",
+    "check-types-backend": "cd src/backend && tsc",
+    "check-types-frontend": "cd src/frontend && tsc",
+    "check-types": "npm run check-types-backend && npm run check-types-frontend",
+    "build-backend": "npm run check-types-backend && rm -rf dist/backend && webpack --config webpack.backend.config.js",
     "build-frontend": "next build src/frontend",
     "build": "npm run build-backend && npm run build-frontend",
     "serve": "NODE_ENV=production node dist/backend/index.js",
-    "check-types": "cd src/backend/ && tsc",
     "generate-migration": "cd src/backend && typeorm migration:generate"
   },
   "dependencies": {

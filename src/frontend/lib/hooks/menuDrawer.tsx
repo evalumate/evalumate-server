@@ -20,7 +20,9 @@ export function useMenuDrawer(
     open: false,
   });
 
-  const toggleMenuDrawer = (open: boolean) => (event?: React.KeyboardEvent | React.MouseEvent) => {
+  const toggleMenuDrawer = (open: boolean) => (
+    event?: React.KeyboardEvent | React.MouseEvent | React.SyntheticEvent<{}, Event>
+  ) => {
     if (
       event && // No event is passed if the drawer is swiped
       event.type === "keydown" &&

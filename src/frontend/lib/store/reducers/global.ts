@@ -1,8 +1,7 @@
-import { setUserRole, setSession } from "../actions/global";
-import { combineReducers } from "redux";
-import { createReducer, action } from "typesafe-actions";
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
+import { setSession, setUserRole } from "../actions/global";
+import { createReducer } from "typesafe-actions";
 
 export type GlobalState = Readonly<{
   /**
@@ -12,7 +11,7 @@ export type GlobalState = Readonly<{
   /**
    * The session that the app is attached to (in client or master mode)
    */
-  session: Readonly<Session>;
+  session: Readonly<Session> | null;
 }>;
 
 const initialState: GlobalState = {
