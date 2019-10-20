@@ -26,6 +26,6 @@
     "secretLength": 16
   },
   "client": {
-    "memberPingInterval": 30
+    "memberPingInterval": 15
   }
 }
