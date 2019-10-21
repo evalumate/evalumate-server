@@ -1,4 +1,5 @@
 import { CaptchaFixture, MemberFixture, SessionFixture } from "./fixtures/models";
+import { getApiUri } from "./util/uri";
 import CaptchaController from "../backend/controllers/CaptchaController";
 import MemberController from "../backend/controllers/MemberController";
 import SessionController from "../backend/controllers/SessionController";
@@ -35,7 +36,7 @@ describe("Unit tests", () => {
       describe("/non-existing/resource", () => {
         describe("GET", () => {
           it("should return 404 and have a proper error format", async () => {
-            const result = await axios.get("/api/non-existing/resource");
+            const result = await axios.get(getApiUri("/non-existing/resource"));
             result.status.should.equal(404);
             result.data.should.have.property("error");
             const error = result.data.error;
@@ -131,7 +132,7 @@ describe("Unit tests", () => {
 
     describe("mCreateCaptcha (via GET /captcha)", () => {
       it("should return a captcha", async () => {
-        const reply = await axios.get("/api/captcha");
+        const reply = await axios.get(getApiUri("/captcha"));
         reply.status.should.equal(200);
         reply.data.should.have
           .property("data")
@@ -184,7 +185,7 @@ describe("Unit tests", () => {
       it("should reply with a new session", async () => {
         const captcha = await CaptchaController.createCaptcha();
 
-        const reply = await axios.post("/api/sessions", {
+        const reply = await axios.post(getApiUri("/sessions"), {
           captcha: {
             token: captcha.id,
             solution: captcha.solution,
@@ -212,7 +213,7 @@ describe("Unit tests", () => {
         it("should reply with sessionName and captchaRequired", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.uri!);
+          const reply = await axios.get(getApiUri(session.uri!));
           reply.status.should.equal(200);
           reply.data.should.have.property("data");
 
@@ -227,7 +228,7 @@ describe("Unit tests", () => {
 
       describe("with an invalid sessionId", () => {
         it("should reply with status 404", async () => {
-          (await axios.get("/api/sessions/non-existing-session")).status.should.equal(404);
+          (await axios.get(getApiUri("/sessions/non-existing-session"))).status.should.equal(404);
         });
       });
     });
@@ -237,7 +238,7 @@ describe("Unit tests", () => {
         it("should reply with status code 403", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.delete(session.uri + "?sessionKey=foo");
+          const reply = await axios.delete(getApiUri(session.uri + "?sessionKey=foo"));
           reply.status.should.equal(403);
 
           await sessionFixture.tearDown();
@@ -248,7 +249,7 @@ describe("Unit tests", () => {
         it("should reply with status code 200 and delete the session", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.delete(session.uri + "?sessionKey=" + session.key);
+          const reply = await axios.delete(getApiUri(`${session.uri}?sessionKey=${session.key}`));
           reply.status.should.equal(200);
           await session.reload().should.be.rejectedWith(EntityNotFoundError);
 
@@ -262,7 +263,9 @@ describe("Unit tests", () => {
         it("should reply with session status data", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.uri + "/status?sessionKey=" + session.key);
+          const reply = await axios.get(
+            getApiUri(session.uri + "/status?sessionKey=" + session.key)
+          );
           reply.status.should.equal(200);
 
           // TODO Add assertions on the data object (once defined in the API)
@@ -275,7 +278,7 @@ describe("Unit tests", () => {
         it("should reply with status code 403", async () => {
           const session = await sessionFixture.setUp();
 
-          const reply = await axios.get(session.uri + "/status?sessionKey=bar");
+          const reply = await axios.get(getApiUri(session.uri + "/status?sessionKey=bar"));
           reply.status.should.equal(403);
 
           await sessionFixture.tearDown();
@@ -303,7 +306,7 @@ describe("Unit tests", () => {
             const session = await sessionFixture.setUp(true); // Require a captcha
             const captcha = await captchaFixture.setUp();
 
-            const reply = await axios.post(`${session.uri}/members`, {
+            const reply = await axios.post(getApiUri(`${session.uri}/members`), {
               captcha: {
                 token: captcha.id,
                 solution: captcha.solution,
@@ -326,7 +329,7 @@ describe("Unit tests", () => {
           it("should reply with status 403", async () => {
             const session = await sessionFixture.setUp(true); // Require a captcha
 
-            const reply = await axios.post(`${session.uri}/members`);
+            const reply = await axios.post(getApiUri(`${session.uri}/members`));
             reply.status.should.equal(403);
 
             await sessionFixture.tearDown();
@@ -338,7 +341,7 @@ describe("Unit tests", () => {
         it("should reply with a new member", async () => {
           const session = await sessionFixture.setUp(false); // Do not require a captcha
 
-          const reply = await axios.post(`${session.uri}/members`);
+          const reply = await axios.post(getApiUri(`${session.uri}/members`));
           reply.status.should.equal(201);
           reply.data.should.have
             .property("data")
@@ -371,9 +374,9 @@ describe("Unit tests", () => {
           it("should reply with status 403", async () => {
             const member = await memberFixture.setUp();
 
-            let reply = await axios.delete(member.uri!);
+            let reply = await axios.delete(getApiUri(member.uri!));
             reply.status.should.equal(403);
-            reply = await axios.delete(member.uri + "?memberSecret=anInvalidSecret");
+            reply = await axios.delete(getApiUri(`${member.uri}?memberSecret=anInvalidSecret`));
             reply.status.should.equal(403);
 
             await memberFixture.tearDown();
@@ -384,7 +387,9 @@ describe("Unit tests", () => {
           it("should reply with status 200", async () => {
             const member = await memberFixture.setUp();
 
-            const reply = await axios.delete(`${member.uri}?memberSecret=${member.secret}`);
+            const reply = await axios.delete(
+              getApiUri(`${member.uri}?memberSecret=${member.secret}`)
+            );
             reply.status.should.equal(200);
 
             await member.reload().should.be.rejectedWith(EntityNotFoundError);
@@ -398,7 +403,7 @@ describe("Unit tests", () => {
     describe("mSetUnderstanding (via PUT /sessions/:sessionId/members/:memberId/status)", () => {
       it("should modify a member's understanding property in the database", async () => {
         const member = await memberFixture.setUp();
-        const statusUri = `${member.uri}/status?memberSecret=${member.secret}`;
+        const statusUri = getApiUri(`${member.uri}/status?memberSecret=${member.secret}`);
 
         let setAndAssertStatus = async (status: boolean) => {
           const reply = await axios.put(statusUri, { understanding: status });

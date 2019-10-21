@@ -1,8 +1,8 @@
-import axios from "axios";
+import { getApiUri } from "./util/uri";
 import Captcha from "../backend/entities/Captcha";
+import axios from "axios";
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import config from "config";
 import { step } from "mocha-steps";
 
 const should = chai.should();
@@ -22,7 +22,7 @@ describe("Smoke test", () => {
     describe("/captcha", () => {
       describe("GET", () => {
         step("should return a captcha object (image and token)", async () => {
-          const reply = await axios.get("/api/captcha");
+          const reply = await axios.get(getApiUri("/captcha"));
           reply.should.have.property("status", 200);
           reply.data.should.have.property("data").that.has.property("captcha");
           captchaToken = reply.data.data.captcha.token;
@@ -41,7 +41,7 @@ describe("Smoke test", () => {
     describe("/sessions", () => {
       describe("GET", () => {
         step("should return error 404 (express doesn't support 405 unfortunately)", () => {
-          return axios.get("/api/sessions").should.eventually.have.property("status", 404);
+          return axios.get(getApiUri("/sessions")).should.eventually.have.property("status", 404);
         });
       });
 
@@ -58,7 +58,7 @@ describe("Smoke test", () => {
               captchaRequired: false,
             };
 
-            const reply = await axios.post("/api/sessions", sessionPostParameters);
+            const reply = await axios.post(getApiUri("/sessions"), sessionPostParameters);
 
             const session = reply.data.data.session;
             sessionUri = session.uri;
@@ -68,7 +68,7 @@ describe("Smoke test", () => {
 
           describe("A GET request to the returned session uri", () => {
             it("should return sessionName and captchaRequired", async () => {
-              const reply = await axios.get(sessionUri);
+              const reply = await axios.get(getApiUri(sessionUri));
               reply.should.have.property("status", 200);
 
               const data = reply.data.data;
@@ -86,7 +86,7 @@ describe("Smoke test", () => {
         describe("with a duplicate captcha token", () => {
           step("should return 403 (forbidden)", () => {
             return axios
-              .post("/api/sessions", sessionPostParameters)
+              .post(getApiUri("/sessions"), sessionPostParameters)
               .should.eventually.have.property("status", 403);
           });
         });
