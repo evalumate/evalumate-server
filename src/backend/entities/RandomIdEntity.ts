@@ -1,13 +1,6 @@
 import generateUuid from "nanoid/async";
 import generateUuidWithCustomAlphabet from "nanoid/async/generate";
-import {
-  BaseEntity,
-  BeforeInsert,
-  PrimaryColumn,
-  SaveOptions,
-  QueryFailedError,
-  Repository,
-} from "typeorm";
+import { BaseEntity, BeforeInsert, PrimaryColumn, QueryFailedError, SaveOptions } from "typeorm";
 
 const badWordFilter = new (require("bad-words") as any)();
 

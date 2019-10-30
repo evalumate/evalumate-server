@@ -23,24 +23,28 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Node.js: Tests",
-      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-      "env": {
-        "BABEL_ENV": "debug",
-        "NODE_ENV": "test"
-      },
-      "args": [
-        "--require",
-        "babel-register.js",
-        "--timeout",
-        "999999",
-        "--colors",
-        "'${workspaceRoot}/src/test/*.ts'"
-      ],
-      "runtimeArgs": ["--nolazy"],
+      "name": "Jest: All",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "sourceMaps": true
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest: Current File",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
     },
     {
       "name": "Frontend with Firefox",

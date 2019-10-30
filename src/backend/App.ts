@@ -1,52 +1,73 @@
+import CaptchaController from "./controllers/CaptchaController";
 import Controller from "./controllers/Controller";
+import MemberController from "./controllers/MemberController";
+import SessionController from "./controllers/SessionController";
 import Destructable from "./interfaces/Destructable";
 import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
+import { cookieReduxStoreCreator } from "./middlewares/redux";
 import databaseConfig from "./ormconfig";
-import mainRouter from "./routes";
+import { success as apiRespondSuccess } from "./utils/api-respond";
 import { createLogger, logStream } from "./utils/logger";
 import express from "express";
 import http from "http";
 import createError from "http-errors";
-import morgan from "morgan";
 import nextJs from "next";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
-import { cookieReduxStoreCreator } from "./middlewares/redux";
+import Server from "next/dist/next-server/server/next-server";
 
-const dev = process.env.NODE_ENV !== "production";
+const env = process.env.NODE_ENV!;
+const dev = env !== "production";
 
 const logger = createLogger(module);
 
 class App implements Destructable {
   public app: express.Application;
-  public port: number;
-  public server: http.Server;
+  public port: number | null;
+  public server?: http.Server;
 
-  static nextJsApp = nextJs({
+  /**
+   * Next.js server instance
+   */
+  static nextJsServer = nextJs({
     dev,
     dir: path.join(__dirname, `../${!dev ? "../src/" : ""}frontend`),
   });
 
+  private runNextJsServer: boolean;
+
   private dbConnection: Connection;
   private apiControllers: Controller[];
 
-  constructor(apiControllers: Controller[], port: number) {
-    this.port = port;
-
+  /**
+   * Constructs a new App instance.
+   *
+   * @param port The port for the http server to listen on. If it is not specified (like for testing
+   *             purposes), no http server is created. In this case,
+   * @param runNextJsServer Whether or not to serve requests using next.js
+   */
+  constructor(port: number | null = null, runNextJsServer: boolean = true) {
     logger.info("Initializing App");
+    this.port = port;
+    this.runNextJsServer = runNextJsServer;
 
     this.app = express();
-    this.app.set("port", this.port);
 
     this.initializeMiddlewares();
     this.initializeRoutes();
-    this.initializeApiControllers(apiControllers);
+    this.initializeApiControllers();
     this.initializeErrorHandling();
-    this.initializeNextJsRequestHandling();
 
-    // Create HTTP server
-    logger.debug("Creating HTTP server");
-    this.server = http.createServer(this.app);
+    if (runNextJsServer) {
+      this.initializeNextJsRequestHandling();
+    }
+
+    if (this.port) {
+      // Create HTTP server
+      this.app.set("port", this.port);
+      logger.debug("Creating HTTP server");
+      this.server = http.createServer(this.app);
+    }
   }
 
   private initializeMiddlewares() {
@@ -60,13 +81,21 @@ class App implements Destructable {
 
   private initializeRoutes() {
     logger.debug("Initializing routes");
-    this.app.use(mainRouter);
+
+    /* Root API route */
+    this.app.get("/api", function(req, res, next) {
+      apiRespondSuccess(res);
+    });
   }
 
-  private initializeApiControllers(apiControllers: Controller[]) {
+  private initializeApiControllers() {
     logger.debug("Initializing API controllers");
-    this.apiControllers = apiControllers;
-    apiControllers.forEach(controller => {
+    this.apiControllers = [
+      new CaptchaController(),
+      new SessionController(),
+      new MemberController(),
+    ];
+    this.apiControllers.forEach(controller => {
       this.app.use("/api", controller.router);
     });
   }
@@ -79,7 +108,10 @@ class App implements Destructable {
 
     // Error middlewares
     this.app.use("/api", apiErrorHandler);
-    this.app.use(frontendErrorHandler);
+
+    if (this.runNextJsServer) {
+      this.app.use(frontendErrorHandler);
+    }
   }
 
   private initializeNextJsRequestHandling() {
@@ -87,24 +119,22 @@ class App implements Destructable {
     this.app.use(cookieReduxStoreCreator);
 
     // Render page with Next.js
-    const requestHandler = App.nextJsApp.getRequestHandler();
+    const requestHandler = App.nextJsServer.getRequestHandler();
     this.app.use(async (req, res) => {
       return requestHandler(req, res);
     });
   }
 
-  private destructApiControllers() {
+  private async destructApiControllers() {
     logger.debug("Shutting down API controllers");
-    return Promise.all(
-      this.apiControllers.map(controller => {
-        controller.shutDown();
-      })
-    );
+    await Promise.all(this.apiControllers.map(controller => controller.shutDown()));
+    logger.debug("API controllers shut down");
   }
 
-  private async prepareNextJsApp() {
-    logger.debug("Preparing Next.js app");
-    return App.nextJsApp.prepare();
+  private async prepareNextJsServer() {
+    logger.debug("Preparing Next.js server");
+    await App.nextJsServer.prepare();
+    logger.debug("Next.js server is ready");
   }
 
   private async connectToDatabase() {
@@ -116,66 +146,89 @@ class App implements Destructable {
   private async disconnectFromDatabase() {
     logger.debug("Closing database connection");
     await this.dbConnection.close();
+    logger.debug("Database connection closed");
   }
 
+  public getDatabaseConnection() {
+    return this.dbConnection;
+  }
+
+  /**
+   * Makes `this.server` listen.
+   *
+   * Note: This can only work if `this.server` is not null and should not be called otherwise.
+   */
   private listen(): Promise<void> {
     return new Promise((resolve, reject) => {
-      logger.debug("Calling Server.listen()");
-      this.server.listen(this.port);
+      if (typeof this.server !== "undefined") {
+        logger.debug("Calling Server.listen()");
+        this.server.listen(this.port);
 
-      this.server.on("error", (error: NodeJS.ErrnoException) => {
-        if (error.syscall !== "listen") {
-          reject(error);
-        }
-
-        let portString = "Port " + this.port;
-
-        // handle specific listen errors with friendly messages
-        switch (error.code) {
-          case "EACCES":
-            logger.error(portString + " requires elevated privileges");
-            process.exit(1);
-            break;
-          case "EADDRINUSE":
-            logger.error(portString + " is already in use");
-            process.exit(1);
-            break;
-          default:
+        this.server.on("error", (error: NodeJS.ErrnoException) => {
+          if (error.syscall !== "listen") {
             reject(error);
-        }
-      });
+          }
 
-      this.server.on("listening", () => {
-        logger.info("EvaluMate server listening on port " + this.port);
-        resolve();
-      });
+          // handle specific listen errors with friendly messages
+          switch (error.code) {
+            case "EACCES":
+              logger.error(`Port ${this.port} requires elevated privileges.`);
+              process.exit(1);
+              break;
+            case "EADDRINUSE":
+              logger.error(`Port ${this.port} is already in use.`);
+              process.exit(1);
+              break;
+            default:
+              reject(error);
+          }
+        });
+
+        this.server.on("listening", () => {
+          logger.info("EvaluMate server listening on port " + this.port);
+          resolve();
+        });
+      } else {
+        reject(new Error("this.server is undefined!"));
+      }
     });
   }
 
   private close(): Promise<void> {
     return new Promise((resolve, reject) => {
-      logger.debug("Calling Server.close()");
-      this.server.close();
+      if (typeof this.server !== "undefined") {
+        logger.debug("Calling Server.close()");
+        this.server.close();
 
-      this.server.on("error", (error: NodeJS.ErrnoException) => {
-        reject(error);
-      });
+        this.server.on("error", (error: NodeJS.ErrnoException) => {
+          reject(error);
+        });
 
-      this.server.on("close", () => {
-        logger.info("Server closed");
-        resolve();
-      });
+        this.server.on("close", () => {
+          logger.info("Server closed");
+          resolve();
+        });
+      } else {
+        reject(new Error("this.server is undefined!"));
+      }
     });
   }
 
   public async run() {
-    await this.prepareNextJsApp();
+    if (this.runNextJsServer) {
+      await this.prepareNextJsServer();
+    }
     await this.connectToDatabase();
-    await this.listen();
+    if (typeof this.server !== "undefined") {
+      await this.listen();
+    }
   }
 
   public async shutDown() {
-    await this.close();
+    logger.info("Shutting down");
+    if (typeof this.server !== "undefined") {
+      await this.close();
+    }
     await this.destructApiControllers();
     await this.disconnectFromDatabase();
   }

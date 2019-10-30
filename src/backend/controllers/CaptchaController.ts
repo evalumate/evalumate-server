@@ -13,6 +13,7 @@ import { Request, Response } from "express";
 const logger = createLogger(module);
 
 const captchaTtl: number = config.get("captcha.ttl");
+const deleteExpiredInterval: number = config.get("captcha.deleteExpiredInterval");
 
 class CaptchaController extends Controller {
   private deleteExpiredTimeout: NodeJS.Timeout;
@@ -20,7 +21,6 @@ class CaptchaController extends Controller {
   constructor() {
     super("/captcha");
     this.initializeRoutes();
-    let deleteExpiredInterval: number = config.get("captcha.deleteExpiredInterval");
     this.deleteExpiredTimeout = setInterval(
       Captcha.deleteExpired,
       deleteExpiredInterval * 1000,
@@ -57,8 +57,8 @@ class CaptchaController extends Controller {
   };
 
   /**
-   * Given a captcha id and a solution, throws an appropriate exception if the id or the solution is
-   * invalid.
+   * Given a captcha id and a solution, rejects the returned promise with an appropriate exception
+   * if the id or the solution is invalid.
    *
    * @param id The captcha's id
    * @param solution The solution to be validated
@@ -81,6 +81,7 @@ class CaptchaController extends Controller {
 
   async shutDown() {
     clearInterval(this.deleteExpiredTimeout);
+    logger.debug("deleteExpired interval was cleared");
   }
 }
 

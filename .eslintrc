@@ -5,7 +5,8 @@
   "env": {
     "es6": true
   },
-  "plugins": ["react-hooks"],
+  "extends": ["plugin:jest/recommended", "plugin:jest/style"],
+  "plugins": ["react-hooks", "jest"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"

@@ -2,7 +2,7 @@ import config from "config";
 import { ConnectionOptions } from "typeorm";
 
 const databaseConfig: ConnectionOptions = {
-  entities: [__dirname + "/entities/*{.ts,.js}"],
+  entities: [__dirname + "/entities/*.ts"],
   migrations: [__dirname + "/migrations/*{.ts,.js}"],
   cli: {
     entitiesDir: __dirname + "/entities",

@@ -9,13 +9,12 @@ export function frontendErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  let queryParams = Object.assign(req.query, req.params);
   res.statusCode = err.status || 500;
 
   if (process.env.NODE_ENV == "production") {
-    return App.nextJsApp.render(req, res, "/_error", { message: err.message });
+    return App.nextJsServer.render(req, res, "/_error", { message: err.message });
   } else {
-    return App.nextJsApp.renderError(err, req, res, "/_error");
+    return App.nextJsServer.renderError(err, req, res, "/_error");
   }
 }
 

@@ -2,5 +2,11 @@
   "logging": {
     "level": "debug",
     "handleExceptions": false
+  },
+  "database": {
+    "type": "sqljs",
+    "database": null,
+    "dropSchema": true,
+    "synchronize": true
   }
 }
