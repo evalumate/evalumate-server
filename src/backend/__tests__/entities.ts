@@ -34,12 +34,14 @@ describe("RandomIdEntity", () => {
       while (!captcha2) {
         try {
           captcha2 = await createCaptcha();
-          expect(["a", "b"]).toContain(captcha2.id);
-          expect(captcha2.id).not.toBe(captcha1.id);
         } catch (error) {
           expect(error).toBeInstanceOf(QueryFailedError);
         }
       }
+
+      expect(["a", "b"]).toContain(captcha2.id);
+      expect(captcha2.id).not.toBe(captcha1.id);
+
       await expect(createCaptcha()).rejects.toBeInstanceOf(QueryFailedError);
 
       await Promise.all([captcha1.remove(), captcha2.remove()]);

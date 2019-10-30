@@ -37,13 +37,14 @@ export default abstract class RandomIdEntity extends BaseEntity {
   save(options?: SaveOptions): Promise<this> {
     const repository = (this.constructor as any).getRepository();
 
-    const saveWithRetry = (timesLeft: number): Promise<this> => {
+    const saveWithRetry = async (timesLeft: number): Promise<this> => {
       try {
-        return repository.save(this, options);
+        return await repository.save(this, options);
       } catch (error) {
         if (error instanceof QueryFailedError && this.idExists(this.id) && timesLeft > 0) {
           // Unique constraint error due to duplicate id. Trying again with a new id, automatically
           // generated thanks to @BeforeInsert
+          this.id = ""; // Reset id, so repository.save() will run another insert operation instead of an update one
           return saveWithRetry(timesLeft - 1);
         }
         throw error;
