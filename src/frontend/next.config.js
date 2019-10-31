@@ -1,5 +1,4 @@
 const withPlugins = require("next-compose-plugins");
-const withCss = require("@zeit/next-css");
 const config = require("config"); // Server config access
 
 const configuration = {
@@ -18,4 +17,4 @@ const configuration = {
   },
 };
 
-module.exports = withPlugins([withCss], configuration);
+module.exports = withPlugins([], configuration);
