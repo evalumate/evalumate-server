@@ -11,5 +11,6 @@ export const connectToInMemoryDatabase = () => {
     dropSchema: true,
     synchronize: true,
     entities: databaseConfig.entities,
+    logging: false,
   });
 };

@@ -1,5 +1,4 @@
 import SessionController from "../controllers/SessionController";
-
 import faker from "faker";
 
 /**

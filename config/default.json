@@ -23,9 +23,11 @@
   },
   "member": {
     "idLength": 8,
-    "secretLength": 16
+    "secretLength": 16,
+    "pingInterval": 15,
+    "activeTimeout": 30
   },
-  "client": {
-    "memberPingInterval": 15
+  "record": {
+    "interval": 15
   }
 }

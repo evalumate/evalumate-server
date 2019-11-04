@@ -12,7 +12,7 @@ import { Request, Response } from "express";
 
 const logger = createLogger(module);
 
-const captchaTtl: number = config.get("captcha.ttl");
+export const captchaTtl: number = config.get("captcha.ttl");
 const deleteExpiredInterval: number = config.get("captcha.deleteExpiredInterval");
 
 class CaptchaController extends Controller {

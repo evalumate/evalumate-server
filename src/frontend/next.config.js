@@ -13,7 +13,7 @@ const configuration = {
     captchaSolutionLength: config.get("captcha.solutionLength"),
     sessionIdLength: config.get("session.idLength"),
     sessionNameMaxLength: config.get("session.nameMaxLength"),
-    memberPingInterval: config.get("client.memberPingInterval"),
+    memberPingInterval: config.get("member.pingInterval"),
   },
 };
 

@@ -1,9 +1,12 @@
-import delay from "delay";
-import Captcha from "../entities/Captcha";
-import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
-import faker from "faker";
-import { QueryFailedError, getConnection } from "typeorm";
 import { connectToInMemoryDatabase } from "../../test/setup";
+import Captcha from "../entities/Captcha";
+import faker from "faker";
+import { getConnection, QueryFailedError } from "typeorm";
+import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
+
+jest.mock("../utils/time");
+const increaseUnixTimestamp: (seconds: number) => void = require("../utils/time")
+  .__increaseUnixTimestamp;
 
 beforeAll(async () => {
   await connectToInMemoryDatabase();
@@ -72,20 +75,21 @@ describe("Captcha", () => {
     it("should return a captcha by its token", async () => {
       const captchaFromDb = await Captcha.findAliveById(captcha.id, 120);
       expect(captchaFromDb).toBeDefined();
-      await captcha.remove();
     });
 
     it("should respect the time to live parameter", async () => {
-      await delay(100);
-      const captchaFromDb = await Captcha.findAliveById(captcha.id, 0.05);
+      const ttl = faker.random.number({ min: 1, max: 360 });
+      increaseUnixTimestamp(ttl + 1);
+      const captchaFromDb = await Captcha.findAliveById(captcha.id, ttl);
       expect(captchaFromDb).toBeUndefined();
     });
   });
 
   describe("deleteExpired()", () => {
     it("should delete an expired captcha", async () => {
-      await delay(50);
-      await Captcha.deleteExpired(0.05);
+      const ttl = faker.random.number({ min: 1, max: 360 });
+      increaseUnixTimestamp(ttl + 1);
+      await Captcha.deleteExpired(ttl);
       await expect(captcha.reload()).rejects.toBeInstanceOf(EntityNotFoundError);
     });
 
