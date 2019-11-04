@@ -38,6 +38,12 @@ export default class Member extends RandomIdEntity {
   @Column("int", { default: getUnixTimestamp })
   createdAt: number;
 
+  /**
+   * The UNIX timestamp of the moment when the member's last ping was processed.
+   */
+  @Column("int", { default: getUnixTimestamp })
+  lastPingTime: number;
+
   async idExists(id: string): Promise<boolean> {
     return (await Member.count({ id, sessionId: this.sessionId })) > 0;
   }

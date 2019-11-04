@@ -1,5 +1,6 @@
 import Member from "./Member";
 import RandomIdEntity from "./RandomIdEntity";
+import Record from "./Record";
 import { getUnixTimestamp } from "../utils/time";
 import config from "config";
 import { Column, Entity, OneToMany } from "typeorm";
@@ -23,6 +24,9 @@ export default class Session extends RandomIdEntity {
 
   @OneToMany(type => Member, member => member.session)
   members: Member[];
+
+  @OneToMany(type => Record, record => record.session)
+  records: Record[];
 
   /**
    * The creation time as a UNIX timestamp

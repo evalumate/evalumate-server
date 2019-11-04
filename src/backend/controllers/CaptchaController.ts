@@ -1,14 +1,12 @@
-import * as respond from "../utils/api-respond";
-import Captcha from "../entities/Captcha";
-import config from "config";
 import Controller from "./Controller";
+import Captcha from "../entities/Captcha";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
-import randomstring from "randomstring";
-import svgCaptcha from "svg-captcha";
-import { clearInterval, setInterval } from "timers";
+import * as respond from "../utils/api-respond";
 import { createLogger } from "../utils/logger";
+import config from "config";
 import { Request, Response } from "express";
+import svgCaptcha from "svg-captcha";
 
 const logger = createLogger(module);
 
@@ -16,12 +14,12 @@ export const captchaTtl: number = config.get("captcha.ttl");
 const deleteExpiredInterval: number = config.get("captcha.deleteExpiredInterval");
 
 class CaptchaController extends Controller {
-  private deleteExpiredTimeout: NodeJS.Timeout;
+  private deleteExpiredIntervalId: number;
 
   constructor() {
     super("/captcha");
     this.initializeRoutes();
-    this.deleteExpiredTimeout = setInterval(
+    this.deleteExpiredIntervalId = setInterval(
       Captcha.deleteExpired,
       deleteExpiredInterval * 1000,
       captchaTtl
@@ -80,7 +78,7 @@ class CaptchaController extends Controller {
   }
 
   async shutDown() {
-    clearInterval(this.deleteExpiredTimeout);
+    clearInterval(this.deleteExpiredIntervalId);
     logger.debug("deleteExpired interval was cleared");
   }
 }

@@ -14,7 +14,7 @@ import createError from "http-errors";
 import nextJs from "next";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
-import Server from "next/dist/next-server/server/next-server";
+import RecordController from "./controllers/RecordController";
 
 const env = process.env.NODE_ENV!;
 const dev = env !== "production";
@@ -94,6 +94,7 @@ class App implements Destructable {
       new CaptchaController(),
       new SessionController(),
       new MemberController(),
+      new RecordController(),
     ];
     this.apiControllers.forEach(controller => {
       this.app.use("/api", controller.router);

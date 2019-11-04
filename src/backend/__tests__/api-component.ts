@@ -1,17 +1,51 @@
 import { setupRandomSession } from "../__fixtures__/entities";
 import App from "../App";
-import CaptchaController from "../controllers/CaptchaController";
+import CaptchaController, { captchaTtl } from "../controllers/CaptchaController";
 import MemberController from "../controllers/MemberController";
+import RecordController, {
+  recordInterval,
+  memberActiveTimeout,
+} from "../controllers/RecordController";
 import SessionController from "../controllers/SessionController";
 import Captcha from "../entities/Captcha";
 import Member from "../entities/Member";
 import Session from "../entities/Session";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
+import delay from "delay";
 import faker from "faker";
 import pick from "lodash/pick";
 import request from "supertest";
 import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
+import { getUnixTimestamp } from "../utils/time";
+
+jest.useFakeTimers();
+const advanceTimersBySeconds = (seconds: number) => jest.advanceTimersByTime(seconds * 1000);
+
+/**
+ * Cheaty workaround to wait for async functions called as a consequence to
+ * `jest.advanceTimersByTime()` to complete. Returns a promise that is resolved once the JavaScript
+ * PromiseJobs queue has been processed `n` times (implemented by awaiting `n` dummy promises).
+ *
+ * Note: After awaiting the promise returned by this function, only functions that have awaited <=
+ * `n` + 1 promises in total (including promises used internally by other async function calls) will
+ * have finished after the promise has been resolved.
+ *
+ * @param n (optional) The number of promises that will be awaited subsequently by this function.
+ *          Defaults to 20.
+ */
+async function driveAsyncFunctions(n?: number) {
+  if (typeof n === "undefined") {
+    n = 20;
+  }
+  for (let i = 0; i < n; i++) {
+    await Promise.resolve(); // Wait for promises in the PromiseJobs queue to be resolved
+  }
+}
+
+jest.mock("../utils/time");
+const increaseUnixTimestamp: (seconds: number) => void = require("../utils/time")
+  .__increaseUnixTimestamp;
 
 let evalumateApp: App;
 let app: Express.Application;
@@ -89,15 +123,15 @@ describe("CaptchaController", () => {
   });
 
   describe("validateCaptchaSolution()", () => {
+    let captcha: Captcha;
+
+    beforeEach(async () => {
+      captcha = new Captcha();
+      captcha.solution = faker.random.alphaNumeric(faker.random.number({ min: 4, max: 10 }));
+      await captcha.save();
+    });
+
     describe("with a valid captcha token", () => {
-      let captcha: Captcha;
-
-      beforeEach(async () => {
-        captcha = new Captcha();
-        captcha.solution = faker.random.alphaNumeric(faker.random.number({ min: 4, max: 10 }));
-        await captcha.save();
-      });
-
       it("should successfully validate a valid solution", async () => {
         await expect(
           CaptchaController.validateCaptchaSolution(captcha.id, captcha.solution)
@@ -115,13 +149,29 @@ describe("CaptchaController", () => {
     });
 
     describe("with an invalid captcha token", () => {
-      it("should throw InvalidCaptchaTokenException", async () => {
-        await expect(
-          CaptchaController.validateCaptchaSolution(
-            faker.random.uuid(),
-            faker.random.alphaNumeric(4)
-          )
-        ).rejects.toThrow(InvalidCaptchaTokenException);
+      describe("(non-existent)", () => {
+        it("should throw InvalidCaptchaTokenException", async () => {
+          await expect(
+            CaptchaController.validateCaptchaSolution(
+              faker.random.uuid(),
+              faker.random.alphaNumeric(4)
+            )
+          ).rejects.toThrow(InvalidCaptchaTokenException);
+        });
+      });
+
+      describe("(expired)", () => {
+        it("should throw InvalidCaptchaTokenException", async () => {
+          jest.useFakeTimers();
+
+          increaseUnixTimestamp(captchaTtl + 1);
+          advanceTimersBySeconds(captchaTtl + 1);
+          await driveAsyncFunctions();
+
+          await expect(
+            CaptchaController.validateCaptchaSolution(captcha.id, captcha.solution)
+          ).rejects.toThrow(InvalidCaptchaTokenException);
+        });
       });
     });
   });
@@ -369,5 +419,93 @@ describe("MemberController", () => {
         await setAndAssertStatus(status);
       }
     });
+  });
+});
+
+describe("RecordController", () => {
+  it("should generate correct records", async () => {
+    const session = await setupRandomSession();
+
+    // Define helper functions
+    let recordExpectations: jest.CustomMatcher[] = [];
+    const addRecordExpectationAndExpect = async (
+      registeredMembersCount: number,
+      activeMembersCount: number,
+      understandingMembersCount: number
+    ) => {
+      recordExpectations.push(
+        expect.objectContaining({
+          registeredMembersCount,
+          activeMembersCount,
+          understandingMembersCount,
+        })
+      );
+
+      let records = await RecordController.getRecordsBySessionId(session.id);
+      expect(records).toEqual(recordExpectations);
+    };
+
+    const advanceTime = async (seconds: number) => {
+      increaseUnixTimestamp(seconds);
+      advanceTimersBySeconds(seconds);
+      await driveAsyncFunctions(300);
+    };
+
+    // Simulate a session
+    // Note: member.activeTimeout is set to 60 in config/test.json, while record.interval is 15
+
+    // Ten little members...
+    let members = [];
+    for (let i = 0; i < 10; i++) {
+      members.push(await MemberController.createMember(session));
+    }
+
+    await advanceTime(recordInterval); // Simulate waiting for a record to be generated
+    await addRecordExpectationAndExpect(10, 10, 10); // Test whether the record matches our expectations
+
+    // Remove the last member
+    await members.pop()!.remove();
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(9, 9, 9);
+
+    // Let the first member back out
+    members[0].understanding = false;
+    members[0].lastPingTime = getUnixTimestamp();
+    await members[0].save();
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(9, 9, 8);
+
+    // Simulate a ping of the second member
+    members[1].lastPingTime = getUnixTimestamp();
+    await members[1].save();
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(9, 9, 8);
+
+    // Wait for a record interval – all members except 1 and 2 should be considered inactive now.
+    // Hence, only one (the first) member should be considered understanding.
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(9, 2, 1);
+
+    // Drop another member, just for fun
+    await members.pop()!.remove();
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(8, 2, 1);
+
+    // Member 1 should become inactive now.
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(8, 1, 1);
+
+    // Member 2 should become inactive now. He was the only one understanding. Too bad.
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(8, 0, 0);
+
+    // Remove all the remaining members
+    await Promise.all(members.map(member => member.remove()));
+    await advanceTime(recordInterval);
+    await addRecordExpectationAndExpect(0, 0, 0); // ... and then there were none.
+  });
+
+  describe("getRecordsBySessionId()", () => {
+    it("should return all of a session's records", async () => {});
   });
 });
