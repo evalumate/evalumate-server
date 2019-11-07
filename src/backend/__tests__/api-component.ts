@@ -266,26 +266,6 @@ describe("SessionController", () => {
       });
     });
   });
-
-  describe("mGetSessionStatus (via GET /sessions/:sessionId/status)", () => {
-    describe("with a valid session key", () => {
-      it("should reply with session status data", async () => {
-        const session = await setupRandomSession();
-
-        // TODO Add assertions on the response (once defined in the API)
-      });
-    });
-
-    describe("with an invalid session key", () => {
-      it("should reply with status code 403", async () => {
-        const session = await setupRandomSession();
-
-        await request(app)
-          .get(`/api${session.uri}/status?sessionKey=${faker.random.uuid()}`)
-          .expect(403);
-      });
-    });
-  });
 });
 
 describe("MemberController", () => {

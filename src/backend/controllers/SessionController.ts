@@ -32,12 +32,6 @@ class SessionController extends Controller {
       SessionController.mValidateSessionKey,
       this.mDeleteSession
     );
-    this.router.get(
-      this.path + "/:sessionId/status",
-      SessionController.mLoadSession,
-      SessionController.mValidateSessionKey,
-      this.mGetSessionStatus
-    );
   }
 
   static async createSession(name: string, captchaRequired: boolean): Promise<Session> {
@@ -115,11 +109,6 @@ class SessionController extends Controller {
     logger.info("Deleting session %s", session.id);
     await session.remove();
     respond.success(res);
-  });
-
-  private mGetSessionStatus = asyncHandler(async (req: Request, res: Response) => {
-    const session = req.session!;
-    respond.success(res, {}); // TODO add status data
   });
 }
 
