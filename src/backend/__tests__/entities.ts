@@ -1,4 +1,4 @@
-import { connectToInMemoryDatabase } from "../../test/setup";
+import { connectToInMemoryDatabase } from "../__setup__/database";
 import Captcha from "../entities/Captcha";
 import faker from "faker";
 import { getConnection, QueryFailedError } from "typeorm";

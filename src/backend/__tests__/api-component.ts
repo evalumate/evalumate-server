@@ -1,23 +1,22 @@
-import { setupRandomSession } from "../__fixtures__/entities";
+import { setupRandomSession } from "../__setup__/entities";
 import App from "../App";
 import CaptchaController, { captchaTtl } from "../controllers/CaptchaController";
 import MemberController from "../controllers/MemberController";
-import RecordController, {
-  recordInterval,
-  memberActiveTimeout,
-} from "../controllers/RecordController";
+import RecordController, { recordInterval } from "../controllers/RecordController";
 import SessionController from "../controllers/SessionController";
 import Captcha from "../entities/Captcha";
 import Member from "../entities/Member";
+import Record from "../entities/Record";
 import Session from "../entities/Session";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
-import delay from "delay";
+import { getUnixTimestamp } from "../utils/time";
 import faker from "faker";
 import pick from "lodash/pick";
 import request from "supertest";
 import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
-import { getUnixTimestamp } from "../utils/time";
+import { number } from "yup";
+import HttpStatus from "http-status-codes";
 
 jest.useFakeTimers();
 const advanceTimersBySeconds = (seconds: number) => jest.advanceTimersByTime(seconds * 1000);
@@ -217,7 +216,7 @@ describe("SessionController", () => {
         },
       });
 
-      expect(Session.findOne(response.body.data.session.id)).resolves.toBeInstanceOf(Session);
+      await expect(Session.findOne(response.body.data.session.id)).resolves.toBeInstanceOf(Session);
     });
   });
 
@@ -297,7 +296,7 @@ describe("MemberController", () => {
       expect(member).toBeInstanceOf(Member);
       expect(member.session).toBe(session);
 
-      expect(Member.findOne({ id: member.id, sessionId: session.id })).resolves.toMatchObject(
+      await expect(Member.findOne({ id: member.id, sessionId: session.id })).resolves.toMatchObject(
         pick(member, ["secret", "sessionId"])
       );
     });
@@ -423,9 +422,25 @@ describe("MemberController", () => {
 });
 
 describe("RecordController", () => {
-  it("should generate correct records", async () => {
-    const session = await setupRandomSession();
+  const advanceTime = async (seconds: number) => {
+    increaseUnixTimestamp(seconds);
+    advanceTimersBySeconds(seconds);
+    await driveAsyncFunctions(300);
+  };
 
+  let session: Session;
+  let members: Member[];
+
+  beforeEach(async () => {
+    session = await setupRandomSession();
+
+    members = [];
+    for (let i = 0; i < 10; i++) {
+      members.push(await MemberController.createMember(session));
+    }
+  });
+
+  it("should generate correct records", async () => {
     // Define helper functions
     let recordExpectations: jest.CustomMatcher[] = [];
     const addRecordExpectationAndExpect = async (
@@ -435,6 +450,7 @@ describe("RecordController", () => {
     ) => {
       recordExpectations.push(
         expect.objectContaining({
+          id: recordExpectations.length,
           registeredMembersCount,
           activeMembersCount,
           understandingMembersCount,
@@ -445,21 +461,10 @@ describe("RecordController", () => {
       expect(records).toEqual(recordExpectations);
     };
 
-    const advanceTime = async (seconds: number) => {
-      increaseUnixTimestamp(seconds);
-      advanceTimersBySeconds(seconds);
-      await driveAsyncFunctions(300);
-    };
-
     // Simulate a session
     // Note: member.activeTimeout is set to 60 in config/test.json, while record.interval is 15
 
     // Ten little members...
-    let members = [];
-    for (let i = 0; i < 10; i++) {
-      members.push(await MemberController.createMember(session));
-    }
-
     await advanceTime(recordInterval); // Simulate waiting for a record to be generated
     await addRecordExpectationAndExpect(10, 10, 10); // Test whether the record matches our expectations
 
@@ -506,6 +511,114 @@ describe("RecordController", () => {
   });
 
   describe("getRecordsBySessionId()", () => {
-    it("should return all of a session's records", async () => {});
+    it("should return a session's records", async () => {
+      const getRecords = () => RecordController.getRecordsBySessionId(session.id);
+
+      await expect(getRecords()).resolves.toBeArrayOfSize(0);
+
+      await advanceTime(recordInterval); // Create a single record
+      await expect(getRecords()).resolves.toEqual([expect.any(Record)]);
+
+      // Create two records (separate calls needed because of driveAsyncFunctions())
+      for (let i = 0; i < 2; i++) {
+        await advanceTime(recordInterval);
+      }
+      await expect(getRecords()).resolves.toBeArrayOfSize(3);
+    });
+  });
+
+  describe("mGetRecords (via GET /sessions/:sessionId/records)", () => {
+    it("should return a session's records in the specified format", async () => {
+      const retrieveRecords = async () => {
+        const response = await request(app)
+          .get(`/api${session.uri}/records?sessionKey=${session.key}`)
+          .expect(200);
+        return response.body.data;
+      };
+
+      await expect(retrieveRecords()).resolves.toBeArrayOfSize(0);
+
+      // Create two records
+      for (let i = 0; i < 2; i++) {
+        await advanceTime(recordInterval);
+      }
+      const records = await retrieveRecords();
+
+      expect(records).toBeArrayOfSize(2);
+      for (let i = 0; i < records.length; i++) {
+        expect(records[i]).toEqual({
+          id: i,
+          time: expect.any(Number),
+          registeredMembersCount: expect.any(Number),
+          activeMembersCount: expect.any(Number),
+          understandingMembersCount: expect.any(Number),
+        });
+      }
+    });
+  });
+
+  describe("getRecordsBySessionIdAfter()", () => {
+    it("should return a session's records starting after a given record id", async () => {
+      const getRecordsAfter = (recordId: number) =>
+        RecordController.getRecordsBySessionIdAfter(session.id, recordId);
+
+      await expect(getRecordsAfter(0)).resolves.toBeArrayOfSize(0);
+      await expect(
+        getRecordsAfter(faker.random.number({ min: -10000, max: 10000 }))
+      ).resolves.toBeArrayOfSize(0);
+
+      // Create two records
+      for (let i = 0; i < 2; i++) {
+        await advanceTime(recordInterval);
+      }
+
+      await expect(getRecordsAfter(1)).resolves.toBeArrayOfSize(0);
+      await expect(getRecordsAfter(0)).resolves.toEqual([expect.any(Record)]);
+      await expect(getRecordsAfter(-1)).resolves.toBeArrayOfSize(2);
+    });
+  });
+
+  describe("mGetRecordsAfter (via GET /sessions/:sessionId/records/after/:recordId)", () => {
+    it("should fail with an invalid recordId", async () => {
+      const testResponse = async (recordId: string, expectedStatus: number) =>
+        await request(app)
+          .get(`/api${session.uri}/records/after/${recordId}?sessionKey=${session.key}`)
+          .expect(expectedStatus);
+
+      await Promise.all([
+        testResponse("", HttpStatus.NOT_FOUND),
+        testResponse(faker.random.alphaNumeric(10), HttpStatus.BAD_REQUEST),
+        testResponse("-42", HttpStatus.BAD_REQUEST),
+        testResponse("4.2", HttpStatus.BAD_REQUEST),
+        testResponse("-4.2", HttpStatus.BAD_REQUEST),
+        testResponse("0xFF", HttpStatus.BAD_REQUEST),
+      ]);
+    });
+
+    it("should return a session's records in the specified format", async () => {
+      const retrieveRecordsAfter = async (recordId: number) => {
+        const response = await request(app)
+          .get(`/api${session.uri}/records/after/${recordId}?sessionKey=${session.key}`)
+          .expect(200);
+        return response.body.data;
+      };
+
+      await expect(retrieveRecordsAfter(0)).resolves.toBeArrayOfSize(0);
+
+      // Create two records
+      for (let i = 0; i < 2; i++) {
+        await advanceTime(recordInterval);
+      }
+
+      await expect(retrieveRecordsAfter(0)).resolves.toEqual([
+        {
+          id: 1,
+          time: expect.any(Number),
+          registeredMembersCount: expect.any(Number),
+          activeMembersCount: expect.any(Number),
+          understandingMembersCount: expect.any(Number),
+        },
+      ]);
+    });
   });
 });

@@ -1,17 +1,16 @@
 import Session from "./Session";
 import { getUnixTimestamp } from "../utils/time";
-import { Column, Entity, Index, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity()
-export default class Record {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+export default class Record extends BaseEntity {
+  @PrimaryColumn("int")
+  id: number;
 
   @ManyToOne(type => Session, session => session.records, { onDelete: "CASCADE" })
   session: Session;
 
-  @Column()
-  @Index()
+  @PrimaryColumn()
   sessionId: string;
 
   @Column()
@@ -27,6 +26,5 @@ export default class Record {
    * The creation time as a UNIX timestamp
    */
   @Column("int", { default: getUnixTimestamp })
-  @Index()
   time: number;
 }
