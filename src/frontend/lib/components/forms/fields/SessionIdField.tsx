@@ -1,6 +1,6 @@
 import { getSession } from "../../../api/session";
 import { Session } from "../../../models/Session";
-import { connect, Field, FormikContext } from "formik";
+import { connect, Field, FormikContextType } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
@@ -18,7 +18,7 @@ type Props = {
   onSessionChange: (session: Session | null) => void;
 };
 
-const InternalSessionIdField: React.ComponentType<Props & { formik: FormikContext<any> }> = ({
+const InternalSessionIdField: React.ComponentType<Props & { formik: FormikContextType<any> }> = ({
   formik,
   onSessionChange,
 }) => {

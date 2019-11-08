@@ -5,7 +5,7 @@ import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
 import { setSession, setUserRole } from "../../store/actions/global";
 import { Box, Button, FormControlLabel, Grid, Tooltip, Typography } from "@material-ui/core";
-import { Field, Form, Formik, FormikActions } from "formik";
+import { Field, Form, Formik } from "formik";
 import { Switch, TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
@@ -41,7 +41,7 @@ export const InternalCreateSessionForm: React.FunctionComponent<Props> = props =
     router.push(`/master/${session.id}`);
   };
 
-  const onCreateFormSubmit = async (values: FormValues, actions: FormikActions<FormValues>) => {
+  const onCreateFormSubmit = async (values: FormValues) => {
     const session = await createSession(values);
     if (!session) {
       // Captcha solution was invalid
@@ -49,7 +49,6 @@ export const InternalCreateSessionForm: React.FunctionComponent<Props> = props =
     } else {
       onSessionCreated(session);
     }
-    actions.setSubmitting(false);
   };
 
   return (

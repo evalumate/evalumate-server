@@ -1,11 +1,11 @@
 import { getCaptcha } from "../../../api/captcha";
+import { CaptchaSolution } from "../../../models/CaptchaSolution";
 import { Grid } from "@material-ui/core";
-import { connect, Field, FormikContext } from "formik";
+import { connect, Field, FormikContextType } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
 import InlineSVG from "svg-inline-react";
-import { CaptchaSolution } from "../../../models/CaptchaSolution";
 
 const { publicRuntimeConfig } = getConfig();
 const captchaSolutionLength: number = publicRuntimeConfig.captchaSolutionLength;
@@ -22,7 +22,7 @@ type Props = {
 };
 
 const InternalCaptcha: React.ComponentType<
-  Props & { formik: FormikContext<any & { captcha: CaptchaSolution }> }
+  Props & { formik: FormikContextType<any & { captcha: CaptchaSolution }> }
 > = ({ formik, invalidSolutionCount, stack = false }) => {
   const [captcha, setCaptcha] = React.useState({ image: "", token: "" });
   const [showRetryMessage, setShowRetryMessage] = React.useState(false);

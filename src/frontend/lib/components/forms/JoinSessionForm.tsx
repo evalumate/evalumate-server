@@ -8,7 +8,7 @@ import { UserRole } from "../../models/UserRole";
 import { setSession, setUserRole } from "../../store/actions/global";
 import { setMember } from "../../store/actions/member";
 import { Box, Button, Grid, Typography } from "@material-ui/core";
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -46,7 +46,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     router.push(`/client/${session!.id}`);
   };
 
-  const onJoinFormSubmit = async (values: FormValues, actions: FormikActions<FormValues>) => {
+  const onJoinFormSubmit = async (values: FormValues) => {
     // Session cannot be null at this point, because the Formik validation of the SessionIdField has
     // succeeded.
     let member: Member;
@@ -63,7 +63,6 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     if (member) {
       onSessionJoined(member);
     }
-    actions.setSubmitting(false);
   };
 
   return (
