@@ -19,9 +19,13 @@ const initialState: MemberState = {
 };
 
 const memberReducer = createReducer(initialState)
-  .handleAction(setMember, (state, action) => Object.assign({}, state, { member: action.payload }))
-  .handleAction(setUnderstanding, (state, action) =>
-    Object.assign({}, state, { understanding: action.payload })
-  );
+  .handleAction(setMember, (state, action) => ({
+    ...state,
+    member: action.payload,
+  }))
+  .handleAction(setUnderstanding, (state, action) => ({
+    ...state,
+    understanding: action.payload,
+  }));
 
 export default memberReducer;
