@@ -1,3 +1,4 @@
+import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import { redirectIfApplicable } from "../lib/util/redirect";
 import withRedux from "next-redux-wrapper";
@@ -21,6 +22,7 @@ class App extends NextApp {
     return (
       <Provider store={store}>
         <Component {...pageProps} />
+        <GlobalSnackbar />
       </Provider>
     );
   }
