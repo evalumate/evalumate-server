@@ -1,17 +1,21 @@
 import rootReducer from "./reducers";
-import { createStore } from "redux";
-import { RootState, Store } from "StoreTypes";
+import { rootSaga } from "./sagas";
 import { Request } from "express";
+import { applyMiddleware, createStore, Store } from "redux";
+import createSagaMiddleware from "redux-saga";
+import { RootState } from "StoreTypes";
 
 export const makeStore = (
   initialState: RootState,
-  { isServer, req = null }: { isServer: boolean; req: Request & { reduxStore: Store } | null }
+  { isServer, req = null }: { isServer: boolean; req: Request & { reduxState: any } | null }
 ) => {
+  const sagaMiddleware = createSagaMiddleware();
+  let store: Store;
+
   if (isServer) {
     if (req) {
-      // An express middleware has already created a redux store with the client state for us. We
-      // can't do this here because it is asynchronous.
-      return req.reduxStore;
+      // An express middleware has already extracted the client's state from cookies
+      initialState = req.reduxState;
     }
 
     // While the above store is present during getInitialProps, another store has to be provided for
@@ -20,7 +24,7 @@ export const makeStore = (
     // Note: Changes made to the store during rendering will be lost, since the client state is
     // taken from a page's getInitialProps.
 
-    return createStore(rootReducer, initialState);
+    store = createStore(rootReducer, initialState, applyMiddleware(sagaMiddleware));
   } else {
     // Initialize redux-persist only on the client side
     const { persistStore, persistReducer } = require("redux-persist");
@@ -42,12 +46,19 @@ export const makeStore = (
     const { composeWithDevTools } = require("redux-devtools-extension/logOnlyInProduction");
 
     const reducer = persistReducer(persistConfig, rootReducer);
-    const store = createStore(reducer, initialState, composeWithDevTools());
+    store = createStore(
+      reducer,
+      initialState,
+      composeWithDevTools(applyMiddleware(sagaMiddleware))
+    );
 
     // Since a store with the current state is present during SSR, we do not need a persist Gate.
     // Hence, we do not have to keep a reference to the persistor.
     persistStore(store);
-
-    return store;
   }
+
+  // @ts-ignore: TypeScript doesn't know about store.sagaTask
+  store.sagaTask = sagaMiddleware.run(rootSaga);
+
+  return store;
 };

@@ -1,20 +1,20 @@
 import CaptchaController from "./controllers/CaptchaController";
 import Controller from "./controllers/Controller";
 import MemberController from "./controllers/MemberController";
+import RecordController from "./controllers/RecordController";
 import SessionController from "./controllers/SessionController";
 import Destructable from "./interfaces/Destructable";
 import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
-import { cookieReduxStoreCreator } from "./middlewares/redux";
+import { cookieReduxStateExtractor } from "./middlewares/redux";
 import databaseConfig from "./ormconfig";
 import { success as apiRespondSuccess } from "./utils/api-respond";
-import { createLogger, logStream } from "./utils/logger";
+import { createLogger } from "./utils/logger";
 import express from "express";
 import http from "http";
 import createError from "http-errors";
 import nextJs from "next";
 import path from "path";
 import { Connection, createConnection } from "typeorm";
-import RecordController from "./controllers/RecordController";
 
 const env = process.env.NODE_ENV!;
 const dev = env !== "production";
@@ -116,8 +116,8 @@ class App implements Destructable {
   }
 
   private initializeNextJsRequestHandling() {
-    // Create redux store with state from cookies and store it in the request object
-    this.app.use(cookieReduxStoreCreator);
+    // Extract redux state from cookies and store it in the request object
+    this.app.use(cookieReduxStateExtractor);
 
     // Render page with Next.js
     const requestHandler = App.nextJsServer.getRequestHandler();

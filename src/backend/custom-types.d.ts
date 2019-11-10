@@ -7,7 +7,7 @@ declare global {
     interface Request {
       session?: Session;
       member?: Member;
-      reduxStore?: Store;
+      reduxState?: any;
     }
   }
 }

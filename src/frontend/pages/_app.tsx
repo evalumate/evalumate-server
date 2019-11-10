@@ -1,6 +1,7 @@
 import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import { redirectIfApplicable } from "../lib/util/redirect";
+import withReduxSaga from "next-redux-saga";
 import withRedux from "next-redux-wrapper";
 import NextApp, { AppContext } from "next/app";
 import React from "react";
@@ -30,4 +31,4 @@ class App extends NextApp {
 
 // @ts-ignore: Setting up TypeScript with next-redux-wrapper was too much of a hassle for too little
 // value
-export default withRedux(makeStore)(App);
+export default withRedux(makeStore)(withReduxSaga(App));
