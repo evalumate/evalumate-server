@@ -5,7 +5,7 @@ import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole } from "../../store/actions/global";
+import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
 import { setMember } from "../../store/actions/member";
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { Form, Formik } from "formik";
@@ -43,6 +43,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     props.setSession(session);
     props.setMember(member);
     props.setUserRole(UserRole.Member);
+    props.showSnackbar(`Joined session "${session!.name}"`);
     router.push(`/client/${session!.id}`);
   };
 
@@ -97,11 +98,9 @@ const mapDispatchToProps = {
   setUserRole,
   setMember,
   setSession,
+  showSnackbar,
 };
 
-const connectToRedux = connect(
-  null,
-  mapDispatchToProps
-);
+const connectToRedux = connect(null, mapDispatchToProps);
 
 export const JoinSessionForm = connectToRedux(InternalJoinSessionForm);

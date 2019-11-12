@@ -3,7 +3,7 @@ import { createSession } from "../../api/session";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole } from "../../store/actions/global";
+import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
 import { Box, Button, FormControlLabel, Grid, Tooltip, Typography } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import { Switch, TextField } from "formik-material-ui";
@@ -38,6 +38,7 @@ export const InternalCreateSessionForm: React.FunctionComponent<Props> = props =
   const onSessionCreated = (session: Session) => {
     props.setSession(session);
     props.setUserRole(UserRole.Owner);
+    props.showSnackbar(`Session "${session.name}" created`);
     router.push(`/master/${session.id}`);
   };
 
@@ -101,11 +102,9 @@ export const InternalCreateSessionForm: React.FunctionComponent<Props> = props =
 const mapDispatchToProps = {
   setUserRole,
   setSession,
+  showSnackbar,
 };
 
-const connectToRedux = connect(
-  null,
-  mapDispatchToProps
-);
+const connectToRedux = connect(null, mapDispatchToProps);
 
 export const CreateSessionForm = connectToRedux(InternalCreateSessionForm);
