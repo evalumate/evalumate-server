@@ -1,4 +1,4 @@
-let unixTimestamp = Date.now() / 1000;
+let unixTimestamp = Math.floor(Date.now() / 1000);
 
 export function __setUnixTimestamp(newUnixTimestamp: number) {
   unixTimestamp = newUnixTimestamp;
