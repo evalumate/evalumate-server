@@ -7,7 +7,7 @@ import { RootState } from "StoreTypes";
 
 export const makeStore = (
   initialState: RootState,
-  { isServer, req = null }: { isServer: boolean; req: Request & { reduxState: any } | null }
+  { isServer, req = null }: { isServer: boolean; req: (Request & { reduxState: any }) | null }
 ) => {
   const sagaMiddleware = createSagaMiddleware();
   let store: Store;
@@ -34,6 +34,7 @@ export const makeStore = (
     const persistConfig = {
       key: "evalumate",
       storage: new CookieStorage(Cookies),
+      blacklist: "owner",
       stateReconciler(inboundState: any, originalState: any) {
         // Ignore state from cookies, only use the state passed to makeStore (which is the state
         // returned from `getInitialProps` by next-redux-wrapper). Reason: A page could change the
@@ -57,8 +58,10 @@ export const makeStore = (
     persistStore(store);
   }
 
-  // @ts-ignore: TypeScript doesn't know about store.sagaTask
-  store.sagaTask = sagaMiddleware.run(rootSaga);
+  if (req || !isServer) {
+    // @ts-ignore: TypeScript doesn't know about store.sagaTask
+    store.sagaTask = sagaMiddleware.run(rootSaga);
+  }
 
   return store;
 };
