@@ -11,6 +11,7 @@ import InvalidMemberSecretException from "../exceptions/InvalidMemberSecretExcep
 import validationMiddleware from "../middlewares/validation";
 import * as respond from "../utils/api-respond";
 import { createLogger } from "../utils/logger";
+import { getUnixTimestamp } from "../utils/time";
 import config from "config";
 import cryptoRandomString from "crypto-random-string";
 import { NextFunction, Request, Response } from "express";
@@ -129,6 +130,7 @@ export default class MemberController extends Controller {
   private mSetUnderstanding = asyncHandler(async (req: Request, res: Response) => {
     const member = req.member!;
     member.understanding = (req.body as SetUnderstandingDto).understanding;
+    member.lastPingTime = getUnixTimestamp();
     await member.save();
     respond.success(res);
   });
