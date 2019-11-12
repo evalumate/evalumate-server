@@ -25,7 +25,7 @@
     "idLength": 8,
     "secretLength": 16,
     "pingInterval": 15,
-    "activeTimeout": 30
+    "activeTimeout": 300
   },
   "record": {
     "interval": 15
