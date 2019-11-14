@@ -29,5 +29,8 @@
   },
   "record": {
     "interval": 15
+  },
+  "client": {
+    "historyScaleChangeInterval": 240
   }
 }

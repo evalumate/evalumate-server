@@ -14,6 +14,8 @@ const configuration = {
     sessionIdLength: config.get("session.idLength"),
     sessionNameMaxLength: config.get("session.nameMaxLength"),
     memberPingInterval: config.get("member.pingInterval"),
+    recordInterval: config.get("record.interval"),
+    historyScaleChangeInterval: config.get("client.historyScaleChangeInterval"),
   },
 };
 
