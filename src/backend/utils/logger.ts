@@ -1,3 +1,5 @@
+import config from "config";
+import path from "path";
 import {
   createLogger as createWinstonLogger,
   Logger,
@@ -5,8 +7,6 @@ import {
   format,
   transports,
 } from "winston";
-import config from "config";
-import path from "path";
 
 const options: LoggerOptions = {
   format: format.combine(
@@ -35,7 +35,7 @@ const nodeEnv = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
 if (!["test", "production"].includes(nodeEnv)) {
   logger.add(
     new transports.Console({
-      level: "debug",
+      level: config.get("logging.level"),
       format: format.cli(),
       handleExceptions: true,
     })
