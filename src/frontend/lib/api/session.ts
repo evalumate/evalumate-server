@@ -50,3 +50,17 @@ export async function joinSession(sessionId: string, captcha?: CaptchaSolution):
   );
   return reply.data.error ? null : reply.data.data.member;
 }
+
+/**
+ * Deletes a session.
+ *
+ * @param session The `Session` object specifying the session to be deleted. Note: The `key`
+ *                attribute has to be set.
+ *
+ * @returns `True` on success, or `False` if the session does not exist (error 404) or the session
+ * key is invalid (error 403).
+ */
+export async function deleteSession(session: Session): Promise<boolean> {
+  const reply = await axios.delete(getApiUrl(`${session.uri}?sessionKey=${session.key}`));
+  return !reply.data.error;
+}
