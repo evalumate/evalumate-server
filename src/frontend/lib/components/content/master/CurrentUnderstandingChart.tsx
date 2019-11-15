@@ -1,4 +1,4 @@
-import { selectLatestRecord } from "../../../store/selectors/owner";
+import { selectLatestUnderstandingPercentage } from "../../../store/selectors/owner";
 import theme from "../../../theme";
 import { Title } from "../../layout/Title";
 import * as React from "react";
@@ -10,15 +10,7 @@ const palette = theme.palette;
 
 type Props = ConnectedProps<typeof connectToRedux>;
 
-const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ record }) => {
-  let understanding: number;
-  if (!record || record.activeMembersCount == 0) {
-    understanding = 100;
-  } else {
-    understanding = Math.floor(
-      (record.understandingMembersCount / record.activeMembersCount) * 100
-    );
-  }
+const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ understanding }) => {
   return (
     <>
       <Title>Current</Title>
@@ -40,7 +32,7 @@ const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ rec
 };
 
 const mapStateToProps = (state: RootState) => ({
-  record: selectLatestRecord(state),
+  understanding: selectLatestUnderstandingPercentage(state),
 });
 
 const connectToRedux = connect(mapStateToProps);
