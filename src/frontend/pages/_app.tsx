@@ -2,6 +2,7 @@ import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import theme from "../lib/theme";
 import { redirectIfApplicable } from "../lib/util/redirect";
+import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import withReduxSaga from "next-redux-saga";
 import withRedux from "next-redux-wrapper";
@@ -27,6 +28,7 @@ class App extends NextApp {
     return (
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
+          <CssBaseline />
           <ModalProvider container={TransitionGroup}>
             <Component {...pageProps} />
           </ModalProvider>
