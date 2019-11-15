@@ -1,10 +1,7 @@
+import { MainGrid } from "./MainGrid";
 import { ToolBar } from "./toolbar/ToolBar";
-import theme from "../../theme";
-import { MuiThemeProvider } from "@material-ui/core/styles";
 import Head from "next/head";
 import * as React from "react";
-import { MainGrid } from "./MainGrid";
-import CssBaseline from "@material-ui/core/CssBaseline";
 
 type Props = {
   hideMenu?: boolean;
@@ -34,11 +31,8 @@ export const Page: React.FunctionComponent<Props> = ({
       <Head>
         <title>{title + (titleAddHomepageTitle ? " – EvaluMate" : "")}</title>
       </Head>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        {!hideMenu && <ToolBar />}
-        <MainGrid maxWidth={maxWidth}>{children}</MainGrid>
-      </MuiThemeProvider>
+      {!hideMenu && <ToolBar />}
+      <MainGrid maxWidth={maxWidth}>{children}</MainGrid>
     </div>
   );
 };
