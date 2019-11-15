@@ -1,6 +1,7 @@
-// Gratefully taken from https://github.com/mui-org/material-ui/blob/master/examples/nextjs-with-typescript/pages/_document.tsx
+// Based on https://github.com/mui-org/material-ui/blob/master/examples/nextjs-with-typescript/pages/_document.tsx
 
 import theme from "../lib/theme";
+import { CssBaseline } from "@material-ui/core";
 import { ServerStyleSheets } from "@material-ui/styles";
 import NextDocument, { Head, Main, NextScript } from "next/document";
 import * as React from "react";
@@ -21,6 +22,7 @@ class Document extends NextDocument {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
+          <CssBaseline />
         </Head>
         <body>
           <Main />
