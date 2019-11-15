@@ -5,6 +5,7 @@ type ButtonProps = {
   "aria-controls": string;
   "aria-label": string;
   "aria-haspopup": boolean;
+  title: string;
   onClick: (
     event: React.KeyboardEvent<HTMLButtonElement> | React.MouseEvent<HTMLButtonElement>
   ) => void;
@@ -26,8 +27,8 @@ type CreateCloseHandlerFunction = (
 /**
  * A React hook for dropdown menus that returns the following utilities for menu creation:
  *
- * * `buttonProps`: An object to be spread into the button that opens the menu. Contains:
- *   `aria-controls`, `aria-haspopup`, `aria-label` (passed to the handler), `onClick`
+ * * `buttonProps`: An object to be spread into the button that opens the menu. Contains: `title`,
+ *   `aria-controls`, `aria-haspopup`, `aria-label`, `onClick`
  *
  * * `menuProps`: An object to be spread into the `Menu` element. Contains: `id`, `keepMounted`,
  *   `open`, `anchorEl`, `getContentAnchorEl`, `onClose`
@@ -35,10 +36,10 @@ type CreateCloseHandlerFunction = (
  * * `createCloseHandler`: A function, that takes a function and returns an event handler that
  *   closes the menu and calls the provided function.
  *
- * @param menuButtonAriaLabelText The string used for `aria-label` in `buttonProps`
+ * @param menuButtonTitle The title used for the `title` and `aria-label` props in `buttonProps`
  */
 export function useMenuHandler(
-  menuButtonAriaLabelText: string
+  menuButtonTitle: string
 ): [ButtonProps, MenuProps, CreateCloseHandlerFunction] {
   const [menuId] = React.useState(uniqueId("useMenuHandlers-"));
   const [anchorElement, setAnchorElement] = React.useState<Element | null>(null);
@@ -49,8 +50,9 @@ export function useMenuHandler(
 
   const buttonProps: ButtonProps = {
     "aria-controls": menuId,
-    "aria-label": menuButtonAriaLabelText,
+    "aria-label": menuButtonTitle,
     "aria-haspopup": true,
+    title: menuButtonTitle,
     onClick: event => {
       setAnchorElement(event.currentTarget);
     },
