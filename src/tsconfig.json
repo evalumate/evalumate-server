@@ -1,4 +1,3 @@
-// Server-side typescript configuration
 {
   "compilerOptions": {
     // Target latest version of ECMAScript.
@@ -23,5 +22,9 @@
   "exclude": [
     "node_modules"
   ],
-  "include": ["global.d.ts", "custom-types.d.ts", "backend/custom-types.d.ts", "backend/**/*.ts"]
+  "include": [
+    "*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
