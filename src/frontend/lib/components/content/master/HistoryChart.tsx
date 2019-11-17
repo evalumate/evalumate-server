@@ -1,12 +1,12 @@
 import { selectRecords } from "../../../store/selectors/owner";
-import theme from "../../../theme";
+import { Title } from "../../layout/Title";
+import { useTheme } from "@material-ui/core";
 import moment from "moment";
 import getConfig from "next/config";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { Area, AreaChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RootState } from "StoreTypes";
-import { Title } from "../../layout/Title";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -16,11 +16,12 @@ function formatUnixTime(time: number, formatString: string = "HH:mm") {
   return moment.unix(time).format(formatString);
 }
 
-const palette = theme.palette;
-
 type Props = ConnectedProps<typeof connectToRedux>;
 
 const InternalHistoryChart: React.FunctionComponent<Props> = ({ records }) => {
+  const theme = useTheme();
+  const palette = theme.palette;
+
   return (
     <>
       <Title>History</Title>

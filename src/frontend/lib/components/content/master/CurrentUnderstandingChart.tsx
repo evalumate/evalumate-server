@@ -1,16 +1,17 @@
 import { selectLatestUnderstandingPercentage } from "../../../store/selectors/owner";
-import theme from "../../../theme";
 import { Title } from "../../layout/Title";
+import { useTheme } from "@material-ui/core";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, YAxis } from "recharts";
 import { RootState } from "StoreTypes";
 
-const palette = theme.palette;
-
 type Props = ConnectedProps<typeof connectToRedux>;
 
 const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ understanding }) => {
+  const theme = useTheme();
+  const palette = theme.palette;
+
   return (
     <>
       <Title>Current</Title>
