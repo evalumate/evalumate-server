@@ -6,7 +6,7 @@ import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
 import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
-import { setMember } from "../../store/actions/member";
+import { setMember, setUnderstanding } from "../../store/actions/member";
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -42,6 +42,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
   const onSessionJoined = (member: Member) => {
     props.setSession(session);
     props.setMember(member);
+    props.setUnderstanding(true);
     props.setUserRole(UserRole.Member);
     props.showSnackbar(`Joined session "${session!.name}"`);
     router.push(`/client/${session!.id}`);
@@ -63,6 +64,8 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
 
     if (member) {
       onSessionJoined(member);
+    } else {
+      props.showSnackbar("Sorry, something went wrong. Please try again!");
     }
   };
 
@@ -98,6 +101,7 @@ const mapDispatchToProps = {
   setUserRole,
   setMember,
   setSession,
+  setUnderstanding,
   showSnackbar,
 };
 
