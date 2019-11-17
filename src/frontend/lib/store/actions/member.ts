@@ -1,5 +1,5 @@
 import { Member } from "../../models/Member";
-import { createStandardAction } from "typesafe-actions";
+import { createAction } from "typesafe-actions";
 
-export const setMember = createStandardAction("Member:setMember")<Member>();
-export const setUnderstanding = createStandardAction("Member:setUnderstanding")<boolean>();
+export const setMember = createAction("Member:setMember")<Member | null>();
+export const setUnderstanding = createAction("Member:setUnderstanding")<boolean>();

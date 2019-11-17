@@ -1,5 +1,5 @@
 import { Record } from "../../models/Record";
-import { createStandardAction } from "typesafe-actions";
+import { createAction } from "typesafe-actions";
 
-export const setRecords = createStandardAction("Owner:setRecords")<Record[]>();
-export const addRecords = createStandardAction("Owner:addRecords")<Record[]>();
+export const setRecords = createAction("Owner:setRecords")<Record[]>();
+export const addRecords = createAction("Owner:addRecords")<Record[]>();
