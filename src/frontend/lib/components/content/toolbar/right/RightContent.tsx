@@ -12,7 +12,7 @@ import { MemberExitSessionButton } from "./MemberExitSessionButton";
 type Props = ConnectedProps<typeof connectToRedux>;
 
 const InternalRightContent: React.FunctionComponent<Props> = ({ role, session }) => {
-  if (role == UserRole.Visitor) {
+  if (role == UserRole.Visitor || !session) {
     return (
       <Hidden implementation="css" smDown>
         <VisitorButtons />
