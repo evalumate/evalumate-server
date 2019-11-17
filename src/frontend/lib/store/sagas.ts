@@ -1,17 +1,28 @@
-import { showSnackbar } from "./actions/global";
-import { selectUserRole, selectSession } from "./selectors/global";
-import { UserRole } from "../models/UserRole";
-import { call, delay, put, select } from "redux-saga/effects";
-import { selectLatestRecord } from "./selectors/owner";
-import { Record } from "../models/Record";
-import { getRecords } from "../api/record";
+import { setUserRole, showSnackbar } from "./actions/global";
+import { setUnderstanding } from "./actions/member";
 import { addRecords } from "./actions/owner";
+import { selectSession, selectUserRole } from "./selectors/global";
+import { selectMember, selectUnderstanding } from "./selectors/member";
+import { selectLatestRecord } from "./selectors/owner";
+import { setUnderstanding as apiSetUnderstanding } from "../api/member";
+import { getRecords } from "../api/record";
+import { Record } from "../models/Record";
+import { UserRole } from "../models/UserRole";
+import { isClient, isServer } from "../util/environment";
+import getConfig from "next/config";
+import { call, delay, put, race, select, take, takeLatest, fork, cancel } from "redux-saga/effects";
+import { getType } from "typesafe-actions";
+import { Task } from "redux-saga";
 
-const isClient = process.browser;
+const { publicRuntimeConfig } = getConfig();
+const { recordInterval, memberPingInterval } = publicRuntimeConfig;
 
-// TODO Rework saga structure, use sagas for the client too
-
-function* fetchRecordsSaga() {
+/**
+ * Fetches records from the API.
+ *
+ * Note: The user has to be a session owner in order for this to take effect.
+ */
+export function* fetchRecordsSaga() {
   const session = yield select(selectSession);
   const latestRecord: Record | null = yield select(selectLatestRecord);
   let newRecords: Record[] | null;
@@ -27,20 +38,80 @@ function* fetchRecordsSaga() {
   }
 }
 
-function* pingSaga() {
-  switch (yield select(selectUserRole)) {
-    case UserRole.Owner:
+/**
+ * On the client side, periodically calls `fetchRecordsSaga`. On the server side, `fetchRecordsSaga`
+ * is called only once.
+ */
+export function* ownerSaga() {
+  yield call(fetchRecordsSaga);
+  if (isClient) {
+    while (true) {
+      yield delay(recordInterval * 1000);
       yield call(fetchRecordsSaga);
-      break;
+    }
+  }
+}
+
+/**
+ * Pings the API with the current understanding value.
+ */
+export function* memberSaga() {
+  const member = yield select(selectMember);
+  while (true) {
+    // Wait for understanding to be set or a memberPingInterval to pass
+    const result = yield race({
+      take: take(getType(setUnderstanding)),
+      delay: delay(memberPingInterval * 1000),
+    });
+    const understanding = yield select(selectUnderstanding);
+    yield call(apiSetUnderstanding, member, understanding);
+  }
+}
+
+/**
+ * Depending on the user role, forks `ownerSaga`, `memberSaga`, or does nothing. On the client side,
+ * cancels the forked saga and starts again every time the user role is set.
+ */
+export function* pingSaga() {
+  const createForkSagaByUserRoleEffect = (role: UserRole) => {
+    switch (role) {
+      case UserRole.Owner:
+        return fork(ownerSaga);
+      case UserRole.Member:
+        if (isClient) {
+          return fork(memberSaga);
+        }
+        break;
+    }
+    return null;
+  };
+
+  let role: UserRole = yield select(selectUserRole);
+
+  if (isServer) {
+    // Fork if applicable
+    const forkEffect = createForkSagaByUserRoleEffect(role);
+    if (forkEffect) {
+      yield forkEffect;
+    }
+  } else {
+    let lastTask: Task | null = null;
+    while (true) {
+      // Fork if applicable
+      const forkEffect = createForkSagaByUserRoleEffect(role);
+      if (forkEffect) {
+        lastTask = yield forkEffect;
+      }
+
+      role = yield take(getType(setUserRole));
+      if (lastTask) {
+        yield cancel(lastTask);
+        lastTask = null;
+      }
+    }
   }
 }
 
 export function* rootSaga() {
-  yield call(pingSaga);
-  if (isClient) {
-    while (true) {
-      yield delay(15000);
-      yield call(pingSaga);
-    }
-  }
+  yield fork(pingSaga);
 }

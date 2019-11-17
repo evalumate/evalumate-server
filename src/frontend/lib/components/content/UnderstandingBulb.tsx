@@ -1,15 +1,12 @@
 import { setUnderstanding } from "../../store/actions/member";
 import { selectMember, selectUnderstanding } from "../../store/selectors/member";
+import { ButtonBase, Theme } from "@material-ui/core";
+import { EmojiObjects, EmojiObjectsOutlined } from "@material-ui/icons";
+import { createStyles, makeStyles } from "@material-ui/styles";
+import getConfig from "next/config";
 import * as React from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { RootState } from "StoreTypes";
-import { makeStyles, createStyles } from "@material-ui/styles";
-import { Theme, Button, ButtonBase } from "@material-ui/core";
-import { EmojiObjects, EmojiObjectsOutlined } from "@material-ui/icons";
-import { setUnderstanding as apiSetUnderstanding } from "../../api/member";
-import useInterval from "@use-it/interval";
-
-import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 const pingIntervalSeconds: number = publicRuntimeConfig.memberPingInterval * 1000;
@@ -37,19 +34,6 @@ const InternalUnderstandingBulb: React.FunctionComponent<Props> = ({
   setUnderstanding,
 }) => {
   const classes = useStyles({});
-
-  const pingApi = () => {
-    apiSetUnderstanding(member, understanding);
-  };
-
-  // Contact the API on `understanding` changes and regularly ping it with the current state
-  React.useEffect(() => {
-    pingApi();
-    const intervalId = setInterval(() => {
-      pingApi();
-    }, pingIntervalSeconds);
-    return () => clearInterval(intervalId);
-  }, [understanding]);
 
   const handleButtonClick = () => {
     setUnderstanding(!understanding);
@@ -79,9 +63,6 @@ const mapDispatchToProps = {
   setUnderstanding,
 };
 
-const connectToRedux = connect(
-  mapStateToProps,
-  mapDispatchToProps
-);
+const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export const UnderstandingBulb = connectToRedux(InternalUnderstandingBulb);
