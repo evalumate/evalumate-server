@@ -29,7 +29,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const InternalUnderstandingBulb: React.FunctionComponent<Props> = ({
-  member,
   understanding,
   setUnderstanding,
 }) => {
@@ -55,7 +54,6 @@ const InternalUnderstandingBulb: React.FunctionComponent<Props> = ({
 };
 
 const mapStateToProps = (state: RootState) => ({
-  member: selectMember(state),
   understanding: selectUnderstanding(state),
 });
 
