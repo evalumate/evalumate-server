@@ -6,6 +6,7 @@ const serverRuntimeConfig = {
 };
 
 const publicRuntimeConfig = {
+  publicUrl: config.get("publicUrl"),
   captchaSolutionLength: config.get("captcha.solutionLength"),
   sessionIdLength: config.get("session.idLength"),
   sessionNameMaxLength: config.get("session.nameMaxLength"),
