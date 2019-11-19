@@ -6,6 +6,7 @@ import { ServerResponse } from "http";
 import minimatch from "minimatch";
 import nextRouter from "next/router";
 import { Store } from "StoreTypes";
+import { ParsedUrlQuery } from "querystring";
 
 /**
  * Redirects the client to the given domain-relative location.
@@ -33,10 +34,15 @@ export function redirectTo(location: string, res?: ServerResponse) {
  *
  * @param store A redux store holding the app's current state
  * @param pathname The current page's path name, as passed to `getInitialProps`.
+ * @param query The current requests query parameters, as passed to `getInitialProps`.
  *
  * @returns The redirect destination URL or `null`
  */
-export async function getRedirectUrlIfApplicable(store: Store, pathname: string) {
+export async function getRedirectUrlIfApplicable(
+  store: Store,
+  pathname: string,
+  query: ParsedUrlQuery
+) {
   const state = store.getState();
   const role = selectUserRole(state);
   const session = selectSession(state);
@@ -49,46 +55,37 @@ export async function getRedirectUrlIfApplicable(store: Store, pathname: string)
 
       if (session) {
         // Session was not `null` before we reset it
-        switch (role) {
-          case UserRole.Member:
-            if (pathname === `/client/${session.id}`) {
-              store.dispatch(showSnackbar("The session has expired."));
-              return "/";
-            }
-            break;
-          case UserRole.Owner:
-            if (pathname === `/master/${session.id}`) {
-              store.dispatch(showSnackbar("The session has expired."));
-              return "/";
-            }
-            break;
+        if (query.sessionId && query.sessionId == session.id) {
+          if (
+            (pathname == "/client/[sessionId]" && role == UserRole.Member) ||
+            (pathname == "/master/[sessionId]" && role == UserRole.Owner)
+          ) {
+            store.dispatch(showSnackbar("The session has expired."));
+            return "/";
+          }
         }
       }
     } else {
       // Session is valid
       switch (role) {
         case UserRole.Member:
-          if (pathname === `/client/${session.id}`) {
+          if (pathname === "/client/[sessionId]" && query.sessionId == session.id) {
             return null;
           }
-          if (minimatch(pathname, "{/,/client,/client/*}")) {
-            if (minimatch(pathname, "/client/*")) {
+          if (["/", "/client", "/client/[sessionId]"].includes(pathname)) {
+            if (pathname == "/client/[sessionId]") {
               store.dispatch(showSnackbar("You cannot join multiple sessions at the same time."));
             }
             return `/client/${session.id}`;
           }
           break;
         case UserRole.Owner:
-          if (pathname === `/master/${session.id}`) {
+          if (pathname === "/master/[sessionId]" && query.sessionId == session.id) {
             return null;
           }
-          if (minimatch(pathname, "{/,/master,/master/*}")) {
-            if (minimatch(pathname, "/master/*")) {
-              store.dispatch(
-                showSnackbar(
-                  "You have to stop the current session before you can connect to another session."
-                )
-              );
+          if (["/", "/master", "/master/[sessionId]"].includes(pathname)) {
+            if (pathname == "/master/[sessionId]") {
+              store.dispatch(showSnackbar("You cannot join multiple sessions at the same time."));
             }
             return `/master/${session.id}`;
           }

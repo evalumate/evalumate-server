@@ -11,6 +11,7 @@ import httpMocks from "node-mocks-http";
 import { createStore } from "redux";
 import { Store } from "StoreTypes";
 import { mocked } from "ts-jest/utils";
+import { isEmpty } from "lodash";
 
 jest.mock("next/router");
 jest.mock("../api/session");
@@ -43,11 +44,12 @@ describe("redirectTo()", () => {
 });
 
 describe("getRedirectUrlIfApplicable()", () => {
+  const sessionId = faker.random.alphaNumeric(4);
   const session: Session = {
-    id: "sessionId",
+    id: sessionId,
     captchaRequired: false,
     name: faker.lorem.words(3),
-    uri: "/sessions/sessionId",
+    uri: `/sessions/${sessionId}`,
   };
 
   let store: Store;
@@ -57,44 +59,55 @@ describe("getRedirectUrlIfApplicable()", () => {
     store = createStore(rootReducer);
   });
 
-  enum AdditionalTests {
+  enum AdditionalEffects {
     setsVisitor,
     showsSnackbar,
   }
 
-  const allPages = ["/", "/about", "/client", "/master", "/client/sessionId", "/master/sessionId"];
+  const allPathnames = [
+    "/",
+    "/about",
+    "/client",
+    "/master",
+    "/client/[sessionId]",
+    "/master/[sessionId]",
+  ];
 
   describe.each([
-    // UserRole, sessionValid, expectedRedirect, paths, (additionalTests)
+    // UserRole, sessionValid, expectedRedirect, paths, (additionalEffects)
+
     // Visitor
-    [UserRole.Visitor, false, null, allPages],
+    [UserRole.Visitor, false, null, allPathnames.map(pathname => ({ pathname }))],
 
     // Member with invalid session
     [
       UserRole.Member,
       false,
       "/",
-      ["/client/sessionId"],
-      [AdditionalTests.setsVisitor, AdditionalTests.showsSnackbar],
+      [{ pathname: "/client/[sessionId]", query: { sessionId } }],
+      [AdditionalEffects.setsVisitor, AdditionalEffects.showsSnackbar],
     ],
     [
       UserRole.Member,
       false,
       null,
-      ["/client", "/client/anotherSessionId"],
-      [AdditionalTests.setsVisitor],
+      [
+        { pathname: "/client" },
+        { pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } },
+      ],
+      [AdditionalEffects.setsVisitor],
     ],
 
     // Member with valid session
-    [UserRole.Member, true, null, ["/client/sessionId"]],
-    [UserRole.Member, true, null, ["/about"]],
-    [UserRole.Member, true, "/client/sessionId", ["/", "/client"]],
+    [UserRole.Member, true, null, [{ pathname: "/client/[sessionId]", query: { sessionId } }]],
+    [UserRole.Member, true, null, [{ pathname: "/about" }]],
+    [UserRole.Member, true, `/client/${sessionId}`, [{ pathname: "/" }, { pathname: "/client" }]],
     [
       UserRole.Member,
       true,
-      "/client/sessionId",
-      ["/client/anotherSessionId"],
-      [AdditionalTests.showsSnackbar],
+      `/client/${sessionId}`,
+      [{ pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } }],
+      [AdditionalEffects.showsSnackbar],
     ],
 
     // Owner with invalid session
@@ -102,31 +115,34 @@ describe("getRedirectUrlIfApplicable()", () => {
       UserRole.Owner,
       false,
       "/",
-      ["/master/sessionId"],
-      [AdditionalTests.setsVisitor, AdditionalTests.showsSnackbar],
+      [{ pathname: "/master/[sessionId]", query: { sessionId } }],
+      [AdditionalEffects.setsVisitor, AdditionalEffects.showsSnackbar],
     ],
     [
       UserRole.Owner,
       false,
       null,
-      ["/master", "/master/anotherSessionId"],
-      [AdditionalTests.setsVisitor],
+      [
+        { pathname: "/master" },
+        { pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } },
+      ],
+      [AdditionalEffects.setsVisitor],
     ],
 
     // Owner with valid session
-    [UserRole.Owner, true, null, ["/master/sessionId"]],
-    [UserRole.Owner, true, null, ["/about"]],
-    [UserRole.Owner, true, "/master/sessionId", ["/", "/master"]],
+    [UserRole.Owner, true, null, [{ pathname: "/master/[sessionId]", query: { sessionId } }]],
+    [UserRole.Owner, true, null, [{ pathname: "/about" }]],
+    [UserRole.Owner, true, `/master/${sessionId}`, [{ pathname: "/" }, { pathname: "/master" }]],
     [
       UserRole.Owner,
       true,
-      "/master/sessionId",
-      ["/master/anotherSessionId"],
-      [AdditionalTests.showsSnackbar],
+      `/master/${sessionId}`,
+      [{ pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } }],
+      [AdditionalEffects.showsSnackbar],
     ],
-  ] as [UserRole, boolean, string | null, string[], AdditionalTests[]?][])(
+  ] as [UserRole, boolean, string | null, { pathname: string; query?: { sessionId: string } }[], AdditionalEffects[]?][])(
     "with UserRole = %p and sessionValid = %p",
-    (role, sessionValid, expectedRedirect, paths, additionalTests) => {
+    (role, sessionValid, expectedRedirect, paths, additionalEffects) => {
       beforeEach(() => {
         store.dispatch(setUserRole(role));
         store.dispatch(setSession(session));
@@ -143,40 +159,61 @@ describe("getRedirectUrlIfApplicable()", () => {
       });
 
       // Test with each path in `paths`
-      describe.each(paths)("at '%s'", path => {
-        if (expectedRedirect) {
-          it(`should return '${expectedRedirect}'`, async () => {
-            const url = await getRedirectUrlIfApplicable(store, path);
-            expect(url).toBe(expectedRedirect);
-          });
-        } else {
-          it("should return null", async () => {
-            const url = await getRedirectUrlIfApplicable(store, path);
-            expect(url).toBeNull();
-          });
+      for (const { pathname, query = {} } of paths) {
+        // Generate description for `describe` block
+        let description = `at '${pathname}'`;
+        if (!isEmpty(query)) {
+          description += " with query " + JSON.stringify(query);
         }
 
-        // Optionally add tests for `additionalTests`
-        if (additionalTests) {
-          for (const check of additionalTests) {
-            switch (check) {
-              case AdditionalTests.setsVisitor:
-                it("should set UserRole to Visitor", async () => {
-                  await getRedirectUrlIfApplicable(store, path);
-                  expect(selectUserRole(store.getState())).toBe(UserRole.Visitor);
-                });
-                break;
+        describe(description, () => {
+          if (expectedRedirect) {
+            it(`should return '${expectedRedirect}'`, async () => {
+              const url = await getRedirectUrlIfApplicable(store, pathname, query);
+              expect(url).toBe(expectedRedirect);
+            });
+          } else {
+            it("should return null", async () => {
+              const url = await getRedirectUrlIfApplicable(store, pathname, query);
+              expect(url).toBeNull();
+            });
+          }
 
-              case AdditionalTests.showsSnackbar:
-                it("should show a snackbar", async () => {
-                  await getRedirectUrlIfApplicable(store, path);
-                  expect(selectSnackbarVisible(store.getState())).toBeTrue();
-                });
-                break;
+          // Handle `additionalEffects`
+          if (!additionalEffects || !additionalEffects.includes(AdditionalEffects.setsVisitor)) {
+            it("should not change UserRole", async () => {
+              await getRedirectUrlIfApplicable(store, pathname, query);
+              expect(selectUserRole(store.getState())).toBe(role);
+            });
+          }
+          if (!additionalEffects || !additionalEffects.includes(AdditionalEffects.showsSnackbar)) {
+            it("should not show a snackbar", async () => {
+              await getRedirectUrlIfApplicable(store, pathname, query);
+              expect(selectSnackbarVisible(store.getState())).toBeFalse();
+            });
+          }
+
+          if (additionalEffects) {
+            for (const check of additionalEffects) {
+              switch (check) {
+                case AdditionalEffects.setsVisitor:
+                  it("should set UserRole to Visitor", async () => {
+                    await getRedirectUrlIfApplicable(store, pathname, query);
+                    expect(selectUserRole(store.getState())).toBe(UserRole.Visitor);
+                  });
+                  break;
+
+                case AdditionalEffects.showsSnackbar:
+                  it("should show a snackbar", async () => {
+                    await getRedirectUrlIfApplicable(store, pathname, query);
+                    expect(selectSnackbarVisible(store.getState())).toBeTrue();
+                  });
+                  break;
+              }
             }
           }
-        }
-      });
+        });
+      }
     }
   );
 });
