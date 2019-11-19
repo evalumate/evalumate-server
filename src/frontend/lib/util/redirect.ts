@@ -4,9 +4,8 @@ import { setSession, setUserRole, showSnackbar } from "../store/actions/global";
 import { selectSession, selectUserRole } from "../store/selectors/global";
 import { ServerResponse } from "http";
 import minimatch from "minimatch";
-import { Store } from "StoreTypes";
-import UrlPattern from "url-pattern";
 import nextRouter from "next/router";
+import { Store } from "StoreTypes";
 
 /**
  * Redirects the client to the given domain-relative location.
