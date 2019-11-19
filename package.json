@@ -74,7 +74,6 @@
     "svg-inline-react": "3.2.0",
     "typeorm": "0.2.20",
     "typesafe-actions": "5.1.0",
-    "url-pattern": "1.0.3",
     "winston": "3.2.1",
     "yup": "0.27.0"
   },
