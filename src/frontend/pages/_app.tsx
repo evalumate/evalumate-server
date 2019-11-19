@@ -1,7 +1,7 @@
 import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import theme from "../lib/theme";
-import { redirectIfApplicable } from "../lib/util/redirect";
+import { redirectTo, getRedirectUrlIfApplicable } from "../lib/util/redirect";
 import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import withReduxSaga from "next-redux-saga";
@@ -14,16 +14,18 @@ import { TransitionGroup } from "react-transition-group";
 
 class App extends NextApp {
   static async getInitialProps({ Component, ctx }: AppContext) {
-    // @ts-ignore: TypeScript does not know about the redux store from next-redux-wrapper
-    redirectIfApplicable(ctx.store, ctx.pathname, ctx.res);
+    const redirectDestination = await getRedirectUrlIfApplicable((ctx as any).store, ctx.pathname);
+    if (redirectDestination) {
+      redirectTo(redirectDestination, ctx.res);
+    }
+
     return {
       pageProps: Component.getInitialProps ? await Component.getInitialProps(ctx) : {},
     };
   }
 
   render() {
-    // @ts-ignore: TypeScript does not know about the redux store from next-redux-wrapper
-    const { Component, pageProps, store } = this.props;
+    const { Component, pageProps, store } = this.props as any;
 
     return (
       <Provider store={store}>
@@ -39,6 +41,4 @@ class App extends NextApp {
   }
 }
 
-// @ts-ignore: Setting up TypeScript with next-redux-wrapper was too much of a hassle for too little
-// value
 export default withRedux(makeStore)(withReduxSaga(App));

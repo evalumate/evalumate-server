@@ -1,21 +1,18 @@
 import rootReducer from "./reducers";
 import { rootSaga } from "./sagas";
-import { Request } from "express";
 import { applyMiddleware, createStore, Store } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { RootState } from "StoreTypes";
+import { MakeStoreOptions } from "next-redux-wrapper";
 
-export const makeStore = (
-  initialState: RootState,
-  { isServer, req = null }: { isServer: boolean; req: (Request & { reduxState: any }) | null }
-) => {
+export const makeStore = (initialState: RootState, { isServer, req }: MakeStoreOptions) => {
   const sagaMiddleware = createSagaMiddleware();
   let store: Store;
 
   if (isServer) {
     if (req) {
       // An express middleware has already extracted the client's state from cookies
-      initialState = req.reduxState;
+      initialState = (req as any).reduxState;
     }
 
     // While the above store is present during getInitialProps, another store has to be provided for
