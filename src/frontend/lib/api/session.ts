@@ -29,7 +29,7 @@ export async function createSession(sessionOptions: {
  * object does not contain a sessionKey.
  *
  */
-export async function getSession(sessionId: string): Promise<Session> {
+export async function getSession(sessionId: string): Promise<Session | null> {
   const reply = await axios.get(getApiUrl(`/sessions/${sessionId}`));
   return reply.data.error ? null : reply.data.data.session;
 }
