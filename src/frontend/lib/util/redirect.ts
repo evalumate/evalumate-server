@@ -69,27 +69,72 @@ export async function getRedirectUrlIfApplicable(
       // Session is valid
       switch (role) {
         case UserRole.Member:
-          if (pathname === "/client/[sessionId]" && query.sessionId == session.id) {
+          if (pathname == "/client/[sessionId]" && query.sessionId == session.id) {
             return null;
           }
-          if (["/", "/client", "/client/[sessionId]"].includes(pathname)) {
-            if (pathname == "/client/[sessionId]") {
-              store.dispatch(showSnackbar("You cannot join multiple sessions at the same time."));
+          if (pathname !== "/about") {
+            switch (pathname) {
+              case "/client/[sessionId]":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently logged in at "${session.name}". ` +
+                      "Log out if you want to join another session."
+                  )
+                );
+                break;
+              case "/master":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently logged in at "${session.name}". ` +
+                      "Log out if you want to create a session."
+                  )
+                );
+                break;
+              case "/master/[sessionId]":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently logged in at "${session.name}". ` +
+                      "Log out if you want to attach it to a session."
+                  )
+                );
+                break;
             }
             return `/client/${session.id}`;
           }
           break;
         case UserRole.Owner:
-          if (pathname === "/master/[sessionId]" && query.sessionId == session.id) {
+          if (pathname == "/master/[sessionId]" && query.sessionId == session.id) {
             return null;
           }
-          if (["/", "/master", "/master/[sessionId]"].includes(pathname)) {
-            if (pathname == "/master/[sessionId]") {
-              store.dispatch(showSnackbar("You cannot join multiple sessions at the same time."));
+          if (pathname !== "/about") {
+            switch (pathname) {
+              case "/master/[sessionId]":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently attached to "${session.name}". ` +
+                      "Log out if you want to attach it to another session."
+                  )
+                );
+                break;
+              case "/client":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently attached to "${session.name}". ` +
+                      "Log out if you want to join a session."
+                  )
+                );
+                break;
+              case "/client/[sessionId]":
+                store.dispatch(
+                  showSnackbar(
+                    `This device is currently attached to "${session.name}". ` +
+                      "Log out if you want to join a session."
+                  )
+                );
+                break;
             }
             return `/master/${session.id}`;
           }
-          break;
       }
     }
   }

@@ -94,6 +94,8 @@ describe("getRedirectUrlIfApplicable()", () => {
       [
         { pathname: "/client" },
         { pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } },
+        { pathname: "/master" },
+        { pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } },
       ],
       [AdditionalEffects.setsVisitor],
     ],
@@ -106,7 +108,12 @@ describe("getRedirectUrlIfApplicable()", () => {
       UserRole.Member,
       true,
       `/client/${sessionId}`,
-      [{ pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } }],
+      [
+        { pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } },
+        { pathname: "/master" },
+        { pathname: "/master/[sessionId]", query: { sessionId } },
+        { pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } },
+      ],
       [AdditionalEffects.showsSnackbar],
     ],
 
@@ -125,6 +132,8 @@ describe("getRedirectUrlIfApplicable()", () => {
       [
         { pathname: "/master" },
         { pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } },
+        { pathname: "/client" },
+        { pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } },
       ],
       [AdditionalEffects.setsVisitor],
     ],
@@ -137,7 +146,12 @@ describe("getRedirectUrlIfApplicable()", () => {
       UserRole.Owner,
       true,
       `/master/${sessionId}`,
-      [{ pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } }],
+      [
+        { pathname: "/master/[sessionId]", query: { sessionId: "otherSession" } },
+        { pathname: "/client" },
+        { pathname: "/client/[sessionId]", query: { sessionId } },
+        { pathname: "/client/[sessionId]", query: { sessionId: "otherSession" } },
+      ],
       [AdditionalEffects.showsSnackbar],
     ],
   ] as [UserRole, boolean, string | null, { pathname: string; query?: { sessionId: string } }[], AdditionalEffects[]?][])(
