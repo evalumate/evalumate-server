@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "NODE_ENV=development nodemon --watch src/backend src/backend/index.ts --exec babel-node --extensions \".ts\"",
-    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
+    "test": "NODE_ENV=test jest",
     "test:watch": "npm run test -- --watch",
     "test:coverage": "npm run test -- --coverage",
     "tsc:backend": "cd src/backend && tsc",
