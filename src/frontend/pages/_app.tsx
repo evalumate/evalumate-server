@@ -14,7 +14,12 @@ import { TransitionGroup } from "react-transition-group";
 
 class App extends NextApp {
   static async getInitialProps({ Component, ctx }: AppContext) {
-    const redirectDestination = await getRedirectUrlIfApplicable((ctx as any).store, ctx.pathname);
+    const redirectDestination = await getRedirectUrlIfApplicable(
+      (ctx as any).store,
+      ctx.pathname,
+      ctx.query
+    );
+
     if (redirectDestination) {
       redirectTo(redirectDestination, ctx.res);
     }
