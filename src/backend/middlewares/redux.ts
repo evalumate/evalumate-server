@@ -2,6 +2,7 @@ import Cookies from "cookies";
 import { NextFunction, Request, Response } from "express";
 import { getStoredState } from "redux-persist";
 import { CookieStorage, NodeCookiesWrapper } from "redux-persist-cookie-storage";
+import { sharedPersistConfig } from "../../frontend/lib/store/persist.config";
 
 /**
  * Express middleware to create a server-side redux store (`req.reduxStore`) with the client's redux
@@ -11,7 +12,7 @@ export async function cookieReduxStateExtractor(req: Request, res: Response, nex
   const cookieJar = new NodeCookiesWrapper(new Cookies(req, res));
 
   const persistConfig = {
-    key: "evalumate",
+    ...sharedPersistConfig,
     storage: new CookieStorage(cookieJar),
   };
 
@@ -29,9 +30,6 @@ export async function cookieReduxStateExtractor(req: Request, res: Response, nex
     state = cleanedState;
   }
 
-  // Not persisting the store here since state changes will not be sent via cookies directly. Instead,
-  // the serialized state will be attached to the browser's window object.
   req.reduxState = state;
-
   next();
 }

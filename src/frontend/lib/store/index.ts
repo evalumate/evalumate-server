@@ -4,6 +4,7 @@ import { applyMiddleware, createStore, Store } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { RootState } from "StoreTypes";
 import { MakeStoreOptions } from "next-redux-wrapper";
+import { sharedPersistConfig } from "./persist.config";
 
 export const makeStore = (initialState: RootState, { isServer, req }: MakeStoreOptions) => {
   const sagaMiddleware = createSagaMiddleware();
@@ -29,9 +30,8 @@ export const makeStore = (initialState: RootState, { isServer, req }: MakeStoreO
     const Cookies = require("cookies-js");
 
     const persistConfig = {
-      key: "evalumate",
+      ...sharedPersistConfig,
       storage: new CookieStorage(Cookies),
-      blacklist: "owner",
       stateReconciler(inboundState: any, originalState: any) {
         // Ignore state from cookies, only use the state passed to makeStore (which is the state
         // returned from `getInitialProps` by next-redux-wrapper). Reason: A page could change the
@@ -56,8 +56,7 @@ export const makeStore = (initialState: RootState, { isServer, req }: MakeStoreO
   }
 
   if (req || !isServer) {
-    // @ts-ignore: TypeScript doesn't know about store.sagaTask
-    store.sagaTask = sagaMiddleware.run(rootSaga);
+    (store as any).sagaTask = sagaMiddleware.run(rootSaga);
   }
 
   return store;
