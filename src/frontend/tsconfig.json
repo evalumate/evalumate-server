@@ -1,17 +1,12 @@
-// Frontend/next.js-specific modifications to the main tsconfig.json
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "resolveJsonModule": true,
     "jsx": "preserve"
-  },
+  }
 }

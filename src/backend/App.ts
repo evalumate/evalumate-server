@@ -5,7 +5,7 @@ import RecordController from "./controllers/RecordController";
 import SessionController from "./controllers/SessionController";
 import Destructable from "./interfaces/Destructable";
 import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
-import { cookieReduxStateExtractor } from "./middlewares/redux";
+
 import databaseConfig from "./ormconfig";
 import { success as apiRespondSuccess } from "./utils/api-respond";
 import { createLogger } from "./utils/logger";
@@ -116,14 +116,9 @@ class App implements Destructable {
   }
 
   private initializeNextJsRequestHandling() {
-    // Extract redux state from cookies and store it in the request object
-    this.app.use(cookieReduxStateExtractor);
-
     // Render page with Next.js
     const requestHandler = App.nextJsServer.getRequestHandler();
-    this.app.use(async (req, res) => {
-      return requestHandler(req, res);
-    });
+    this.app.use((req, res) => requestHandler(req, res));
   }
 
   private async destructApiControllers() {
