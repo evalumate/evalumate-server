@@ -3,10 +3,9 @@ import { UserRole } from "../models/UserRole";
 import { setSession, setUserRole, showSnackbar } from "../store/actions/global";
 import { selectSession, selectUserRole } from "../store/selectors/global";
 import { ServerResponse } from "http";
-import minimatch from "minimatch";
 import nextRouter from "next/router";
-import { Store } from "StoreTypes";
 import { ParsedUrlQuery } from "querystring";
+import { Store } from "StoreTypes";
 
 /**
  * Redirects the client to the given domain-relative location.
