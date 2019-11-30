@@ -29,7 +29,7 @@ export const Page: React.FunctionComponent<Props> = ({
   return (
     <div id="page">
       <Head>
-        <title>{title + (titleAddHomepageTitle ? " – EvaluMate" : "")}</title>
+        <title>{title + (titleAddHomepageTitle ? " – EvaluMate (Alpha)" : "")}</title>
       </Head>
       {!hideMenu && <ToolBar />}
       <MainGrid maxWidth={maxWidth}>{children}</MainGrid>

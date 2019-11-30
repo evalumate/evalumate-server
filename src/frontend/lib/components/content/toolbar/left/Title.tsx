@@ -15,11 +15,11 @@ type Props = ConnectedProps<typeof connectToRedux>;
 const InternalTitle: React.FunctionComponent<Props> = ({ role, session }) => {
   const classes = useStyles({});
 
-  const appTitle = "EvaluMate";
+  const appTitle = "EvaluMate (Alpha)";
 
   return (
     <Typography variant="h6" className={classes.root}>
-      {role == UserRole.Visitor && appTitle}
+      {role === UserRole.Visitor && appTitle}
       {[UserRole.Owner, UserRole.Member].includes(role) && (
         <>
           <Hidden implementation="css" smDown>

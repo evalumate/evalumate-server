@@ -8,7 +8,11 @@ import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 
 const HomePage: NextPage<{}, void> = () => {
   return (
-    <Page title="EvaluMate – Feedback Made Easy" titleAddHomepageTitle={false} maxWidth="sm">
+    <Page
+      title="EvaluMate – Feedback Made Easy (Alpha)"
+      titleAddHomepageTitle={false}
+      maxWidth="sm"
+    >
       <Grid item xs={12}>
         <Paper>
           <JoinSessionForm />
