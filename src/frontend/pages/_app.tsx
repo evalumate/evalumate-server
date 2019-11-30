@@ -6,7 +6,7 @@ import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import withReduxSaga from "next-redux-saga";
 import NextApp, { AppContext } from "next/app";
-import React from "react";
+import * as React from "react";
 import { ModalProvider } from "react-modal-hook";
 import { Provider } from "react-redux";
 import { TransitionGroup } from "react-transition-group";
@@ -20,9 +20,11 @@ class App extends NextApp {
       ctx.query
     );
 
-    if (redirectDestination && ctx.req) {
-      // Persist the store's state by setting a cookie header (sent with the redirect)
-      await ctx.flushReduxStateToCookies();
+    if (redirectDestination) {
+      if (ctx.req) {
+        // Persist the store's state by setting a cookie header (sent with the redirect)
+        await ctx.flushReduxStateToCookies();
+      }
       redirectTo(redirectDestination, ctx.res);
     }
 
