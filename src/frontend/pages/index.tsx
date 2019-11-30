@@ -9,7 +9,7 @@ import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 const HomePage: NextPage<{}, void> = () => {
   return (
     <Page
-      title="EvaluMate – Feedback Made Easy (Alpha)"
+      title="EvaluMate (Alpha) – Feedback Made Easy"
       titleAddHomepageTitle={false}
       maxWidth="sm"
     >
