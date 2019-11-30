@@ -1,8 +1,8 @@
 import { Page } from "../lib/components/layout/Page";
-import { NextReduxPage } from "NextReduxTypes";
+import { NextPage } from "next";
 import * as React from "react";
 
-const AboutPage: NextReduxPage<{}, void> = () => {
+const AboutPage: NextPage<{}, void> = () => {
   return <Page title="About"></Page>;
 };
 

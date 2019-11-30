@@ -1,20 +1,18 @@
 import { Page } from "../../lib/components/layout/Page";
 import { setSession, setUserRole } from "../../lib/store/actions/global";
 import { selectSession, selectUserRole } from "../../lib/store/selectors/global";
-import { NextReduxPage } from "NextReduxTypes";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
 import { UnderstandingBulb } from "../../lib/components/content/UnderstandingBulb";
+import { NextPage } from "next";
 
-type InitialProps = {
-  sessionIsValid: boolean;
-};
+type InitialProps = {};
 
 type Props = InitialProps & ConnectedProps<typeof connectToRedux>;
 
-const ClientPage: NextReduxPage<Props, InitialProps> = props => {
-  const title = props.sessionIsValid ? props.session.name : "Invalid session";
+const ClientPage: NextPage<Props, InitialProps> = props => {
+  const title = props.session ? props.session.name : "Invalid session";
   return (
     <Page title={title} maxWidth="sm">
       <UnderstandingBulb />
@@ -23,8 +21,7 @@ const ClientPage: NextReduxPage<Props, InitialProps> = props => {
 };
 
 ClientPage.getInitialProps = async ({ store }) => {
-  // TODO check if the session is valid
-  return { sessionIsValid: false };
+  return {};
 };
 
 const mapStateToProps = (state: RootState) => ({
@@ -37,9 +34,6 @@ const mapDispatchToProps = {
   setSession,
 };
 
-const connectToRedux = connect(
-  mapStateToProps,
-  mapDispatchToProps
-);
+const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export default connectToRedux(ClientPage);

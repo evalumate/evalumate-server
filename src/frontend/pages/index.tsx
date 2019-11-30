@@ -1,8 +1,8 @@
 import { Page } from "../lib/components/layout/Page";
-import { NextReduxPage } from "NextReduxTypes";
 import * as React from "react";
+import { NextPage } from "next";
 
-const HomePage: NextReduxPage<{}, void> = () => {
+const HomePage: NextPage<{}, void> = () => {
   return <Page title="EvaluMate – Feedback Made Easy" titleAddHomepageTitle={false}></Page>;
 };
 

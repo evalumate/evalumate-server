@@ -4,7 +4,7 @@ import { Page } from "../../lib/components/layout/Page";
 import { Paper } from "../../lib/components/layout/Paper";
 import { selectSession, selectUserRole } from "../../lib/store/selectors/global";
 import { Box, createStyles, Grid, makeStyles } from "@material-ui/core";
-import { NextReduxPage } from "NextReduxTypes";
+import { NextPage } from "next";
 import * as React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RootState } from "StoreTypes";
@@ -17,10 +17,15 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-const MasterPage: NextReduxPage<Props> = props => {
+const MasterPage: NextPage<Props> = props => {
   const classes = useStyles();
+
+  if (!props.session) {
+    return null;
+  }
+
   return (
-    <Page title={props.session && props.session.name}>
+    <Page title={props.session.name}>
       <Box clone order={{ xs: 2, md: 1 }}>
         <Grid item xs={12} md={10}>
           <Paper>
