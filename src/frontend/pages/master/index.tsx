@@ -7,8 +7,8 @@ import * as React from "react";
 
 const InitialMasterPage: NextPage = () => {
   return (
-    <Page title="Create a session">
-      <Grid item xs={12} md={6}>
+    <Page title="Create a session" maxWidth="sm">
+      <Grid item xs={12}>
         <Paper>
           <CreateSessionForm />
         </Paper>
