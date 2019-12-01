@@ -4,6 +4,8 @@
     "target": "esnext",
     // Search under node_modules for non-relative imports.
     "moduleResolution": "node",
+    // Do not check types in node_modules
+    "skipLibCheck": true,
     // Process & infer types from .js files.
     "allowJs": true,
     // Don't emit; allow Babel to transform files.
