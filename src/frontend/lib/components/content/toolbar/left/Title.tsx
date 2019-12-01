@@ -1,5 +1,6 @@
 import { UserRole } from "../../../../models/UserRole";
 import { selectSession, selectUserRole } from "../../../../store/selectors/global";
+import { Link } from "../../../links/Link";
 import { Box, Hidden, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
@@ -17,22 +18,28 @@ const InternalTitle: React.FunctionComponent<Props> = ({ role, session }) => {
 
   const appTitle = "EvaluMate (Alpha)";
 
+  if (role === UserRole.Visitor) {
+    return (
+      <Link href="/" className={classes.root}>
+        <Typography variant="h6" color="textPrimary">
+          {appTitle}
+        </Typography>
+      </Link>
+    );
+  }
+
+  // Member or owner
   return (
     <Typography variant="h6" className={classes.root}>
-      {role === UserRole.Visitor && appTitle}
-      {[UserRole.Owner, UserRole.Member].includes(role) && (
-        <>
-          <Hidden implementation="css" smDown>
-            {appTitle}
-          </Hidden>
-          <Hidden implementation="css" mdUp>
-            {/* TODO: Make text overflow work */}
-            <Box component="div" style={{ whiteSpace: "nowrap" }} textOverflow="ellipsis">
-              {session && session.name}
-            </Box>
-          </Hidden>
-        </>
-      )}
+      <Hidden implementation="css" smDown>
+        {appTitle}
+      </Hidden>
+      <Hidden implementation="css" mdUp>
+        {/* TODO: Make text overflow work */}
+        <Box component="div" style={{ whiteSpace: "nowrap" }} textOverflow="ellipsis">
+          {session && session.name}
+        </Box>
+      </Hidden>
     </Typography>
   );
 };
