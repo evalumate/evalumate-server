@@ -4,7 +4,7 @@ import { getUnixTimestamp } from "../utils/time";
 import { Column, Entity } from "typeorm";
 
 @Entity()
-class Captcha extends RandomIdEntity {
+export default class Captcha extends RandomIdEntity {
   @Column()
   public solution: string;
 
@@ -36,5 +36,3 @@ class Captcha extends RandomIdEntity {
    */
   public image: string;
 }
-
-export default Captcha;
