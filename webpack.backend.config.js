@@ -28,5 +28,6 @@ module.exports = {
   plugins: [new ForkTsCheckerWebpackPlugin({ tsconfig: "./src/tsconfig.json" })],
   optimization: {
     namedModules: true,
+    minimize: false,
   },
 };
