@@ -1,13 +1,13 @@
 {
   "logging": {
-    "level": "debug",
-    "handleExceptions": false
+    "level": "debug"
   },
   "database": {
     "type": "sqljs",
     "database": null,
     "dropSchema": true,
     "synchronize": true,
+    "migrationsRun": false,
     "logging": false
   },
   "member": {

@@ -1,6 +1,5 @@
 {
-  "database": {
-    "synchronize": false,
-    "migrationsRun": true
+  "logging": {
+    "handleExceptions": true
   }
 }

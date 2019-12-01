@@ -4,13 +4,13 @@
   "database": {
     "type": "sqlite",
     "database": "db.sqlite",
-    "synchronize": true,
-    "migrationsRun": false
+    "synchronize": false,
+    "migrationsRun": true
   },
   "logging": {
     "directory": "logs",
     "level": "info",
-    "handleExceptions": true
+    "handleExceptions": false
   },
   "captcha": {
     "ttl": 120,
