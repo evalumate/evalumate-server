@@ -1,5 +1,8 @@
 {
   "logging": {
     "handleExceptions": true
+  },
+  "database": {
+    "database": "sqlite/db.sqlite"
   }
 }

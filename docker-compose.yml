@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  evalumate:
+    build: .
+    volumes:
+      - ./logs:/usr/src/app/logs
+      - ./sqlite:/usr/src/app/sqlite
+    ports:
+      - 3000:3000
+    environment:
+      - PUBLIC_URL=http://localhost:3000
