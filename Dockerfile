@@ -17,12 +17,18 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci
 
+# Copy built files
 COPY --from=builder dist dist
+
+# Copy configs
 COPY config config
-# Copy Next.js config
 COPY src/frontend/next.config.js src/frontend/next.config.js
 
-USER node
-
+# Configure volumes
+RUN mkdir sqlite && chown node:node sqlite
+RUN mkdir logs && chown node:node logs
 VOLUME [ "/usr/src/app/logs", "/usr/src/app/sqlite"  ]
+
+USER node
+EXPOSE 3000
 CMD [ "npm", "run", "serve" ]
