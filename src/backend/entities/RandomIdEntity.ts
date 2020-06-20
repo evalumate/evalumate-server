@@ -1,5 +1,5 @@
 import generateUuid from "nanoid/async";
-import generateUuidWithCustomAlphabet from "nanoid/async/generate";
+import { nanoid, customAlphabet } from "nanoid/async";
 import { BaseEntity, BeforeInsert, PrimaryColumn, QueryFailedError, SaveOptions } from "typeorm";
 
 const badWordFilter = new (require("bad-words") as any)();
@@ -27,9 +27,9 @@ export default abstract class RandomIdEntity extends BaseEntity {
 
     do {
       if (alphabet) {
-        this.id = await generateUuidWithCustomAlphabet(alphabet, length);
+        this.id = await customAlphabet(alphabet, length)();
       } else {
-        this.id = await generateUuid(length);
+        this.id = await nanoid(length);
       }
     } while (noBadWords && badWordFilter.isProfane(this.id));
   }

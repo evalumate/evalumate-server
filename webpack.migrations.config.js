@@ -33,7 +33,7 @@ module.exports = {
   module: {
     rules: [{ test: /\.(ts|js)x?$/, loader: "babel-loader", exclude: /node_modules/ }],
   },
-  plugins: [new ForkTsCheckerWebpackPlugin({ tsconfig: "./src/tsconfig.json" })],
+  plugins: [new ForkTsCheckerWebpackPlugin({ typescript: { configFile: "./src/tsconfig.json" } })],
   optimization: {
     namedModules: true,
     minimize: false,

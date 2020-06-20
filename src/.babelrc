@@ -1,6 +1,6 @@
 // Server-side babel configuration
 {
-  "presets": [["latest-node", { "target": "10" }], "@babel/typescript"],
+  "presets": [["latest-node", { "target": "12" }], "@babel/typescript"],
   "env": {
     "debug": {
       "sourceMaps": "inline"

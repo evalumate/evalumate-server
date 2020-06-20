@@ -31,7 +31,7 @@ class Document extends NextDocument {
   }
 }
 
-Document.getInitialProps = async ctx => {
+Document.getInitialProps = async (ctx) => {
   // Resolution order
   //
   // On the server:
@@ -60,7 +60,7 @@ Document.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: App => props => sheets.collect(<App {...props} />),
+      enhanceApp: (App) => (props) => sheets.collect(<App {...props} />),
     });
 
   const initialProps = await NextDocument.getInitialProps(ctx);
@@ -68,12 +68,7 @@ Document.getInitialProps = async ctx => {
   return {
     ...initialProps,
     // Styles fragment is rendered after the app and page rendering finish.
-    styles: [
-      <React.Fragment key="styles">
-        {initialProps.styles}
-        {sheets.getStyleElement()}
-      </React.Fragment>,
-    ],
+    styles: [...React.Children.toArray(initialProps.styles), sheets.getStyleElement()],
   };
 };
 

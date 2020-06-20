@@ -40,7 +40,7 @@ class App extends NextApp {
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
-          <ModalProvider container={TransitionGroup}>
+          <ModalProvider rootComponent={TransitionGroup}>
             <Component {...pageProps} />
           </ModalProvider>
           <GlobalSnackbar />
