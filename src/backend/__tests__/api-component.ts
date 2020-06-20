@@ -62,9 +62,7 @@ afterAll(async () => {
 describe("Api Responses", () => {
   describe("GET /api", () => {
     it("should return a valid response", async () => {
-      const res = await request(app)
-        .get("/api")
-        .expect(200);
+      const res = await request(app).get("/api").expect(200);
 
       expect(res.body).toEqual({
         apiVersion: expect.any(Number),
@@ -75,9 +73,7 @@ describe("Api Responses", () => {
 
   describe("GET /api/non-existing/resource", () => {
     it("should return 404 and have a proper error format", async () => {
-      const res = await request(app)
-        .get("/api/non-existing/resource")
-        .expect(404);
+      const res = await request(app).get("/api/non-existing/resource").expect(404);
 
       expect(res.body).toEqual({
         apiVersion: expect.any(Number),
@@ -106,9 +102,7 @@ describe("CaptchaController", () => {
 
   describe("mCreateCaptcha (via GET /captcha)", () => {
     it("should return a captcha", async () => {
-      const response = await request(app)
-        .get("/api/captcha")
-        .expect(200);
+      const response = await request(app).get("/api/captcha").expect(200);
 
       expect(response.body.data).toEqual({
         captcha: { image: expect.any(String), token: expect.any(String) },
@@ -177,12 +171,18 @@ describe("CaptchaController", () => {
 });
 
 describe("SessionController", () => {
+  let session: Session | undefined;
+
+  afterEach(async () => {
+    if (typeof session !== "undefined") {
+      await session.remove();
+    }
+    session = undefined;
+  });
+
   describe("createSession()", () => {
     it("should return a session object", async () => {
-      const session = await SessionController.createSession(
-        faker.lorem.words(4),
-        faker.random.boolean()
-      );
+      session = await SessionController.createSession(faker.lorem.words(4), faker.random.boolean());
       expect(session).toBeInstanceOf(Session);
     });
   });
@@ -216,18 +216,20 @@ describe("SessionController", () => {
         },
       });
 
-      await expect(Session.findOne(response.body.data.session.id)).resolves.toBeInstanceOf(Session);
+      const retrievedSession = await Session.findOne(response.body.data.session.id);
+      expect(retrievedSession).toBeInstanceOf(Session);
+
+      // Set session variable so the session object will be deleted after this test
+      session = retrievedSession!;
     });
   });
 
   describe("mGetSession (via GET /sessions/:sessionId)", () => {
     describe("with a valid sessionId", () => {
       it("should reply with sessionName and captchaRequired", async () => {
-        const session = await setupRandomSession();
+        session = await setupRandomSession();
 
-        const response = await request(app)
-          .get(`/api${session.uri!}`)
-          .expect(200);
+        const response = await request(app).get(`/api${session.uri!}`).expect(200);
 
         expect(response.body.data).toEqual({
           session: pick(session, ["id", "name", "uri", "captchaRequired"]),
@@ -237,9 +239,7 @@ describe("SessionController", () => {
 
     describe("with an invalid sessionId", () => {
       it("should reply with status 404", () => {
-        return request(app)
-          .get(`/api/sessions/${faker.random.uuid()}`)
-          .expect(404);
+        return request(app).get(`/api/sessions/${faker.random.uuid()}`).expect(404);
       });
     });
   });
@@ -247,7 +247,7 @@ describe("SessionController", () => {
   describe("mDeleteSession (via DELETE /sessions/:sessionId)", () => {
     describe("with an invalid session key", () => {
       it("should reply with status code 403", async () => {
-        const session = await setupRandomSession();
+        session = await setupRandomSession();
 
         await request(app)
           .delete(`/api${session.uri}?sessionKey=${faker.random.uuid()}`)
@@ -257,11 +257,9 @@ describe("SessionController", () => {
 
     describe("with a valid session key", () => {
       it("should reply with status code 200 and delete the session", async () => {
-        const session = await setupRandomSession();
+        const session = await setupRandomSession(); // Not assigning to the outer-scope session variable since we delete the session ourselves
 
-        await request(app)
-          .delete(`/api${session.uri}?sessionKey=${session.key}`)
-          .expect(200);
+        await request(app).delete(`/api${session.uri}?sessionKey=${session.key}`).expect(200);
         await expect(session.reload()).rejects.toBeInstanceOf(EntityNotFoundError);
       });
     });
@@ -269,9 +267,15 @@ describe("SessionController", () => {
 });
 
 describe("MemberController", () => {
+  let session: Session;
+
+  afterEach(async () => {
+    await session.remove();
+  });
+
   describe("createMember()", () => {
     it("should return a member object", async () => {
-      const session = await setupRandomSession();
+      session = await setupRandomSession();
       const member = await MemberController.createMember(session);
       expect(member).toBeInstanceOf(Member);
       expect(member.session).toBe(session);
@@ -286,7 +290,7 @@ describe("MemberController", () => {
     describe("when joining the session requires a captcha", () => {
       describe("and a captcha is provided", () => {
         it("should reply with a new member", async () => {
-          const session = await setupRandomSession(true);
+          session = await setupRandomSession(true);
           const captcha = await CaptchaController.createCaptcha();
 
           const response = await request(app)
@@ -311,22 +315,18 @@ describe("MemberController", () => {
 
       describe("and no captcha is provided", () => {
         it("should reply with status 403", async () => {
-          const session = await setupRandomSession(true);
+          session = await setupRandomSession(true);
 
-          await request(app)
-            .post(`/api${session.uri}/members`)
-            .expect(403);
+          await request(app).post(`/api${session.uri}/members`).expect(403);
         });
       });
     });
 
     describe("when joining the session requires no captcha", () => {
       it("should reply with a new member", async () => {
-        const session = await setupRandomSession(false);
+        session = await setupRandomSession(false);
 
-        const response = await request(app)
-          .post(`/api${session.uri}/members`)
-          .expect(201);
+        const response = await request(app).post(`/api${session.uri}/members`).expect(201);
 
         expect(response.body.data).toEqual({
           member: {
@@ -342,16 +342,15 @@ describe("MemberController", () => {
   describe("mDeleteMember (via DELETE /sessions/:sessionId/members/:memberId)", () => {
     describe("with an invalid member id", () => {
       it("should reply with status 404", async () => {
-        const session = await setupRandomSession();
+        session = await setupRandomSession();
 
-        await request(app)
-          .delete(`/api${session.uri}/members/${faker.random.uuid()}`)
-          .expect(404);
+        await request(app).delete(`/api${session.uri}/members/${faker.random.uuid()}`).expect(404);
       });
     });
 
     describe("with a valid member id", () => {
-      let session: Session, member: Member;
+      let member: Member;
+
       beforeEach(async () => {
         session = await setupRandomSession();
         member = await MemberController.createMember(session);
@@ -359,9 +358,7 @@ describe("MemberController", () => {
 
       describe("with no or an invalid member secret", () => {
         it("should reply with status 403", async () => {
-          await request(app)
-            .delete(`/api${member.uri}`)
-            .expect(403);
+          await request(app).delete(`/api${member.uri}`).expect(403);
           await request(app)
             .delete(`/api${member.uri}?memberSecret=${faker.random.uuid()}`)
             .expect(403);
@@ -370,9 +367,7 @@ describe("MemberController", () => {
 
       describe("with a valid member secret", () => {
         it("should reply with status 200", async () => {
-          await request(app)
-            .delete(`/api${member.uri}?memberSecret=${member.secret}`)
-            .expect(200);
+          await request(app).delete(`/api${member.uri}?memberSecret=${member.secret}`).expect(200);
 
           await expect(member.reload()).rejects.toBeInstanceOf(EntityNotFoundError);
         });
@@ -382,7 +377,7 @@ describe("MemberController", () => {
 
   describe("mSetUnderstanding (via PUT /sessions/:sessionId/members/:memberId/status)", () => {
     it("should modify a member's understanding property in the database", async () => {
-      const session = await setupRandomSession();
+      session = await setupRandomSession();
       const member = await MemberController.createMember(session);
 
       let setAndAssertStatus = async (status: boolean) => {
@@ -485,7 +480,7 @@ describe("RecordController", () => {
     await addRecordExpectationAndExpect(8, 0, 0);
 
     // Remove all the remaining members
-    await Promise.all(members.map(member => member.remove()));
+    await Promise.all(members.map((member) => member.remove()));
     await advanceTime(recordInterval);
     await addRecordExpectationAndExpect(0, 0, 0); // ... and then there were none.
   });
