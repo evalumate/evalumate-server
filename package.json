@@ -67,7 +67,7 @@
     "svg-inline-react": "3.2.0",
     "typeorm": "0.2.25",
     "typesafe-actions": "5.1.0",
-    "winston": "3.2.1",
+    "winston": "3.3.0",
     "yup": "0.29.1"
   },
   "devDependencies": {
@@ -107,7 +107,7 @@
     "babel-loader": "8.1.0",
     "babel-preset-latest-node": "4.1.0",
     "eslint": "7.3.0",
-    "eslint-plugin-jest": "23.13.2",
+    "eslint-plugin-jest": "23.16.0",
     "eslint-plugin-react-hooks": "4.0.4",
     "faker": "4.1.0",
     "fork-ts-checker-webpack-plugin": "5.0.4",
@@ -124,6 +124,50 @@
     "url-loader": "4.1.0",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.12",
-    "webpack-node-externals": "1.7.2"
+    "webpack-node-externals": "1.7.2",
+    "husky": "^4.2.5",
+    "import-sort-style-module": "^6.0.0",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "prettier-plugin-import-sort": "^0.0.4"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "printWidth": 100
+  },
+  "importSort": {
+    ".ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.ts(x)": "prettier --write"
+  },
+  "eslint": {
+    "parserOptions": {
+      "ecmaVersion": 2019
+    },
+    "env": {
+      "es6": true
+    },
+    "extends": [
+      "plugin:jest/recommended",
+      "plugin:jest/style"
+    ],
+    "plugins": [
+      "react-hooks",
+      "jest"
+    ],
+    "rules": {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
+    }
   }
 }
