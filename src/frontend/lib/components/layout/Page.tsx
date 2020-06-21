@@ -1,7 +1,8 @@
-import { MainGrid } from "./MainGrid";
-import { ToolBar } from "./toolbar/ToolBar";
 import Head from "next/head";
 import * as React from "react";
+
+import { MainGrid } from "./MainGrid";
+import { ToolBar } from "./toolbar/ToolBar";
 
 type Props = {
   hideMenu?: boolean;

@@ -1,10 +1,11 @@
-import { setUnderstanding } from "../../../store/actions/member";
-import { selectUnderstanding } from "../../../store/selectors/member";
 import { ButtonBase, Theme } from "@material-ui/core";
 import { EmojiObjects, EmojiObjectsOutlined } from "@material-ui/icons";
 import { createStyles, makeStyles } from "@material-ui/styles";
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { setUnderstanding } from "../../../store/actions/member";
+import { selectUnderstanding } from "../../../store/selectors/member";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

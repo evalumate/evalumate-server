@@ -1,12 +1,13 @@
+import { IconButton } from "@material-ui/core";
+import { useRouter } from "next/router";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { deleteMember } from "../../../../api/member";
 import { UserRole } from "../../../../models/UserRole";
 import { setSession, setUserRole } from "../../../../store/actions/global";
 import { setMember, setUnderstanding } from "../../../../store/actions/member";
 import { selectUserRole } from "../../../../store/selectors/global";
-import { IconButton } from "@material-ui/core";
-import { useRouter } from "next/router";
-import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { deleteMember } from "../../../../api/member";
 import { selectMember } from "../../../../store/selectors/member";
 
 export const MemberExitSessionButton: React.FunctionComponent = ({ children }) => {

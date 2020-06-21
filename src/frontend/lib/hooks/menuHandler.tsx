@@ -53,7 +53,7 @@ export function useMenuHandler(
     "aria-label": menuButtonTitle,
     "aria-haspopup": true,
     title: menuButtonTitle,
-    onClick: event => {
+    onClick: (event) => {
       setAnchorElement(event.currentTarget);
     },
   };
@@ -67,7 +67,7 @@ export function useMenuHandler(
     onClose: closeMenu,
   };
 
-  const createCloseHandler: CreateCloseHandlerFunction = callback => event => {
+  const createCloseHandler: CreateCloseHandlerFunction = (callback) => (event) => {
     closeMenu();
     callback();
   };

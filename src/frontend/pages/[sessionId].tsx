@@ -1,14 +1,15 @@
-import { Page } from "../lib/components/layout/Page";
-import { setSession, setUserRole, showSnackbar } from "../lib/store/actions/global";
-import { selectSession, selectUserRole } from "../lib/store/selectors/global";
 import { NextPage } from "next";
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { UserRole } from "../lib/models/UserRole";
+
 import { getSession, joinSession } from "../lib/api/session";
-import { setUnderstanding, setMember } from "../lib/store/actions/member";
 import { ClientPageContent } from "../lib/components/content/client/ClientPageContent";
 import { MasterPageContent } from "../lib/components/content/master/MasterPageContent";
+import { Page } from "../lib/components/layout/Page";
+import { UserRole } from "../lib/models/UserRole";
+import { setSession, setUserRole, showSnackbar } from "../lib/store/actions/global";
+import { setMember, setUnderstanding } from "../lib/store/actions/member";
+import { selectSession, selectUserRole } from "../lib/store/selectors/global";
 
 type InitialProps = {
   sessionExists: boolean;

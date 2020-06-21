@@ -1,8 +1,9 @@
-import { JoinSessionForm } from "../../forms/JoinSessionForm";
-import { Paper } from "../../layout/Paper";
 import { Grid, Typography } from "@material-ui/core";
 import * as React from "react";
+
 import { CreateSessionForm } from "../../forms/CreateSessionForm";
+import { JoinSessionForm } from "../../forms/JoinSessionForm";
+import { Paper } from "../../layout/Paper";
 
 export const HomePageContent: React.FunctionComponent = () => (
   <>

@@ -1,12 +1,13 @@
-import { selectRecords } from "../../../store/selectors/owner";
-import { Title } from "../../layout/Title";
 import { useTheme } from "@material-ui/core";
 import moment from "moment";
 import getConfig from "next/config";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 import { Area, AreaChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RootState } from "StoreTypes";
+
+import { selectRecords } from "../../../store/selectors/owner";
+import { Title } from "../../layout/Title";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,7 +40,7 @@ const InternalHistoryChart: React.FunctionComponent<Props> = ({ records }) => {
             type="number"
             domain={[
               "dataMin",
-              dataMax => (Math.floor(dataMax / xScaleChangeInterval) + 1) * xScaleChangeInterval,
+              (dataMax) => (Math.floor(dataMax / xScaleChangeInterval) + 1) * xScaleChangeInterval,
             ]}
             name="Time"
             tickFormatter={formatUnixTime}
@@ -63,7 +64,7 @@ const InternalHistoryChart: React.FunctionComponent<Props> = ({ records }) => {
             name="Understanding Members"
             isAnimationActive={false}
           />
-          <Tooltip labelFormatter={label => formatUnixTime(Number(label), "HH:mm:ss")} />
+          <Tooltip labelFormatter={(label) => formatUnixTime(Number(label), "HH:mm:ss")} />
           <Legend iconType="plainline" />
         </AreaChart>
       </ResponsiveContainer>

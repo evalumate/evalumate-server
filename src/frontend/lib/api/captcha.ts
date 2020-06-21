@@ -1,5 +1,6 @@
-import { getApiUrl } from ".";
 import axios from "axios";
+
+import { getApiUrl } from ".";
 
 export type Captcha = { image: string; token: string };
 

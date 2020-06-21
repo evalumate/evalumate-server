@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import Destructable from "../interfaces/Destructable";
 
 abstract class Controller implements Destructable {

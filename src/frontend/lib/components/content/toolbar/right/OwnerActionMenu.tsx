@@ -1,3 +1,11 @@
+import { Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from "@material-ui/core";
+import { MoreVert } from "@material-ui/icons";
+import { useRouter } from "next/router";
+import * as React from "react";
+import { useModal } from "react-modal-hook";
+import { ConnectedProps, connect } from "react-redux";
+import { RootState } from "StoreTypes";
+
 import { deleteSession } from "../../../../api/session";
 import { useMenuHandler } from "../../../../hooks/menuHandler";
 import { UserRole } from "../../../../models/UserRole";
@@ -5,13 +13,6 @@ import { setSession, setUserRole, showSnackbar } from "../../../../store/actions
 import { selectSession } from "../../../../store/selectors/global";
 import { TextDialog } from "../../../layout/dialogs/TextDialog";
 import { InviteMembersDialog } from "../../InviteMembersDialog";
-import { Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from "@material-ui/core";
-import { MoreVert } from "@material-ui/icons";
-import { useRouter } from "next/router";
-import * as React from "react";
-import { useModal } from "react-modal-hook";
-import { connect, ConnectedProps } from "react-redux";
-import { RootState } from "StoreTypes";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 

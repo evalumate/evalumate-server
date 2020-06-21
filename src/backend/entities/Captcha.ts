@@ -1,7 +1,8 @@
-import RandomIdEntity from "./RandomIdEntity";
+import { Column, Entity } from "typeorm";
+
 import { OlderThan, YoungerThan } from "../utils/query-operators";
 import { getUnixTimestamp } from "../utils/time";
-import { Column, Entity } from "typeorm";
+import RandomIdEntity from "./RandomIdEntity";
 
 @Entity()
 export default class Captcha extends RandomIdEntity {

@@ -1,7 +1,8 @@
+import axios, { AxiosResponse } from "axios";
+
 import { Record } from "../models/Record";
 import { Session } from "../models/Session";
 import { getApiUrl } from ".";
-import axios, { AxiosResponse } from "axios";
 
 /**
  * Retrieves a session's records.

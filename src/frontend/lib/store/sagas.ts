@@ -1,18 +1,19 @@
+import getConfig from "next/config";
+import { Task } from "redux-saga";
+import { call, cancel, delay, fork, put, race, select, take, takeLatest } from "redux-saga/effects";
+import { getType } from "typesafe-actions";
+
+import { setUnderstanding as apiSetUnderstanding } from "../api/member";
+import { getRecords } from "../api/record";
+import { Record } from "../models/Record";
+import { UserRole } from "../models/UserRole";
+import { isClient, isServer } from "../util/environment";
 import { setUserRole, showSnackbar } from "./actions/global";
 import { setUnderstanding } from "./actions/member";
 import { addRecords } from "./actions/owner";
 import { selectSession, selectUserRole } from "./selectors/global";
 import { selectMember, selectUnderstanding } from "./selectors/member";
 import { selectLatestRecord } from "./selectors/owner";
-import { setUnderstanding as apiSetUnderstanding } from "../api/member";
-import { getRecords } from "../api/record";
-import { Record } from "../models/Record";
-import { UserRole } from "../models/UserRole";
-import { isClient, isServer } from "../util/environment";
-import getConfig from "next/config";
-import { call, delay, put, race, select, take, takeLatest, fork, cancel } from "redux-saga/effects";
-import { getType } from "typesafe-actions";
-import { Task } from "redux-saga";
 
 const { publicRuntimeConfig } = getConfig();
 const { recordInterval, memberPingInterval } = publicRuntimeConfig;

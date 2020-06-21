@@ -1,5 +1,6 @@
-import DetailHttpException from "./DetailHttpException";
 import HttpStatus from "http-status-codes";
+
+import DetailHttpException from "./DetailHttpException";
 
 export default class MalformedRequestException extends DetailHttpException {
   constructor(details: any) {

@@ -1,13 +1,16 @@
-import Session from "./Session";
-import { getUnixTimestamp } from "../utils/time";
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+
+import { getUnixTimestamp } from "../utils/time";
+import Session from "./Session";
 
 @Entity()
 export default class Record extends BaseEntity {
   @PrimaryColumn("int")
   id: number;
 
-  @ManyToOne(type => Session, session => session.records, { onDelete: "CASCADE" })
+  @ManyToOne((type) => Session, (session) => session.records, {
+    onDelete: "CASCADE",
+  })
   session: Session;
 
   @PrimaryColumn()

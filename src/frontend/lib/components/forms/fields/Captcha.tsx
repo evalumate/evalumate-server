@@ -1,11 +1,12 @@
-import { getCaptcha } from "../../../api/captcha";
-import { CaptchaSolution } from "../../../models/CaptchaSolution";
 import { Grid } from "@material-ui/core";
-import { connect, Field, FormikContextType } from "formik";
+import { Field, FormikContextType, connect } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
 import InlineSVG from "svg-inline-react";
+
+import { getCaptcha } from "../../../api/captcha";
+import { CaptchaSolution } from "../../../models/CaptchaSolution";
 
 const { publicRuntimeConfig } = getConfig();
 const captchaSolutionLength: number = publicRuntimeConfig.captchaSolutionLength;

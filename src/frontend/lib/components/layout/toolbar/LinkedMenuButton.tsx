@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { ButtonLink } from "../../links/ButtonLink";
 
 interface LinkedMenuButtonProps {
@@ -6,7 +7,7 @@ interface LinkedMenuButtonProps {
   href: string;
 }
 
-export const LinkedMenuButton: React.FunctionComponent<LinkedMenuButtonProps> = props => (
+export const LinkedMenuButton: React.FunctionComponent<LinkedMenuButtonProps> = (props) => (
   <ButtonLink size="large" color="inherit" href={props.href}>
     {props.text}
   </ButtonLink>

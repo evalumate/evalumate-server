@@ -1,6 +1,7 @@
-import { getApiUrl } from ".";
 import axios from "axios";
+
 import { Member } from "../models/Member";
+import { getApiUrl } from ".";
 
 /**
  * Sets the understanding flag of a member.

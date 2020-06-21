@@ -1,6 +1,7 @@
 import { plainToClass } from "class-transformer";
-import { validate, ValidationError } from "class-validator";
+import { ValidationError, validate } from "class-validator";
 import * as express from "express";
+
 import BadRequestException from "../exceptions/BadRequestException";
 
 function validationMiddleware<T>(type: any, skipMissingProperties = false): express.RequestHandler {

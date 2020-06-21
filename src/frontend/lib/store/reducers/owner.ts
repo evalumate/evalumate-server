@@ -1,7 +1,8 @@
-import { createReducer } from "typesafe-actions";
-import { Record } from "../../models/Record";
-import { setRecords, addRecords } from "../actions/owner";
 import { sortBy } from "lodash";
+import { createReducer } from "typesafe-actions";
+
+import { Record } from "../../models/Record";
+import { addRecords, setRecords } from "../actions/owner";
 
 export type OwnerState = Readonly<{
   records: Record[];

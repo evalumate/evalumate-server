@@ -1,6 +1,7 @@
+import { createReducer } from "typesafe-actions";
+
 import { Member } from "../../models/Member";
 import { setMember, setUnderstanding } from "../actions/member";
-import { createReducer } from "typesafe-actions";
 
 export type MemberState = Readonly<{
   /**

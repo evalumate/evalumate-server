@@ -1,10 +1,11 @@
-import { CurrentUnderstandingChart } from "./CurrentUnderstandingChart";
-import { HistoryChart } from "./HistoryChart";
-import { Paper } from "../../layout/Paper";
 import { Box, Grid } from "@material-ui/core";
 import * as React from "react";
 import { useSelector } from "react-redux";
+
 import { selectSession } from "../../../store/selectors/global";
+import { Paper } from "../../layout/Paper";
+import { CurrentUnderstandingChart } from "./CurrentUnderstandingChart";
+import { HistoryChart } from "./HistoryChart";
 
 export const MasterPageContent: React.FunctionComponent = () => {
   const session = useSelector(selectSession);

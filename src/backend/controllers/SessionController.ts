@@ -1,5 +1,10 @@
-import CaptchaController from "./CaptchaController";
-import Controller from "./Controller";
+import config from "config";
+import { NextFunction, Request, Response } from "express";
+import asyncHandler from "express-async-handler";
+import HttpStatus from "http-status-codes";
+import pick from "lodash/pick";
+import generatePassword from "password-generator";
+
 import CreateSessionDto from "../dtos/CreateSessionDto";
 import Session from "../entities/Session";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
@@ -7,12 +12,8 @@ import InvalidSessionKeyException from "../exceptions/InvalidSessionKeyException
 import validationMiddleware from "../middlewares/validation";
 import * as respond from "../utils/api-respond";
 import { createLogger } from "../utils/logger";
-import config from "config";
-import { NextFunction, Request, Response } from "express";
-import asyncHandler from "express-async-handler";
-import HttpStatus from "http-status-codes";
-import pick from "lodash/pick";
-import generatePassword from "password-generator";
+import CaptchaController from "./CaptchaController";
+import Controller from "./Controller";
 
 const logger = createLogger(module);
 const sessionKeyLength: number = config.get("session.keyLength");

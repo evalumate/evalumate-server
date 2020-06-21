@@ -1,17 +1,18 @@
-import Controller from "./Controller";
-import SessionController from "./SessionController";
+import config from "config";
+import { Request, Response } from "express";
+import asyncHandler from "express-async-handler";
+import { keyBy, map, mapValues } from "lodash";
+import pick from "lodash/pick";
+import { MoreThan, getRepository } from "typeorm";
+
 import Record from "../entities/Record";
 import Session from "../entities/Session";
 import BadRequestException from "../exceptions/BadRequestException";
 import * as respond from "../utils/api-respond";
 import { createLogger } from "../utils/logger";
 import { getUnixTimestamp } from "../utils/time";
-import config from "config";
-import { Request, Response } from "express";
-import asyncHandler from "express-async-handler";
-import { keyBy, map, mapValues } from "lodash";
-import pick from "lodash/pick";
-import { getRepository, MoreThan } from "typeorm";
+import Controller from "./Controller";
+import SessionController from "./SessionController";
 
 const logger = createLogger(module);
 
@@ -131,7 +132,7 @@ export default class RecordController extends Controller {
    *          array
    */
   private static pickExposableRecordAttributes(records: Record[]) {
-    return map(records, record =>
+    return map(records, (record) =>
       pick(record, [
         "id",
         "time",

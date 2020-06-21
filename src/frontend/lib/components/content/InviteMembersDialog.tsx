@@ -1,21 +1,22 @@
-import { selectSession } from "../../store/selectors/global";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Theme,
+  createStyles,
+  makeStyles,
+} from "@material-ui/core";
 import { DialogProps } from "@material-ui/core/Dialog";
 import getConfig from "next/config";
 import QRCode from "qrcode.react";
 import * as React from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { ConnectedProps, connect, useSelector } from "react-redux";
 import { RootState } from "StoreTypes";
-import {
-  DialogTitle,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  makeStyles,
-  createStyles,
-  Theme,
-} from "@material-ui/core";
+
+import { selectSession } from "../../store/selectors/global";
 
 const { publicRuntimeConfig } = getConfig();
 const { publicUrl } = publicRuntimeConfig;

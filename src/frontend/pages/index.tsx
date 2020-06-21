@@ -1,10 +1,11 @@
-import { JoinSessionForm } from "../lib/components/forms/JoinSessionForm";
-import { Page } from "../lib/components/layout/Page";
-import { Paper } from "../lib/components/layout/Paper";
 import { Grid, Typography } from "@material-ui/core";
 import { NextPage } from "next";
 import * as React from "react";
+
 import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
+import { JoinSessionForm } from "../lib/components/forms/JoinSessionForm";
+import { Page } from "../lib/components/layout/Page";
+import { Paper } from "../lib/components/layout/Paper";
 import { selectSession } from "../lib/store/selectors/global";
 import { redirectTo } from "../lib/util/redirect";
 

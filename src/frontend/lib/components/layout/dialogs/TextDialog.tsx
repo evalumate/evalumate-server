@@ -1,13 +1,13 @@
-import { DialogProps } from "@material-ui/core/Dialog";
-import * as React from "react";
 import {
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
+import { DialogProps } from "@material-ui/core/Dialog";
+import * as React from "react";
 
 export type TextDialogProps = DialogProps & {
   /**

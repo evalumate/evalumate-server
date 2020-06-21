@@ -1,5 +1,6 @@
-import { getUnixTimestamp } from "./time";
 import { LessThan, MoreThan } from "typeorm";
+
+import { getUnixTimestamp } from "./time";
 
 /**
  * A TypeORM query operator that checks whether a unix time stamp is "younger" than a given number

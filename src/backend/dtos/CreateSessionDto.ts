@@ -1,6 +1,7 @@
-import CaptchaDto from "./CaptchaDto";
-import { IsBoolean, IsDefined, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
+import { IsBoolean, IsDefined, IsString, ValidateNested } from "class-validator";
+
+import CaptchaDto from "./CaptchaDto";
 
 export default class CreateSessionDto {
   @ValidateNested()

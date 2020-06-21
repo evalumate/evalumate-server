@@ -1,3 +1,10 @@
+import faker from "faker";
+import HttpStatus from "http-status-codes";
+import pick from "lodash/pick";
+import request from "supertest";
+import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
+import { number } from "yup";
+
 import { setupRandomSession } from "../__setup__/entities";
 import App from "../App";
 import CaptchaController, { captchaTtl } from "../controllers/CaptchaController";
@@ -11,12 +18,6 @@ import Session from "../entities/Session";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
 import { getUnixTimestamp } from "../utils/time";
-import faker from "faker";
-import pick from "lodash/pick";
-import request from "supertest";
-import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
-import { number } from "yup";
-import HttpStatus from "http-status-codes";
 
 jest.useFakeTimers();
 const advanceTimersBySeconds = (seconds: number) => jest.advanceTimersByTime(seconds * 1000);

@@ -1,8 +1,9 @@
+import faker from "faker";
+import { QueryFailedError, getConnection } from "typeorm";
+import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
+
 import { connectToInMemoryDatabase } from "../__setup__/database";
 import Captcha from "../entities/Captcha";
-import faker from "faker";
-import { getConnection, QueryFailedError } from "typeorm";
-import { EntityNotFoundError } from "typeorm/error/EntityNotFoundError";
 
 jest.mock("../utils/time");
 const increaseUnixTimestamp: (seconds: number) => void = require("../utils/time")

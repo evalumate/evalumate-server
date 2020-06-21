@@ -1,9 +1,10 @@
+import config from "config";
+import { Column, Entity, OneToMany } from "typeorm";
+
+import { getUnixTimestamp } from "../utils/time";
 import Member from "./Member";
 import RandomIdEntity from "./RandomIdEntity";
 import Record from "./Record";
-import { getUnixTimestamp } from "../utils/time";
-import config from "config";
-import { Column, Entity, OneToMany } from "typeorm";
 
 const sessionIdLength: number = config.get("session.idLength");
 
@@ -22,10 +23,10 @@ export default class Session extends RandomIdEntity {
   @Column()
   captchaRequired: boolean;
 
-  @OneToMany(type => Member, member => member.session)
+  @OneToMany((type) => Member, (member) => member.session)
   members: Member[];
 
-  @OneToMany(type => Record, record => record.session)
+  @OneToMany((type) => Record, (record) => record.session)
   records: Record[];
 
   /**

@@ -1,6 +1,7 @@
-import Session from "./entities/Session";
-import Member from "./entities/Member";
 import { Store } from "redux";
+
+import Member from "./entities/Member";
+import Session from "./entities/Session";
 
 declare global {
   namespace Express {

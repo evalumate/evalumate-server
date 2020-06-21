@@ -1,7 +1,8 @@
+import { createReducer } from "typesafe-actions";
+
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
 import { resetSnackbar, setSession, setUserRole, showSnackbar } from "../actions/global";
-import { createReducer } from "typesafe-actions";
 
 export type GlobalState = Readonly<{
   /**

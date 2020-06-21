@@ -1,11 +1,12 @@
-import { UserRole } from "../../../../models/UserRole";
-import { selectSession, selectUserRole } from "../../../../store/selectors/global";
-import { Link } from "../../../links/Link";
 import { Box, Hidden, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 import { RootState } from "StoreTypes";
+
+import { UserRole } from "../../../../models/UserRole";
+import { selectSession, selectUserRole } from "../../../../store/selectors/global";
+import { Link } from "../../../links/Link";
 
 const useStyles = makeStyles(() => ({
   root: { flexGrow: 1 },

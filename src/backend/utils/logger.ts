@@ -1,9 +1,10 @@
-import config from "config";
 import path from "path";
+
+import config from "config";
 import {
-  createLogger as createWinstonLogger,
   Logger,
   LoggerOptions,
+  createLogger as createWinstonLogger,
   format,
   transports,
 } from "winston";
@@ -51,16 +52,16 @@ export function createLogger(module?: NodeModule) {
   }
   const filenamePrefix = path.relative(rootModulePath, module.id) + ": ";
   return {
-    debug: function(msg: string, meta?: any) {
+    debug: function (msg: string, meta?: any) {
       logger.debug(filenamePrefix + msg, meta);
     },
-    info: function(msg: string, meta?: any) {
+    info: function (msg: string, meta?: any) {
       logger.info(filenamePrefix + msg, meta);
     },
-    warn: function(msg: string, meta?: any) {
+    warn: function (msg: string, meta?: any) {
       logger.warn(filenamePrefix + msg, meta);
     },
-    error: function(msg: string, meta?: any) {
+    error: function (msg: string, meta?: any) {
       logger.error(filenamePrefix + msg, meta);
     },
   };
@@ -68,7 +69,7 @@ export function createLogger(module?: NodeModule) {
 
 // For use by morgan
 export const logStream = {
-  write: function(message: string) {
+  write: function (message: string) {
     logger.info(message.slice(0, -1));
   },
 };

@@ -1,10 +1,11 @@
-import { MenuDrawer } from "./MenuDrawer";
-import { UserRole } from "../../../../models/UserRole";
-import { selectUserRole } from "../../../../store/selectors/global";
 import { Hidden } from "@material-ui/core";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 import { RootState } from "StoreTypes";
+
+import { UserRole } from "../../../../models/UserRole";
+import { selectUserRole } from "../../../../store/selectors/global";
+import { MenuDrawer } from "./MenuDrawer";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 

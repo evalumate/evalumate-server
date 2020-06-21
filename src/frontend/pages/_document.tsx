@@ -1,9 +1,10 @@
 // Based on https://github.com/mui-org/material-ui/blob/master/examples/nextjs-with-typescript/pages/_document.tsx
 
-import theme from "../lib/theme";
 import { ServerStyleSheets } from "@material-ui/styles";
 import NextDocument, { Head, Main, NextScript } from "next/document";
 import * as React from "react";
+
+import theme from "../lib/theme";
 
 class Document extends NextDocument {
   render() {

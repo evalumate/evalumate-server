@@ -1,7 +1,8 @@
-import { ToolBarContent } from "../../content/toolbar/ToolBarContent";
 import { AppBar, Toolbar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
+
+import { ToolBarContent } from "../../content/toolbar/ToolBarContent";
 
 const useStyles = makeStyles(() => ({
   root: {

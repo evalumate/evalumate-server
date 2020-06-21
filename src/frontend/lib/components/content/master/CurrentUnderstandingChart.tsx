@@ -1,10 +1,11 @@
-import { selectLatestUnderstandingPercentage } from "../../../store/selectors/owner";
-import { Title } from "../../layout/Title";
 import { useTheme } from "@material-ui/core";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, YAxis } from "recharts";
 import { RootState } from "StoreTypes";
+
+import { selectLatestUnderstandingPercentage } from "../../../store/selectors/owner";
+import { Title } from "../../layout/Title";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 

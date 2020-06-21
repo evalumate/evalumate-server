@@ -1,5 +1,9 @@
-import { Captcha } from "./fields/Captcha";
-import { SessionIdField } from "./fields/SessionIdField";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { Form, Formik } from "formik";
+import { useRouter } from "next/router";
+import * as React from "react";
+import { useDispatch } from "react-redux";
+
 import { joinSession } from "../../api/session";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
@@ -7,11 +11,8 @@ import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
 import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
 import { setMember, setUnderstanding } from "../../store/actions/member";
-import { Box, Button, Grid, Typography } from "@material-ui/core";
-import { Form, Formik } from "formik";
-import { useRouter } from "next/router";
-import * as React from "react";
-import { useDispatch } from "react-redux";
+import { Captcha } from "./fields/Captcha";
+import { SessionIdField } from "./fields/SessionIdField";
 
 type FormValues = {
   sessionId: string;

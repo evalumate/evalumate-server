@@ -1,8 +1,9 @@
+import axios from "axios";
+
 import { CaptchaSolution } from "../models/CaptchaSolution";
 import { Member } from "../models/Member";
 import { Session } from "../models/Session";
 import { getApiUrl } from ".";
-import axios from "axios";
 
 /**
  * Given an object with session options, tries to create a new session.

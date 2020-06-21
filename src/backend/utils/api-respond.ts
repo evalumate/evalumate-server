@@ -1,6 +1,7 @@
+import { Response } from "express";
+
 import DetailHttpException from "../exceptions/DetailHttpException";
 import HttpException from "../exceptions/HttpException";
-import { Response } from "express";
 
 const apiVersion = 0.1;
 

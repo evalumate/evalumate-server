@@ -1,5 +1,6 @@
-import HttpException from "./HttpException";
 import HttpStatus from "http-status-codes";
+
+import HttpException from "./HttpException";
 
 export default class InvalidSessionKeyException extends HttpException {
   constructor() {

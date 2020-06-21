@@ -1,14 +1,3 @@
-import { setSession, setUserRole } from "./actions/global";
-import { setMember, setUnderstanding } from "./actions/member";
-import { setRecords } from "./actions/owner";
-import rootReducer from "./reducers";
-import { fetchRecordsSaga, memberSaga, ownerSaga, pingSaga } from "./sagas";
-import { selectUserRole } from "./selectors/global";
-import { setUnderstanding as apiSetUnderstanding } from "../api/member";
-import { getRecords } from "../api/record";
-import { Member } from "../models/Member";
-import { Session } from "../models/Session";
-import { UserRole } from "../models/UserRole";
 import { createMockTask } from "@redux-saga/testing-utils";
 import faker from "faker";
 import getConfig from "next/config";
@@ -18,6 +7,18 @@ import { expectSaga, testSaga } from "redux-saga-test-plan";
 import { Store } from "StoreTypes";
 import { mocked } from "ts-jest/utils";
 import { getType } from "typesafe-actions";
+
+import { setUnderstanding as apiSetUnderstanding } from "../api/member";
+import { getRecords } from "../api/record";
+import { Member } from "../models/Member";
+import { Session } from "../models/Session";
+import { UserRole } from "../models/UserRole";
+import { setSession, setUserRole } from "./actions/global";
+import { setMember, setUnderstanding } from "./actions/member";
+import { setRecords } from "./actions/owner";
+import rootReducer from "./reducers";
+import { fetchRecordsSaga, memberSaga, ownerSaga, pingSaga } from "./sagas";
+import { selectUserRole } from "./selectors/global";
 
 const { publicRuntimeConfig } = getConfig();
 const { recordInterval, memberPingInterval } = publicRuntimeConfig;
@@ -49,7 +50,7 @@ describe("fetchRecordsSaga", () => {
     captchaRequired: false,
   };
 
-  const records = [0, 1, 2].map(id => ({
+  const records = [0, 1, 2].map((id) => ({
     id,
     time: faker.random.number(),
     registeredMembersCount: faker.random.number(),
@@ -96,11 +97,7 @@ describe("fetchRecordsSaga", () => {
 describe("ownerSaga", () => {
   describe("on the server side", () => {
     it("should call fetchRecordsSaga and finish", () => {
-      testSaga(ownerSaga)
-        .next()
-        .call(fetchRecordsSaga)
-        .next()
-        .isDone();
+      testSaga(ownerSaga).next().call(fetchRecordsSaga).next().isDone();
     });
   });
 
@@ -126,7 +123,11 @@ describe("ownerSaga", () => {
 describe("memberSaga", () => {
   const mockedApiSetUnderstanding = mocked(apiSetUnderstanding);
 
-  const member: Member = { id: "memberId", uri: "memberUri", secret: "memberSecret" };
+  const member: Member = {
+    id: "memberId",
+    uri: "memberUri",
+    secret: "memberSecret",
+  };
 
   let store: Store;
   let task: Task;

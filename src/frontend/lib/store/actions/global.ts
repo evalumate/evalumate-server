@@ -1,6 +1,7 @@
+import { createAction } from "typesafe-actions";
+
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
-import { createAction } from "typesafe-actions";
 
 export const setUserRole = createAction("Global:setUserRole")<UserRole>();
 export const setSession = createAction("Global:setSession")<Session | null>();

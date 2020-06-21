@@ -1,10 +1,10 @@
 import { Snackbar } from "@material-ui/core";
-
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 import { RootState } from "StoreTypes";
-import { selectSnackbarMessage, selectSnackbarVisible } from "../../store/selectors/global";
+
 import { resetSnackbar } from "../../store/actions/global";
+import { selectSnackbarMessage, selectSnackbarVisible } from "../../store/selectors/global";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 
@@ -31,9 +31,6 @@ const mapDispatchToProps = {
   reset: resetSnackbar,
 };
 
-const connectToRedux = connect(
-  mapStateToProps,
-  mapDispatchToProps
-);
+const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export const GlobalSnackbar = connectToRedux(InternalGlobalSnackbar);

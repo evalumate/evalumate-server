@@ -1,4 +1,4 @@
-import { IsString, IsDefined } from "class-validator";
+import { IsDefined, IsString } from "class-validator";
 
 export default class CaptchaDto {
   @IsString()

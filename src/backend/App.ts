@@ -1,3 +1,11 @@
+import http from "http";
+import path from "path";
+
+import express from "express";
+import createError from "http-errors";
+import nextJs from "next";
+import { Connection, createConnection } from "typeorm";
+
 import CaptchaController from "./controllers/CaptchaController";
 import Controller from "./controllers/Controller";
 import MemberController from "./controllers/MemberController";
@@ -5,16 +13,9 @@ import RecordController from "./controllers/RecordController";
 import SessionController from "./controllers/SessionController";
 import Destructable from "./interfaces/Destructable";
 import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
-
 import databaseConfig from "./ormconfig";
 import { success as apiRespondSuccess } from "./utils/api-respond";
 import { createLogger } from "./utils/logger";
-import express from "express";
-import http from "http";
-import createError from "http-errors";
-import nextJs from "next";
-import path from "path";
-import { Connection, createConnection } from "typeorm";
 
 const env = process.env.NODE_ENV!;
 const dev = env !== "production";
@@ -83,7 +84,7 @@ class App implements Destructable {
     logger.debug("Initializing routes");
 
     /* Root API route */
-    this.app.get("/api", function(req, res, next) {
+    this.app.get("/api", function (req, res, next) {
       apiRespondSuccess(res);
     });
   }
@@ -96,7 +97,7 @@ class App implements Destructable {
       new MemberController(),
       new RecordController(),
     ];
-    this.apiControllers.forEach(controller => {
+    this.apiControllers.forEach((controller) => {
       this.app.use("/api", controller.router);
     });
   }
@@ -123,7 +124,7 @@ class App implements Destructable {
 
   private async destructApiControllers() {
     logger.debug("Shutting down API controllers");
-    await Promise.all(this.apiControllers.map(controller => controller.shutDown()));
+    await Promise.all(this.apiControllers.map((controller) => controller.shutDown()));
     logger.debug("API controllers shut down");
   }
 

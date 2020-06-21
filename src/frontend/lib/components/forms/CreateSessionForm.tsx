@@ -1,9 +1,3 @@
-import { Captcha } from "./fields/Captcha";
-import { createSession } from "../../api/session";
-import { CaptchaSolution } from "../../models/CaptchaSolution";
-import { Session } from "../../models/Session";
-import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
 import { Box, Button, FormControlLabel, Grid, Tooltip, Typography } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import { Switch, TextField } from "formik-material-ui";
@@ -12,6 +6,13 @@ import { useRouter } from "next/router";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
+
+import { createSession } from "../../api/session";
+import { CaptchaSolution } from "../../models/CaptchaSolution";
+import { Session } from "../../models/Session";
+import { UserRole } from "../../models/UserRole";
+import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
+import { Captcha } from "./fields/Captcha";
 
 const { publicRuntimeConfig } = getConfig();
 const sessionNameMaxLength: number = publicRuntimeConfig.sessionNameMaxLength;

@@ -1,12 +1,13 @@
-import Controller from "./Controller";
+import config from "config";
+import { Request, Response } from "express";
+import svgCaptcha from "svg-captcha";
+
 import Captcha from "../entities/Captcha";
 import InvalidCaptchaSolutionException from "../exceptions/InvalidCaptchaSolutionException";
 import InvalidCaptchaTokenException from "../exceptions/InvalidCaptchaTokenException";
 import * as respond from "../utils/api-respond";
 import { createLogger } from "../utils/logger";
-import config from "config";
-import { Request, Response } from "express";
-import svgCaptcha from "svg-captcha";
+import Controller from "./Controller";
 
 const logger = createLogger(module);
 

@@ -1,7 +1,8 @@
-import { LinkedListItem } from "../../../layout/toolbar/LinkedListItem";
 import { List } from "@material-ui/core";
-import { Info, Home } from "@material-ui/icons";
+import { Home, Info } from "@material-ui/icons";
 import * as React from "react";
+
+import { LinkedListItem } from "../../../layout/toolbar/LinkedListItem";
 
 export const MenuDrawerContent: React.FunctionComponent = () => (
   <>

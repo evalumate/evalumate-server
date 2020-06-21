@@ -1,8 +1,9 @@
+import config from "config";
+import { Column, Entity, Index, ManyToOne, PrimaryColumn } from "typeorm";
+
+import { getUnixTimestamp } from "../utils/time";
 import RandomIdEntity from "./RandomIdEntity";
 import Session from "./Session";
-import { getUnixTimestamp } from "../utils/time";
-import { Column, Entity, Index, ManyToOne, PrimaryColumn } from "typeorm";
-import config from "config";
 
 const memberIdLength: number = config.get("member.idLength");
 
@@ -20,7 +21,9 @@ export default class Member extends RandomIdEntity {
   @PrimaryColumn()
   id: string;
 
-  @ManyToOne(type => Session, session => session.members, { onDelete: "CASCADE" })
+  @ManyToOne((type) => Session, (session) => session.members, {
+    onDelete: "CASCADE",
+  })
   session: Session;
 
   @PrimaryColumn()

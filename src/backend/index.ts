@@ -1,9 +1,10 @@
-import App from "./App";
+import "reflect-metadata";
 
-import { createLogger } from "./utils/logger";
 import config from "config";
 import nodeCleanup from "node-cleanup";
-import "reflect-metadata";
+
+import App from "./App";
+import { createLogger } from "./utils/logger";
 
 const logger = createLogger();
 

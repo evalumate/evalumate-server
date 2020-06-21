@@ -1,13 +1,14 @@
-import { OwnerActionMenu } from "./OwnerActionMenu";
-import { VisitorButtons } from "./VisitorButtons";
+import { Hidden, IconButton, Typography } from "@material-ui/core";
+import { ExitToApp } from "@material-ui/icons";
+import * as React from "react";
+import { ConnectedProps, connect } from "react-redux";
+import { RootState } from "StoreTypes";
+
 import { UserRole } from "../../../../models/UserRole";
 import { selectSession, selectUserRole } from "../../../../store/selectors/global";
-import { Hidden, Typography, IconButton } from "@material-ui/core";
-import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { RootState } from "StoreTypes";
-import { ExitToApp } from "@material-ui/icons";
 import { MemberExitSessionButton } from "./MemberExitSessionButton";
+import { OwnerActionMenu } from "./OwnerActionMenu";
+import { VisitorButtons } from "./VisitorButtons";
 
 type Props = ConnectedProps<typeof connectToRedux>;
 

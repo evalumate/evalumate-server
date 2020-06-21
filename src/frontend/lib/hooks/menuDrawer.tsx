@@ -1,6 +1,6 @@
+import { SwipeableDrawer } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import * as React from "react";
-import { SwipeableDrawer } from "@material-ui/core";
 
 /**
  * A React hook that returns a drawer JSX component and a function `toggleMenuDrawer()` that, given

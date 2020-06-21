@@ -1,7 +1,8 @@
-import { redirectTo } from "./redirect";
 import nextRouter from "next/router";
 import httpMocks from "node-mocks-http";
 import { mocked } from "ts-jest/utils";
+
+import { redirectTo } from "./redirect";
 
 jest.mock("next/router");
 jest.mock("../api/session");

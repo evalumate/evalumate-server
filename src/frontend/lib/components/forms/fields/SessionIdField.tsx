@@ -1,9 +1,10 @@
-import { getSession } from "../../../api/session";
-import { Session } from "../../../models/Session";
-import { connect, Field, FormikContextType } from "formik";
+import { Field, FormikContextType, connect } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
+
+import { getSession } from "../../../api/session";
+import { Session } from "../../../models/Session";
 
 const { publicRuntimeConfig } = getConfig();
 const sessionIdLength: number = publicRuntimeConfig.sessionIdLength;

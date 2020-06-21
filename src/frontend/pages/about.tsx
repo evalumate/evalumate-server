@@ -1,7 +1,8 @@
-import { Page } from "../lib/components/layout/Page";
+import { Grid, Typography } from "@material-ui/core";
 import { NextPage } from "next";
 import * as React from "react";
-import { Typography, Grid } from "@material-ui/core";
+
+import { Page } from "../lib/components/layout/Page";
 
 const AboutPage: NextPage<{}, void> = () => {
   return (

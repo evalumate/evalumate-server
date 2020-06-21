@@ -1,5 +1,6 @@
-import databaseConfig from "../ormconfig";
 import { createConnection } from "typeorm";
+
+import databaseConfig from "../ormconfig";
 
 export const connectToGlobalDatabase = () => {
   return createConnection(databaseConfig);

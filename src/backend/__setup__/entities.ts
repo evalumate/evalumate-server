@@ -1,5 +1,6 @@
-import SessionController from "../controllers/SessionController";
 import faker from "faker";
+
+import SessionController from "../controllers/SessionController";
 
 /**
  * Creates a session with randomized parameters in the database using `SessionController.createSession()`.
