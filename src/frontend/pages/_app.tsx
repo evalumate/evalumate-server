@@ -9,6 +9,7 @@ import { ModalProvider } from "react-modal-hook";
 import { Provider } from "react-redux";
 import { TransitionGroup } from "react-transition-group";
 
+import { GlobalInfoDialog } from "../lib/components/layout/dialogs/GlobalInfoDialog";
 import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import theme from "../lib/theme";
@@ -31,6 +32,7 @@ class App extends NextApp<ReduxWrapperAppProps> {
             <Component {...pageProps} />
           </ModalProvider>
           <GlobalSnackbar />
+          <GlobalInfoDialog />
         </MuiThemeProvider>
       </Provider>
     );

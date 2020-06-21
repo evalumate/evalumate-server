@@ -2,7 +2,14 @@ import { createReducer } from "typesafe-actions";
 
 import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
-import { resetSnackbar, setSession, setUserRole, showSnackbar } from "../actions/global";
+import {
+  resetInfoDialog,
+  resetSnackbar,
+  setSession,
+  setUserRole,
+  showInfoDialog,
+  showSnackbar,
+} from "../actions/global";
 
 export type GlobalState = Readonly<{
   /**
@@ -14,11 +21,19 @@ export type GlobalState = Readonly<{
    */
   session: Readonly<Session> | null;
   /**
-   * Information related to the global snackbar
+   * Global snackbar
    */
   snackbar: {
     message: string;
     visible: boolean;
+  };
+  /**
+   * Info dialog
+   */
+  infoDialog: {
+    title: string;
+    message: string;
+    isVisible: boolean;
   };
 }>;
 
@@ -28,6 +43,11 @@ const initialState: GlobalState = {
   snackbar: {
     message: "",
     visible: false,
+  },
+  infoDialog: {
+    title: "",
+    message: "",
+    isVisible: false,
   },
 };
 
@@ -40,6 +60,7 @@ const globalReducer = createReducer(initialState)
     ...state,
     session: action.payload,
   }))
+  // Snackbar
   .handleAction(showSnackbar, (state, action) => ({
     ...state,
     snackbar: {
@@ -52,6 +73,23 @@ const globalReducer = createReducer(initialState)
     snackbar: {
       message: "",
       visible: false,
+    },
+  }))
+  // Info dialog
+  .handleAction(showInfoDialog, (state, action) => ({
+    ...state,
+    infoDialog: {
+      title: action.payload.title,
+      message: action.payload.message,
+      isVisible: true,
+    },
+  }))
+  .handleAction(resetInfoDialog, (state, action) => ({
+    ...state,
+    infoDialog: {
+      // Leaving the title and message in place so they do not disappear prior to dialog fadeout
+      ...state.infoDialog,
+      isVisible: false,
     },
   }));
 
