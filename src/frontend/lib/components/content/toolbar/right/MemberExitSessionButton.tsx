@@ -1,39 +1,31 @@
 import { UserRole } from "../../../../models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../../../../store/actions/global";
+import { setSession, setUserRole } from "../../../../store/actions/global";
 import { setMember, setUnderstanding } from "../../../../store/actions/member";
-import { selectUserRole, selectSession } from "../../../../store/selectors/global";
+import { selectUserRole } from "../../../../store/selectors/global";
 import { IconButton } from "@material-ui/core";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { RootState } from "StoreTypes";
+import { useSelector, useDispatch } from "react-redux";
 import { deleteMember } from "../../../../api/member";
 import { selectMember } from "../../../../store/selectors/member";
 
-type Props = ConnectedProps<typeof connectToRedux>;
-
-const InternalMemberExitSessionButton: React.FunctionComponent<Props> = ({
-  children,
-  userRole,
-  member,
-  setUserRole,
-  setSession,
-  setMember,
-  setUnderstanding,
-}) => {
+export const MemberExitSessionButton: React.FunctionComponent = ({ children }) => {
   const router = useRouter();
+  const member = useSelector(selectMember);
+  const userRole = useSelector(selectUserRole);
+  const dispatch = useDispatch();
 
   const exitSession = async () => {
     if (userRole == UserRole.Member) {
-      setUserRole(UserRole.Visitor);
+      dispatch(setUserRole(UserRole.Visitor));
       if (member) {
         await deleteMember(member);
-        setMember(null);
+        dispatch(setMember(null));
       }
-      setSession(null);
-      setUnderstanding(true);
-
       router.push("/");
+
+      dispatch(setSession(null));
+      setUnderstanding(true);
     }
   };
 
@@ -48,19 +40,3 @@ const InternalMemberExitSessionButton: React.FunctionComponent<Props> = ({
     </IconButton>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  userRole: selectUserRole(state),
-  member: selectMember(state),
-});
-
-const mapDispatchToProps = {
-  setUserRole,
-  setSession,
-  setMember,
-  setUnderstanding,
-};
-
-const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
-
-export const MemberExitSessionButton = connectToRedux(InternalMemberExitSessionButton);

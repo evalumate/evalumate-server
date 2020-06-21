@@ -3,7 +3,7 @@ import { DialogProps } from "@material-ui/core/Dialog";
 import getConfig from "next/config";
 import QRCode from "qrcode.react";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect, ConnectedProps, useSelector } from "react-redux";
 import { RootState } from "StoreTypes";
 import {
   DialogTitle,
@@ -15,7 +15,6 @@ import {
   makeStyles,
   createStyles,
   Theme,
-  NoSsr,
 } from "@material-ui/core";
 
 const { publicRuntimeConfig } = getConfig();
@@ -35,31 +34,29 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type Props = DialogProps & {
   onCloseButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-} & ConnectedProps<typeof connectToRedux>;
+};
 
-const InternalInviteMembersDialog: React.FunctionComponent<Props> = ({
-  session,
+export const InviteMembersDialog: React.FunctionComponent<Props> = ({
   onCloseButtonClick,
   ...dialogProps
 }) => {
-  const classes = useStyles({});
+  const classes = useStyles();
+  const session = useSelector(selectSession);
 
   if (!session) {
     return null;
   }
+
+  const sessionUrl = `${publicUrl}/${session.id}`;
 
   return (
     <Dialog {...dialogProps} aria-labelledby="responsive-dialog-title">
       <DialogTitle id="responsive-dialog-title">Invite Members</DialogTitle>
       <DialogContent>
         <DialogContentText>Participants can scan this QR code...</DialogContentText>
-        <QRCode
-          value={`${publicUrl}/client/${session.id}`}
-          renderAs="svg"
-          className={classes.qrcode}
-        />
+        <QRCode value={sessionUrl} renderAs="svg" className={classes.qrcode} />
         <DialogContentText>
-          ...or go to <b>{publicUrl}</b> and join session <b>{session.id}</b>.
+          ...or go to <b>{sessionUrl}</b>.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -70,11 +67,3 @@ const InternalInviteMembersDialog: React.FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  session: selectSession(state),
-});
-
-const connectToRedux = connect(mapStateToProps);
-
-export const InviteMembersDialog = connectToRedux(InternalInviteMembersDialog);

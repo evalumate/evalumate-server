@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const ToolBar: React.FunctionComponent = () => {
-  const classes = useStyles({});
+  const classes = useStyles();
 
   return (
     <div className={classes.root}>

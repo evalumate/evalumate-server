@@ -10,7 +10,7 @@ import { Switch, TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useDispatch } from "react-redux";
 import * as Yup from "yup";
 
 const { publicRuntimeConfig } = getConfig();
@@ -29,17 +29,16 @@ const FormSchema = Yup.object().shape({
     .required("Required"),
 });
 
-type Props = ConnectedProps<typeof connectToRedux>;
-
-export const InternalCreateSessionForm: React.FunctionComponent<Props> = props => {
+export const CreateSessionForm: React.FunctionComponent = (props) => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const onSessionCreated = (session: Session) => {
-    props.setSession(session);
-    props.setUserRole(UserRole.Owner);
-    props.showSnackbar(`Session "${session.name}" created`);
-    router.push(`/master/${session.id}`);
+    dispatch(setSession(session));
+    dispatch(setUserRole(UserRole.Owner));
+    dispatch(showSnackbar(`Session "${session.name}" was created`));
+    router.push(`/${session.id}`);
   };
 
   const onCreateFormSubmit = async (values: FormValues) => {
@@ -98,13 +97,3 @@ export const InternalCreateSessionForm: React.FunctionComponent<Props> = props =
     </Formik>
   );
 };
-
-const mapDispatchToProps = {
-  setUserRole,
-  setSession,
-  showSnackbar,
-};
-
-const connectToRedux = connect(null, mapDispatchToProps);
-
-export const CreateSessionForm = connectToRedux(InternalCreateSessionForm);

@@ -5,6 +5,8 @@ import { Grid, Typography } from "@material-ui/core";
 import { NextPage } from "next";
 import * as React from "react";
 import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
+import { selectSession } from "../lib/store/selectors/global";
+import { redirectTo } from "../lib/util/redirect";
 
 const HomePage: NextPage = () => {
   return (
@@ -29,6 +31,13 @@ const HomePage: NextPage = () => {
       </Grid>
     </Page>
   );
+};
+
+HomePage.getInitialProps = async ({ store, res }) => {
+  const session = selectSession(store.getState());
+  if (session !== null) {
+    redirectTo(`/${session.id}`, res);
+  }
 };
 
 export default HomePage;

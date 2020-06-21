@@ -11,14 +11,14 @@ import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useDispatch } from "react-redux";
 
 type FormValues = {
   sessionId: string;
   captcha: CaptchaSolution;
 };
 
-type Props = ConnectedProps<typeof connectToRedux> & {
+type Props = {
   /**
    * If set, the session id input field will be hidden and only a captcha field will be shown. Note:
    * If the provided `Session` object has `captchaRequired` set to `false`, this component will not
@@ -27,12 +27,13 @@ type Props = ConnectedProps<typeof connectToRedux> & {
   session?: Session;
 };
 
-export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => {
-  const [session, setSession] = React.useState<Session | null>(
+export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
+  const [session, setLocalSession] = React.useState<Session | null>(
     typeof props.session !== "undefined" ? props.session : null
   );
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const initialFormValues = {
     sessionId: typeof props.session === "undefined" ? "" : props.session.id,
@@ -40,12 +41,12 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
   };
 
   const onSessionJoined = (member: Member) => {
-    props.setSession(session);
-    props.setMember(member);
-    props.setUnderstanding(true);
-    props.setUserRole(UserRole.Member);
-    props.showSnackbar(`Joined session "${session!.name}"`);
-    router.push(`/client/${session!.id}`);
+    dispatch(setSession(session));
+    dispatch(setMember(member));
+    dispatch(setUnderstanding(true));
+    dispatch(setUserRole(UserRole.Member));
+    dispatch(showSnackbar(`Joined session "${session!.name}"`));
+    router.push(`/${session!.id}`);
   };
 
   const onJoinFormSubmit = async (values: FormValues) => {
@@ -65,7 +66,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     if (member) {
       onSessionJoined(member);
     } else {
-      props.showSnackbar("Sorry, something went wrong. Please try again!");
+      dispatch(showSnackbar("Sorry, something went wrong. Please try again!"));
     }
   };
 
@@ -79,7 +80,7 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <SessionIdField onSessionChange={setSession} />
+            <SessionIdField onSessionChange={setLocalSession} />
           </Grid>
           {session && session.captchaRequired && (
             <Grid item xs={12}>
@@ -96,15 +97,3 @@ export const InternalJoinSessionForm: React.FunctionComponent<Props> = props => 
     </Formik>
   );
 };
-
-const mapDispatchToProps = {
-  setUserRole,
-  setMember,
-  setSession,
-  setUnderstanding,
-  showSnackbar,
-};
-
-const connectToRedux = connect(null, mapDispatchToProps);
-
-export const JoinSessionForm = connectToRedux(InternalJoinSessionForm);
