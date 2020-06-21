@@ -6,20 +6,21 @@ import { NextPage } from "next";
 import * as React from "react";
 import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 
-const HomePage: NextPage<{}, void> = () => {
+const HomePage: NextPage = () => {
   return (
-    <Page
-      title="EvaluMate (Alpha) – Feedback Made Easy"
-      titleAddHomepageTitle={false}
-      maxWidth="sm"
-    >
+    <Page title="EvaluMate – Feedback Made Easy" titleAddHomepageTitle={false} maxWidth="sm">
+      <Grid item xs={12}>
+        <Typography style={{ flexGrow: 1 }} align="center">
+          <Typography variant="h3" component="h1">
+            Evaluate? EvaluMate!
+          </Typography>
+          <Typography variant="subtitle1">A social project by students, for students.</Typography>
+        </Typography>
+      </Grid>
       <Grid item xs={12}>
         <Paper>
           <JoinSessionForm />
         </Paper>
-      </Grid>
-      <Grid item xs={12} container justify="center">
-        <Typography>or</Typography>
       </Grid>
       <Grid item xs={12}>
         <Paper>
