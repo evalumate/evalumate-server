@@ -3,7 +3,7 @@ import axiosRetry from "axios-retry";
 import { AppThunkAction } from "StoreTypes";
 
 import { ApiResponse } from "../../models/ApiResponse";
-import { showInfoDialog, showSnackbar } from "../actions/global";
+import { showInfoDialog, showSnackbar } from "../actions/dialogs";
 
 export type ApiThunkOptions = {
   /**

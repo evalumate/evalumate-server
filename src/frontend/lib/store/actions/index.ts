@@ -1,10 +1,8 @@
-import * as GlobalActions from "./global";
-import * as MemberActions from "./member";
-import * as OwnerActions from "./owner";
+import * as dialogs from "./dialogs";
+import * as session from "./session";
 
 // Export all actions for usage in type definitions
 export default {
-  global: GlobalActions,
-  owner: OwnerActions,
-  member: MemberActions,
+  dialogs,
+  session,
 };

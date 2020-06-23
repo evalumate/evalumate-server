@@ -6,7 +6,7 @@ import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 import { JoinSessionForm } from "../lib/components/forms/JoinSessionForm";
 import { Page } from "../lib/components/layout/Page";
 import { Paper } from "../lib/components/layout/Paper";
-import { selectSession } from "../lib/store/selectors/global";
+import { selectSession } from "../lib/store/selectors/session";
 import { redirectTo } from "../lib/util/redirect";
 
 const HomePage: NextPage = () => {

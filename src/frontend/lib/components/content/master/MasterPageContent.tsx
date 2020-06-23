@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import useSWR from "swr";
 
 import { useThunkDispatch } from "../../../store";
-import { selectSession } from "../../../store/selectors/global";
+import { selectSession } from "../../../store/selectors/session";
 import { fetchRecords } from "../../../store/thunks/record";
 import { Paper } from "../../layout/Paper";
 import { CurrentUnderstandingChart } from "./CurrentUnderstandingChart";

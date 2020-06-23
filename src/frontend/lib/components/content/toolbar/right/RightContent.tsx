@@ -5,7 +5,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { RootState } from "StoreTypes";
 
 import { UserRole } from "../../../../models/UserRole";
-import { selectSession, selectUserRole } from "../../../../store/selectors/global";
+import { selectSession, selectUserRole } from "../../../../store/selectors/session";
 import { MemberExitSessionButton } from "./MemberExitSessionButton";
 import { OwnerActionMenu } from "./OwnerActionMenu";
 import { VisitorButtons } from "./VisitorButtons";

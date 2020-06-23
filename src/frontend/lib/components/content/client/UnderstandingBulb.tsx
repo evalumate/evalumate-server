@@ -4,8 +4,8 @@ import { createStyles, makeStyles } from "@material-ui/styles";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setUnderstanding } from "../../../store/actions/member";
-import { selectUnderstanding } from "../../../store/selectors/member";
+import { setIsUnderstanding } from "../../../store/actions/session";
+import { selectIsUnderstanding } from "../../../store/selectors/session";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,14 +24,14 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const UnderstandingBulb: React.FunctionComponent = () => {
   const classes = useStyles();
-  const isUnderstanding = useSelector(selectUnderstanding);
+  const isUnderstanding = useSelector(selectIsUnderstanding);
   const dispatch = useDispatch();
 
   return (
     <ButtonBase
       className={classes.root}
       focusVisibleClassName={classes.focusVisible}
-      onClick={() => dispatch(setUnderstanding(!isUnderstanding))}
+      onClick={() => dispatch(setIsUnderstanding(!isUnderstanding))}
     >
       {isUnderstanding ? (
         <EmojiObjects className={classes.image} />

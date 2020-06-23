@@ -13,10 +13,9 @@ import { DialogProps } from "@material-ui/core/Dialog";
 import getConfig from "next/config";
 import QRCode from "qrcode.react";
 import * as React from "react";
-import { ConnectedProps, connect, useSelector } from "react-redux";
-import { RootState } from "StoreTypes";
+import { useSelector } from "react-redux";
 
-import { selectSession } from "../../store/selectors/global";
+import { selectSession } from "../../store/selectors/session";
 
 const { publicRuntimeConfig } = getConfig();
 const { publicUrl } = publicRuntimeConfig;

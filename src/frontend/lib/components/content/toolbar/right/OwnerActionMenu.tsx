@@ -1,15 +1,13 @@
 import { Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from "@material-ui/core";
 import { MoreVert } from "@material-ui/icons";
-import { useRouter } from "next/router";
 import * as React from "react";
 import { useModal } from "react-modal-hook";
 import { useSelector } from "react-redux";
 
 import { useMenuHandler } from "../../../../hooks/menuHandler";
-import { UserRole } from "../../../../models/UserRole";
 import { useThunkDispatch } from "../../../../store";
-import { resetSession, setUserRole } from "../../../../store/actions/global";
-import { selectSession } from "../../../../store/selectors/global";
+import { resetSession } from "../../../../store/actions/session";
+import { selectSession } from "../../../../store/selectors/session";
 import { deleteSession } from "../../../../store/thunks/session";
 import { TextDialog } from "../../../layout/dialogs/TextDialog";
 import { InviteMembersDialog } from "../../InviteMembersDialog";
@@ -19,7 +17,6 @@ import { InviteMembersDialog } from "../../InviteMembersDialog";
  * session owner and a valid session is set.
  */
 export const OwnerActionMenu: React.FunctionComponent = () => {
-  const router = useRouter();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useThunkDispatch();
@@ -40,13 +37,8 @@ export const OwnerActionMenu: React.FunctionComponent = () => {
   ));
 
   const stopSessionAndExit = async () => {
-    const sessionDeleted = await dispatch(
-      deleteSession(session, { successSnackbarMessage: "Session deleted" })
-    );
-    if (sessionDeleted) {
-      dispatch(setUserRole(UserRole.Visitor));
+    if (await dispatch(deleteSession(session, { successSnackbarMessage: "Session deleted" }))) {
       dispatch(resetSession());
-      router.push("/");
     }
   };
 

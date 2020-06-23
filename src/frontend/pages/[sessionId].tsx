@@ -5,25 +5,37 @@ import { AppThunkDispatch } from "StoreTypes";
 
 import { ClientPageContent } from "../lib/components/content/client/ClientPageContent";
 import { MasterPageContent } from "../lib/components/content/master/MasterPageContent";
+import { JoinSessionForm } from "../lib/components/forms/JoinSessionForm";
 import { Page } from "../lib/components/layout/Page";
+import { Session } from "../lib/models/Session";
 import { UserRole } from "../lib/models/UserRole";
-import { setSession } from "../lib/store/actions/global";
-import { selectSession, selectUserRole } from "../lib/store/selectors/global";
+import { selectSession, selectUserRole } from "../lib/store/selectors/session";
 import { fetchSession, joinSession } from "../lib/store/thunks/session";
 
 type InitialProps = {
-  sessionExists: boolean;
+  sessionNotFound?: boolean;
+  sessionToJoin?: Session;
 };
 
-const SessionPage: NextPage<InitialProps> = ({ sessionExists }) => {
+const SessionPage: NextPage<InitialProps> = ({ sessionNotFound, sessionToJoin }) => {
   const session = useSelector(selectSession);
   const userRole = useSelector(selectUserRole);
 
-  if (!sessionExists) {
+  if (sessionNotFound) {
     return <Page title="Session Not Found"></Page>;
   }
 
-  if (session === null) {
+  if (sessionToJoin && session === null) {
+    // Show a join form for a session that requires a captcha
+    return (
+      <Page title={sessionToJoin.name} maxWidth="sm">
+        {sessionToJoin && <JoinSessionForm session={sessionToJoin} />}
+        {!sessionToJoin && <ClientPageContent />}
+      </Page>
+    );
+  }
+
+  if (!session) {
     return null;
   }
 
@@ -37,7 +49,7 @@ const SessionPage: NextPage<InitialProps> = ({ sessionExists }) => {
 
   return (
     <Page title={session!.name} maxWidth="sm">
-      <ClientPageContent session={session!} />
+      <ClientPageContent />
     </Page>
   );
 };
@@ -52,23 +64,17 @@ SessionPage.getInitialProps = async ({ query, store, res }) => {
     if (typeof res !== "undefined") {
       res.statusCode = 404;
     }
-    return { sessionExists: false };
+    return { sessionNotFound: true };
   }
 
-  const userRole = selectUserRole(store.getState());
-
-  if (userRole === UserRole.Visitor) {
-    // A visitor wants to join the session
-    dispatch(setSession(session));
-
-    // Check if the visitor has to enter a captcha to join the session
-    if (!session.captchaRequired) {
-      // Visitor joins session
-      await dispatch(joinSession(session));
+  if (selectUserRole(store.getState()) === UserRole.Visitor) {
+    // A visitor wants to join the session – join it right away if she does not need to enter a captcha
+    if (!session.captchaRequired && (await dispatch(joinSession(session)))) {
+      return {};
     }
   }
 
-  return { sessionExists: true };
+  return { sessionToJoin: session };
 };
 
 export default SessionPage;

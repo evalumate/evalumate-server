@@ -1,19 +1,21 @@
 import { Snackbar } from "@material-ui/core";
 import * as React from "react";
-import { ConnectedProps, connect } from "react-redux";
-import { RootState } from "StoreTypes";
+import { useDispatch, useSelector } from "react-redux";
 
-import { resetSnackbar } from "../../store/actions/global";
-import { selectSnackbarMessage, selectSnackbarVisible } from "../../store/selectors/global";
+import { resetSnackbar } from "../../store/actions/dialogs";
+import { selectSnackbarIsVisible, selectSnackbarMessage } from "../../store/selectors/dialogs";
 
-type Props = ConnectedProps<typeof connectToRedux>;
+export const GlobalSnackbar: React.FunctionComponent = () => {
+  const message = useSelector(selectSnackbarMessage);
+  const isVisible = useSelector(selectSnackbarIsVisible);
+  const dispatch = useDispatch();
 
-const InternalGlobalSnackbar: React.FunctionComponent<Props> = ({ message, visible, reset }) => {
   return (
     <Snackbar
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      open={visible}
-      onClose={reset}
+      open={isVisible}
+      onClose={() => dispatch(resetSnackbar())}
+      autoHideDuration={5000}
       ContentProps={{
         "aria-describedby": "global-snackbar-message",
       }}
@@ -21,16 +23,3 @@ const InternalGlobalSnackbar: React.FunctionComponent<Props> = ({ message, visib
     />
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  message: selectSnackbarMessage(state),
-  visible: selectSnackbarVisible(state),
-});
-
-const mapDispatchToProps = {
-  reset: resetSnackbar,
-};
-
-const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
-
-export const GlobalSnackbar = connectToRedux(InternalGlobalSnackbar);

@@ -4,16 +4,13 @@ import { getApiUrl } from "../../api";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
-import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole } from "../actions/global";
-import { setMember, setUnderstanding } from "../actions/member";
+import { setMemberSession, setOwnerSession } from "../actions/session";
 import { ApiThunkOptions, callApi } from "./base";
 
 /**
  * Given an object with session options, returns a thunk action that tries to create a new session.
- * If it succeeds, it returns the retrieved `Session` object and dispatches `setSession`,
- * `setUserRole(UserRole.Owner)`, and shows a snackbar (if not specified otherwise in
- * apiThunkOptions).
+ * If it succeeds, it returns the retrieved `Session` object, dispatches `setOwnerSession`, and
+ * shows a snackbar (if not specified otherwise in apiThunkOptions).
  *
  * @param sessionOptions The options passed to the API
  */
@@ -42,8 +39,7 @@ export function createSession(
     );
     const session = response?.data?.session;
     if (session) {
-      dispatch(setSession(session));
-      dispatch(setUserRole(UserRole.Owner));
+      dispatch(setOwnerSession(session));
     }
     return session;
   };
@@ -76,14 +72,12 @@ export function fetchSession(
 
 /**
  * A thunk action that tries to join a session. On success, it returns a `Member` object and
- * dispatches `setSession`, `setMember` and `setUserRole(UserRole.Member)`.
+ * dispatches `setMemberSession`. Otherwise (if the session does not exist (error 404) or the
+ * captcha solution is invalid (error 403), or on an any other unexpected error), the thunk action
+ * returns `undefined`.
  *
  * @param session The `Session` object representing the session to be joined
  * @param captcha A `CaptchaSolution` object if joining the session requires a captcha
- *
- * @returns A thunk action that returns a `Member` object on success, or `undefined` if the session
- * does not exist (error 404) or the captcha solution is invalid (error 403), or on an any other
- * unexpected error.
  */
 export function joinSession(
   session: Session,
@@ -107,12 +101,8 @@ export function joinSession(
     );
     const member = response?.data?.member;
     if (member) {
-      dispatch(setSession(session));
-      dispatch(setMember(member));
-      dispatch(setUnderstanding(true));
-      dispatch(setUserRole(UserRole.Member));
+      dispatch(setMemberSession({ session, member }));
     }
-
     return member;
   };
 }

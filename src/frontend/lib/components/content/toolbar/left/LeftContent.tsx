@@ -4,7 +4,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { RootState } from "StoreTypes";
 
 import { UserRole } from "../../../../models/UserRole";
-import { selectUserRole } from "../../../../store/selectors/global";
+import { selectUserRole } from "../../../../store/selectors/session";
 import { MenuDrawer } from "./MenuDrawer";
 
 type Props = ConnectedProps<typeof connectToRedux>;

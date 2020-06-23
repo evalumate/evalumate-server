@@ -39,6 +39,4 @@ class App extends NextApp<ReduxWrapperAppProps> {
   }
 }
 
-export default withReduxCookiePersist(makeStore, {
-  persistConfig: { blacklist: ["owner"] },
-})(withReduxSaga(App));
+export default withReduxCookiePersist(makeStore)(withReduxSaga(App));

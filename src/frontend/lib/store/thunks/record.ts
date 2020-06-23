@@ -13,7 +13,7 @@ import { ApiThunkOptions, callApi } from "./base";
  * @param afterId (optional) If provided, only records with an id larger than the given integer are
  *                retrieved.
  */
-export function getRecords(
+export function fetchRecords(
   session: Session,
   afterId?: number,
   apiThunkOptions?: ApiThunkOptions

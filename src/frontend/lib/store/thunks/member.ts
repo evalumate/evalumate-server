@@ -11,7 +11,7 @@ import { ApiThunkOptions, callApi } from "./base";
  * @param member The `Member` object specifying the member to set the flag for
  * @param understanding The value to set the `understanding` flag to
  */
-export function setUnderstanding(
+export function setIsUnderstanding(
   member: Member,
   understanding: boolean,
   apiThunkOptions?: ApiThunkOptions
