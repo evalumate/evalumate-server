@@ -2,26 +2,28 @@ import { useTheme } from "@material-ui/core";
 import moment from "moment";
 import getConfig from "next/config";
 import * as React from "react";
-import { ConnectedProps, connect } from "react-redux";
 import { Area, AreaChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { RootState } from "StoreTypes";
 
-import { selectRecords } from "../../../store/selectors/owner";
+import { Record } from "../../../models/Record";
 import { Title } from "../../layout/Title";
 
 const { publicRuntimeConfig } = getConfig();
 
-const xScaleChangeInterval = publicRuntimeConfig.historyScaleChangeInterval;
+const xScaleChangeInterval: number = publicRuntimeConfig.historyScaleChangeInterval;
 
 function formatUnixTime(time: number, formatString: string = "HH:mm") {
   return moment.unix(time).format(formatString);
 }
 
-type Props = ConnectedProps<typeof connectToRedux>;
+type Props = { records?: Record[] };
 
-const InternalHistoryChart: React.FunctionComponent<Props> = ({ records }) => {
+export const HistoryChart: React.FunctionComponent<Props> = ({ records }) => {
   const theme = useTheme();
   const palette = theme.palette;
+
+  if (typeof records === "undefined") {
+    records = [];
+  }
 
   return (
     <>
@@ -71,11 +73,3 @@ const InternalHistoryChart: React.FunctionComponent<Props> = ({ records }) => {
     </>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  records: selectRecords(state),
-});
-
-const connectToRedux = connect(mapStateToProps);
-
-export const HistoryChart = connectToRedux(InternalHistoryChart);

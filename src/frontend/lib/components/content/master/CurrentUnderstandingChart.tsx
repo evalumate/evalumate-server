@@ -1,15 +1,14 @@
 import { useTheme } from "@material-ui/core";
 import * as React from "react";
-import { ConnectedProps, connect } from "react-redux";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, YAxis } from "recharts";
-import { RootState } from "StoreTypes";
 
-import { selectLatestUnderstandingPercentage } from "../../../store/selectors/owner";
 import { Title } from "../../layout/Title";
 
-type Props = ConnectedProps<typeof connectToRedux>;
+type Props = {
+  percentage: number;
+};
 
-const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ understanding }) => {
+export const CurrentUnderstandingChart: React.FunctionComponent<Props> = ({ percentage }) => {
   const theme = useTheme();
   const palette = theme.palette;
 
@@ -18,7 +17,7 @@ const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ und
       <Title>Current</Title>
       <ResponsiveContainer height={300}>
         <BarChart
-          data={[{ understanding }]}
+          data={[{ understanding: percentage * 100 }]}
           margin={{
             top: theme.spacing(2),
             left: -16,
@@ -32,11 +31,3 @@ const InternalCurrentUnderstandingChart: React.FunctionComponent<Props> = ({ und
     </>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  understanding: selectLatestUnderstandingPercentage(state),
-});
-
-const connectToRedux = connect(mapStateToProps);
-
-export const CurrentUnderstandingChart = connectToRedux(InternalCurrentUnderstandingChart);
