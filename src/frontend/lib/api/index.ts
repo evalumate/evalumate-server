@@ -13,7 +13,3 @@ export function getApiUrl(endpoint: string = "") {
   const prefix = process.browser ? "" : `http://localhost:${serverRuntimeConfig.port}`;
   return `${prefix}/api${endpoint}`;
 }
-
-axios.defaults.validateStatus = (status: number) => {
-  return (status >= 200 && status < 300) || status == 403 || status == 404; // Do not throw 403 and 404 HTTP errors
-};

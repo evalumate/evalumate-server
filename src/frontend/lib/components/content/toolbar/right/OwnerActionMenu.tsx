@@ -3,32 +3,31 @@ import { MoreVert } from "@material-ui/icons";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { useModal } from "react-modal-hook";
-import { ConnectedProps, connect } from "react-redux";
-import { RootState } from "StoreTypes";
+import { useSelector } from "react-redux";
 
-import { deleteSession } from "../../../../api/session";
 import { useMenuHandler } from "../../../../hooks/menuHandler";
 import { UserRole } from "../../../../models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../../../../store/actions/global";
+import { useThunkDispatch } from "../../../../store";
+import { resetSession, setUserRole } from "../../../../store/actions/global";
 import { selectSession } from "../../../../store/selectors/global";
+import { deleteSession } from "../../../../store/thunks/session";
 import { TextDialog } from "../../../layout/dialogs/TextDialog";
 import { InviteMembersDialog } from "../../InviteMembersDialog";
 
-type Props = ConnectedProps<typeof connectToRedux>;
+/**
+ * A menu with session owner actions. Note: This component can only be rendered when the user is a
+ * session owner and a valid session is set.
+ */
+export const OwnerActionMenu: React.FunctionComponent = () => {
+  const router = useRouter();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const dispatch = useThunkDispatch();
+  const session = useSelector(selectSession);
 
-const InternalOwnerActionMenu: React.FunctionComponent<Props> = ({
-  session,
-  setSession,
-  setUserRole,
-  showSnackbar,
-}) => {
   if (!session) {
     return null;
   }
-  const router = useRouter();
-
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [showInviteMembersModal, hideInviteMembersModal] = useModal(({ in: open, onExited }) => (
     <InviteMembersDialog
@@ -41,14 +40,14 @@ const InternalOwnerActionMenu: React.FunctionComponent<Props> = ({
   ));
 
   const stopSessionAndExit = async () => {
-    if (await deleteSession(session)) {
-      showSnackbar("Session deleted");
-    } else {
-      showSnackbar("Sorry, the session could not be deleted.");
+    const sessionDeleted = await dispatch(
+      deleteSession(session, { successSnackbarMessage: "Session deleted" })
+    );
+    if (sessionDeleted) {
+      dispatch(setUserRole(UserRole.Visitor));
+      dispatch(resetSession());
+      router.push("/");
     }
-    setUserRole(UserRole.Visitor);
-    setSession(null);
-    router.push("/");
   };
 
   const [showDeleteSessionModal, hideDeleteSessionModal] = useModal(({ in: open, onExited }) => (
@@ -107,21 +106,3 @@ const InternalOwnerActionMenu: React.FunctionComponent<Props> = ({
     </>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  session: selectSession(state),
-});
-
-const mapDispatchToProps = {
-  setSession,
-  setUserRole,
-  showSnackbar,
-};
-
-const connectToRedux = connect(mapStateToProps, mapDispatchToProps);
-
-/**
- * A menu with session owner actions. Note: This component can only be rendered when the user is a
- * session owner and a valid session is set.
- */
-export const OwnerActionMenu = connectToRedux(InternalOwnerActionMenu);

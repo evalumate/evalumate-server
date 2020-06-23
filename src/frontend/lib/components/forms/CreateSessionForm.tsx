@@ -4,14 +4,11 @@ import { Switch, TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { useDispatch } from "react-redux";
 import * as Yup from "yup";
 
-import { createSession } from "../../api/session";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
-import { Session } from "../../models/Session";
-import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
+import { useThunkDispatch } from "../../store";
+import { createSession } from "../../store/thunks/session";
 import { Captcha } from "./fields/Captcha";
 
 const { publicRuntimeConfig } = getConfig();
@@ -33,22 +30,15 @@ const FormSchema = Yup.object().shape({
 export const CreateSessionForm: React.FunctionComponent = (props) => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
-  const dispatch = useDispatch();
-
-  const onSessionCreated = (session: Session) => {
-    dispatch(setSession(session));
-    dispatch(setUserRole(UserRole.Owner));
-    dispatch(showSnackbar(`Session "${session.name}" was created`));
-    router.push(`/${session.id}`);
-  };
+  const dispatch = useThunkDispatch();
 
   const onCreateFormSubmit = async (values: FormValues) => {
-    const session = await createSession(values);
+    const session = await dispatch(createSession(values));
     if (!session) {
       // Captcha solution was invalid
       setInvalidCaptchaSolutionCount(invalidCaptchaSolutionCount + 1);
     } else {
-      onSessionCreated(session);
+      router.push(`/${session.id}`);
     }
   };
 

@@ -5,7 +5,6 @@ import { mocked } from "ts-jest/utils";
 import { redirectTo } from "./redirect";
 
 jest.mock("next/router");
-jest.mock("../api/session");
 
 describe("redirectTo()", () => {
   afterEach(() => {

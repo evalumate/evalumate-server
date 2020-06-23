@@ -1,15 +1,15 @@
 import { NextPage } from "next";
 import * as React from "react";
 import { useSelector } from "react-redux";
+import { AppThunkDispatch } from "StoreTypes";
 
-import { getSession, joinSession } from "../lib/api/session";
 import { ClientPageContent } from "../lib/components/content/client/ClientPageContent";
 import { MasterPageContent } from "../lib/components/content/master/MasterPageContent";
 import { Page } from "../lib/components/layout/Page";
 import { UserRole } from "../lib/models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../lib/store/actions/global";
-import { setMember, setUnderstanding } from "../lib/store/actions/member";
+import { setSession } from "../lib/store/actions/global";
 import { selectSession, selectUserRole } from "../lib/store/selectors/global";
+import { fetchSession, joinSession } from "../lib/store/thunks/session";
 
 type InitialProps = {
   sessionExists: boolean;
@@ -45,9 +45,10 @@ const SessionPage: NextPage<InitialProps> = ({ sessionExists }) => {
 SessionPage.getInitialProps = async ({ query, store, res }) => {
   // Check the session id
   const sessionId = query.sessionId as string;
-  const session = await getSession(sessionId);
+  const dispatch = store.dispatch as AppThunkDispatch;
+  const session = await dispatch(fetchSession(sessionId));
 
-  if (session === null) {
+  if (typeof session === "undefined") {
     if (typeof res !== "undefined") {
       res.statusCode = 404;
     }
@@ -58,16 +59,12 @@ SessionPage.getInitialProps = async ({ query, store, res }) => {
 
   if (userRole === UserRole.Visitor) {
     // A visitor wants to join the session
-    store.dispatch(setSession(session));
+    dispatch(setSession(session));
 
     // Check if the visitor has to enter a captcha to join the session
     if (!session.captchaRequired) {
       // Visitor joins session
-      // TODO implement thunk actions for session joining and leaving + error handling
-      const member = await joinSession(session.id);
-      store.dispatch(setMember(member));
-      store.dispatch(setUnderstanding(true));
-      store.dispatch(setUserRole(UserRole.Member));
+      await dispatch(joinSession(session));
     }
   }
 

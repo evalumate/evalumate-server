@@ -1,12 +1,13 @@
 import { Grid } from "@material-ui/core";
-import { Field, FormikContextType, connect } from "formik";
+import { Field, connect } from "formik";
 import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
 import InlineSVG from "svg-inline-react";
+import { string } from "yup";
 
-import { getCaptcha } from "../../../api/captcha";
-import { CaptchaSolution } from "../../../models/CaptchaSolution";
+import { useThunkDispatch } from "../../../store";
+import { fetchCaptcha } from "../../../store/thunks/captcha";
 
 const { publicRuntimeConfig } = getConfig();
 const captchaSolutionLength: number = publicRuntimeConfig.captchaSolutionLength;
@@ -22,15 +23,22 @@ type Props = {
   stack?: boolean;
 };
 
-const InternalCaptcha: React.ComponentType<
-  Props & { formik: FormikContextType<any & { captcha: CaptchaSolution }> }
-> = ({ formik, invalidSolutionCount, stack = false }) => {
+/**
+ * To be used within a Formik form. A component rendering a captcha and a formik field `captcha` of
+ * type `CaptchaSolution` that is populated with the captcha's token and the user-entered solution.
+ */
+export const Captcha = connect<Props>(({ formik, invalidSolutionCount, stack = false }) => {
   const [captcha, setCaptcha] = React.useState({ image: "", token: "" });
   const [showRetryMessage, setShowRetryMessage] = React.useState(false);
+  const dispatch = useThunkDispatch();
 
   React.useEffect(() => {
     // Load a captcha on mount and when invalidSolutionCount changes
-    getCaptcha().then(setCaptcha);
+    dispatch(fetchCaptcha()).then((captcha) => {
+      if (typeof captcha !== "undefined") {
+        setCaptcha(captcha);
+      }
+    });
 
     // Reset the solution if invalidSolutionCount was changed
     if (invalidSolutionCount && invalidSolutionCount > 0) {
@@ -80,10 +88,4 @@ const InternalCaptcha: React.ComponentType<
       </Grid>
     </Grid>
   );
-};
-
-/**
- * To be used within a Formik form. A component rendering a captcha and a formik field `captcha` of
- * type `CaptchaSolution` that is populated with the captcha's token and the user-entered solution.
- */
-export const Captcha = connect<Props>(InternalCaptcha);
+});

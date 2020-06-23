@@ -4,6 +4,7 @@ import { Session } from "../../models/Session";
 import { UserRole } from "../../models/UserRole";
 import {
   resetInfoDialog,
+  resetSession,
   resetSnackbar,
   setSession,
   setUserRole,
@@ -52,13 +53,19 @@ const initialState: GlobalState = {
 };
 
 const globalReducer = createReducer(initialState)
+  // UserRole
   .handleAction(setUserRole, (state, action) => ({
     ...state,
     userRole: action.payload,
   }))
+  // Session
   .handleAction(setSession, (state, action) => ({
     ...state,
     session: action.payload,
+  }))
+  .handleAction(resetSession, (state) => ({
+    ...state,
+    session: null,
   }))
   // Snackbar
   .handleAction(showSnackbar, (state, action) => ({

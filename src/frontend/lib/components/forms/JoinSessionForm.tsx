@@ -2,15 +2,12 @@ import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { useDispatch } from "react-redux";
 
-import { joinSession } from "../../api/session";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
-import { UserRole } from "../../models/UserRole";
-import { setSession, setUserRole, showSnackbar } from "../../store/actions/global";
-import { setMember, setUnderstanding } from "../../store/actions/member";
+import { useThunkDispatch } from "../../store";
+import { joinSession } from "../../store/thunks/session";
 import { Captcha } from "./fields/Captcha";
 import { SessionIdField } from "./fields/SessionIdField";
 
@@ -30,44 +27,33 @@ type Props = {
 
 export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
   const [session, setLocalSession] = React.useState<Session | null>(
-    typeof props.session !== "undefined" ? props.session : null
+    props.session ? props.session : null
   );
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useThunkDispatch();
 
   const initialFormValues = {
-    sessionId: typeof props.session === "undefined" ? "" : props.session.id,
+    sessionId: session ? session.id : "",
     captcha: { token: "", solution: "" },
-  };
-
-  const onSessionJoined = (member: Member) => {
-    dispatch(setSession(session));
-    dispatch(setMember(member));
-    dispatch(setUnderstanding(true));
-    dispatch(setUserRole(UserRole.Member));
-    dispatch(showSnackbar(`Joined session "${session!.name}"`));
-    router.push(`/${session!.id}`);
   };
 
   const onJoinFormSubmit = async (values: FormValues) => {
     // Session cannot be null at this point, because the Formik validation of the SessionIdField has
     // succeeded.
-    let member: Member;
+    let member: Member | undefined;
     if (session!.captchaRequired) {
-      member = await joinSession(session!.id, values.captcha);
+      member = await dispatch(joinSession(session!, values.captcha));
       if (!member) {
         // Captcha solution was invalid
         setInvalidCaptchaSolutionCount(invalidCaptchaSolutionCount + 1);
       }
     } else {
-      member = await joinSession(session!.id);
+      member = await dispatch(joinSession(session!));
     }
 
     if (member) {
-      onSessionJoined(member);
-    } else {
-      dispatch(showSnackbar("Sorry, something went wrong. Please try again!"));
+      router.push(`/${session!.id}`);
     }
   };
 

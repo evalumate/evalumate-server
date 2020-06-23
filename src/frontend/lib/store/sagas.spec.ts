@@ -1,24 +1,20 @@
 import { createMockTask } from "@redux-saga/testing-utils";
-import faker from "faker";
 import getConfig from "next/config";
 import { applyMiddleware, createStore } from "redux";
 import createSagaMiddleware, { Task } from "redux-saga";
-import { expectSaga, testSaga } from "redux-saga-test-plan";
+import { testSaga } from "redux-saga-test-plan";
 import { Store } from "StoreTypes";
 import { mocked } from "ts-jest/utils";
 import { getType } from "typesafe-actions";
 
-import { setUnderstanding as apiSetUnderstanding } from "../api/member";
-import { getRecords } from "../api/record";
 import { Member } from "../models/Member";
-import { Session } from "../models/Session";
 import { UserRole } from "../models/UserRole";
-import { setSession, setUserRole } from "./actions/global";
+import { setUserRole } from "./actions/global";
 import { setMember, setUnderstanding } from "./actions/member";
-import { setRecords } from "./actions/owner";
 import rootReducer from "./reducers";
 import { fetchRecordsSaga, memberSaga, ownerSaga, pingSaga } from "./sagas";
 import { selectUserRole } from "./selectors/global";
+import { setUnderstanding as apiSetUnderstanding } from "./thunks/member";
 
 const { publicRuntimeConfig } = getConfig();
 const { recordInterval, memberPingInterval } = publicRuntimeConfig;
@@ -28,9 +24,8 @@ const recordIntervalMs = recordInterval * 1000;
 
 jest.useFakeTimers();
 
-// Mock api
-jest.mock("../api/member");
-jest.mock("../api/record");
+// Mock api thunks
+jest.mock("./thunks/member");
 
 // Mock environment flags
 jest.mock("../util/environment");
@@ -39,60 +34,6 @@ const setServer: () => void = require("../util/environment").__setServer;
 
 // Reset environment to server after each test
 afterEach(setServer);
-
-describe("fetchRecordsSaga", () => {
-  const mockedGetRecords = mocked(getRecords);
-
-  const session: Session = {
-    id: "sessionId",
-    uri: "sessionUri",
-    name: "sessionName",
-    captchaRequired: false,
-  };
-
-  const records = [0, 1, 2].map((id) => ({
-    id,
-    time: faker.random.number(),
-    registeredMembersCount: faker.random.number(),
-    activeMembersCount: faker.random.number(),
-    understandingMembersCount: faker.random.number(),
-  }));
-
-  describe("with no records in the store", () => {
-    it("should fetch all records", async () => {
-      mockedGetRecords.mockResolvedValue(records);
-
-      const store = createStore(rootReducer);
-      store.dispatch(setSession(session));
-      const initialState = store.getState();
-
-      const { storeState } = await expectSaga(fetchRecordsSaga)
-        .withReducer(rootReducer, initialState)
-        .run();
-
-      expect(mockedGetRecords).toHaveBeenLastCalledWith(session);
-      expect(storeState.owner.records).toEqual(records);
-    });
-  });
-
-  describe("with a record in the store", () => {
-    it("should fetch all records after that record", async () => {
-      mockedGetRecords.mockResolvedValue(records.slice(1));
-
-      const store = createStore(rootReducer);
-      store.dispatch(setSession(session));
-      store.dispatch(setRecords(records.slice(0, 1)));
-      const initialState = store.getState();
-
-      const { storeState } = await expectSaga(fetchRecordsSaga)
-        .withReducer(rootReducer, initialState)
-        .run();
-
-      expect(mockedGetRecords).toHaveBeenLastCalledWith(session, records[0].id);
-      expect(storeState.owner.records).toEqual(records);
-    });
-  });
-});
 
 describe("ownerSaga", () => {
   describe("on the server side", () => {
@@ -129,18 +70,19 @@ describe("memberSaga", () => {
     secret: "memberSecret",
   };
 
-  let store: Store;
-  let task: Task;
+  it("should update and ping the api", async () => {
+    let store: Store;
+    let task: Task;
 
-  beforeAll(() => {
     const sagaMiddleware = createSagaMiddleware();
     store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
     store.dispatch(setMember(member));
     store.dispatch(setUnderstanding(true));
     task = sagaMiddleware.run(memberSaga);
-  });
 
-  it("should update and ping the api", async () => {
+    // Use a mock action as the return value of the `apiSetUnderstanding` thunk cation creator
+    mockedApiSetUnderstanding.mockReturnValue({ type: "", payload: "" } as any);
+
     // redux-saga-test-plan is great, but the race was too tricky to test with it here
     const wait = async (duration = memberPingIntervalMs) => {
       jest.advanceTimersByTime(duration);
@@ -168,9 +110,9 @@ describe("memberSaga", () => {
     expect(mockedApiSetUnderstanding).toHaveBeenLastCalledWith(member, false);
 
     // ...and of course another ping interval later
-    await wait(memberPingIntervalMs);
-    expect(apiSetUnderstanding).toHaveBeenCalledTimes(4);
-    expect(apiSetUnderstanding).toHaveBeenLastCalledWith(member, false);
+    await wait();
+    expect(mockedApiSetUnderstanding).toHaveBeenCalledTimes(4);
+    expect(mockedApiSetUnderstanding).toHaveBeenLastCalledWith(member, false);
 
     task.cancel();
   });

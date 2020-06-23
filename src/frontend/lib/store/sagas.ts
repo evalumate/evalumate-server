@@ -1,19 +1,19 @@
 import getConfig from "next/config";
 import { Task } from "redux-saga";
-import { call, cancel, delay, fork, put, race, select, take, takeLatest } from "redux-saga/effects";
+import { call, cancel, delay, fork, put, putResolve, race, select, take } from "redux-saga/effects";
 import { getType } from "typesafe-actions";
 
-import { setUnderstanding as apiSetUnderstanding } from "../api/member";
-import { getRecords } from "../api/record";
 import { Record } from "../models/Record";
 import { UserRole } from "../models/UserRole";
 import { isClient, isServer } from "../util/environment";
-import { setUserRole, showSnackbar } from "./actions/global";
+import { setUserRole } from "./actions/global";
 import { setUnderstanding } from "./actions/member";
 import { addRecords } from "./actions/owner";
 import { selectSession, selectUserRole } from "./selectors/global";
 import { selectMember, selectUnderstanding } from "./selectors/member";
 import { selectLatestRecord } from "./selectors/owner";
+import { setUnderstanding as apiSetUnderstanding } from "./thunks/member";
+import { getRecords } from "./thunks/record";
 
 const { publicRuntimeConfig } = getConfig();
 const { recordInterval, memberPingInterval } = publicRuntimeConfig;
@@ -29,10 +29,10 @@ export function* fetchRecordsSaga() {
   let newRecords: Record[] | null;
   if (!latestRecord) {
     // Query all records
-    newRecords = yield call(getRecords, session);
+    newRecords = yield putResolve(getRecords(session) as any); // putResolve typing doesn't support thunk actions :(
   } else {
     // Query all records after latestRecord
-    newRecords = yield call(getRecords, session, latestRecord.id);
+    newRecords = yield putResolve(getRecords(session, latestRecord.id) as any); // putResolve typing doesn't support thunk actions :(
   }
   if (newRecords && newRecords.length > 0) {
     yield put(addRecords(newRecords));
@@ -65,7 +65,7 @@ export function* memberSaga() {
       delay: delay(memberPingInterval * 1000),
     });
     const understanding = yield select(selectUnderstanding);
-    yield call(apiSetUnderstanding, member, understanding);
+    yield put(apiSetUnderstanding(member, understanding) as any); // put typing doesn't support thunk actions :(
   }
 }
 

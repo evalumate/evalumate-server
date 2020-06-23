@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Box, Grid, Typography } from "@material-ui/core";
 import { NextPage } from "next";
 import * as React from "react";
 
@@ -13,12 +13,14 @@ const HomePage: NextPage = () => {
   return (
     <Page title="EvaluMate – Feedback Made Easy" titleAddHomepageTitle={false} maxWidth="sm">
       <Grid item xs={12}>
-        <Typography style={{ flexGrow: 1 }} align="center">
-          <Typography variant="h3" component="h1">
+        <Box style={{ flexGrow: 1 }}>
+          <Typography variant="h3" component="h1" align="center">
             Evaluate? EvaluMate!
           </Typography>
-          <Typography variant="subtitle1">A social project by students, for students.</Typography>
-        </Typography>
+          <Typography variant="subtitle1" align="center">
+            A social project by students, for students.
+          </Typography>
+        </Box>
       </Grid>
       <Grid item xs={12}>
         <Paper>
