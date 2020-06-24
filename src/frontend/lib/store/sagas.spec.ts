@@ -45,9 +45,9 @@ describe("memberSaga", () => {
     mockedApiSetIsUnderstanding.mockReturnValue({ type: "", payload: "" } as any);
 
     // redux-saga-test-plan is great, but the race was too tricky to test with it here
-    const wait = async (duration = memberPingInterval) => {
+    const wait = (duration = memberPingInterval) => {
       jest.advanceTimersByTime(duration);
-      await Promise.resolve();
+      return Promise.resolve();
     };
 
     const expectLastCallToBeWith = (isUnderstanding: boolean) => {
@@ -63,7 +63,10 @@ describe("memberSaga", () => {
     store.dispatch(setMemberSession({ session, member }));
     task = sagaMiddleware.run(memberSaga);
 
-    // The first call is made when the saga starts
+    expect(mockedApiSetIsUnderstanding).toHaveBeenCalledTimes(0);
+
+    // Wait for an api call
+    await wait();
     expect(mockedApiSetIsUnderstanding).toHaveBeenCalledTimes(1);
     expectLastCallToBeWith(true);
 
@@ -88,6 +91,8 @@ describe("memberSaga", () => {
     expectLastCallToBeWith(false);
 
     store.dispatch(resetSession());
+    member.id = "secondMemberId";
+    store.dispatch(setMemberSession({ session, member }));
 
     await wait(memberPingInterval);
     expect(task.isRunning()).toBe(false);

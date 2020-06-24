@@ -1,7 +1,9 @@
 import getConfig from "next/config";
+import { SagaIterator } from "redux-saga";
 import { delay, fork, put, race, select, take, takeEvery } from "redux-saga/effects";
 import { ActionType, getType } from "typesafe-actions";
 
+import { Member } from "../models/Member";
 import { UserRole } from "../models/UserRole";
 import { isClient } from "../util/environment";
 import { redirectTo } from "../util/redirect";
@@ -21,17 +23,26 @@ const { memberPingInterval } = publicRuntimeConfig;
 /**
  * Pings the API with the current understanding value.
  */
-export function* memberSaga() {
-  const member = yield select(selectMember);
-  while ((yield select(selectUserRole)) === UserRole.Member) {
-    const understanding = yield select(selectIsUnderstanding);
-    yield put(apiSetIsUnderstanding(member, understanding, { showErrorInfoDialog: false }) as any); // put typing doesn't support thunk actions :/
-
+export function* memberSaga(): SagaIterator<void> {
+  const member: Member = yield select(selectMember);
+  while (true) {
     // Wait for understanding to be set or a memberPingInterval to pass
-    yield race({
+    const { take: wasIsUnderstandingActionDispatched } = yield race({
       take: take(getType(setIsUnderstanding)),
       delay: delay(memberPingInterval * 1000),
     });
+
+    const newMember = yield select(selectMember);
+    if (!wasIsUnderstandingActionDispatched && newMember?.id !== member.id) {
+      // The user left the session, exit the saga
+      break;
+    }
+
+    yield put(
+      apiSetIsUnderstanding(member, yield select(selectIsUnderstanding), {
+        showErrorInfoDialog: false,
+      }) as any // put typing doesn't support thunk actions :/
+    );
   }
 }
 
@@ -41,7 +52,7 @@ export function* memberSaga() {
  */
 export function* redirectBySessionAction(
   action: ActionType<typeof setMemberSession | typeof setOwnerSession | typeof resetSession>
-) {
+): SagaIterator<void> {
   switch (action.type) {
     case getType(setOwnerSession):
       redirectTo(`/${action.payload.id}`);
