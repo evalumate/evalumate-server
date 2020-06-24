@@ -1,8 +1,8 @@
 import { AppThunkAction } from "StoreTypes";
 
-import { getApiUrl } from "../../api";
 import { Record } from "../../models/Record";
 import { Session } from "../../models/Session";
+import { getApiUrl } from "../../util/api";
 import { ApiThunkOptions, callApi } from "./base";
 
 /**

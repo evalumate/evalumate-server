@@ -1,7 +1,7 @@
 import { AppThunkAction } from "StoreTypes";
 
-import { getApiUrl } from "../../api";
 import { Captcha } from "../../models/Captcha";
+import { getApiUrl } from "../../util/api";
 import { ApiThunkOptions, callApi } from "./base";
 
 /**

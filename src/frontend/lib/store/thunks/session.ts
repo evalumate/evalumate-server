@@ -1,9 +1,9 @@
 import { AppThunkAction } from "StoreTypes";
 
-import { getApiUrl } from "../../api";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
+import { getApiUrl } from "../../util/api";
 import { setMemberSession, setOwnerSession } from "../actions/session";
 import { ApiThunkOptions, callApi } from "./base";
 
