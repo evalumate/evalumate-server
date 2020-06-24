@@ -3,6 +3,8 @@ import { AppThunkAction } from "StoreTypes";
 import { Record } from "../../models/Record";
 import { Session } from "../../models/Session";
 import { getApiUrl } from "../../util/api";
+import { showSnackbar } from "../actions/dialogs";
+import { resetSession } from "../actions/session";
 import { ApiThunkOptions, callApi } from "./base";
 
 /**
@@ -10,12 +12,9 @@ import { ApiThunkOptions, callApi } from "./base";
  *
  * @param session The `Session` object specifying the session for which the records shall be
  *                retrieved. Note that the session's `key` property has to be set.
- * @param afterId (optional) If provided, only records with an id larger than the given integer are
- *                retrieved.
  */
 export function fetchRecords(
   session: Session,
-  afterId?: number,
   apiThunkOptions?: ApiThunkOptions
 ): AppThunkAction<Promise<Record[] | undefined>> {
   return async (dispatch) => {
@@ -23,15 +22,19 @@ export function fetchRecords(
       callApi<Record[]>(
         {
           method: "GET",
-          url: getApiUrl(
-            afterId
-              ? `${session.uri}/records/after/${afterId}?sessionKey=${session.key}`
-              : `${session.uri}/records?sessionKey=${session.key}`
-          ),
+          url: getApiUrl(`${session.uri}/records?sessionKey=${session.key}`),
         },
-        apiThunkOptions
+        apiThunkOptions,
+        [404]
       )
     );
+
+    if (response?.error && response.error.code === 404) {
+      // The session was terminated, let's reset it and show a snackbar
+      dispatch(resetSession());
+      dispatch(showSnackbar("Session was terminated"));
+    }
+
     return response?.data;
   };
 }

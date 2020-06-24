@@ -24,7 +24,7 @@ export const MasterPageContent: React.FunctionComponent = () => {
   }
 
   const recordFetcher = async () => {
-    const records = await dispatch(fetchRecords(session));
+    const records = await dispatch(fetchRecords(session, { showErrorInfoDialog: false }));
     return records ? records : [];
   };
   const { data: records } = useSWR("records", recordFetcher, { refreshInterval: recordInterval });

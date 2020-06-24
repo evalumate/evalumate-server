@@ -2,6 +2,8 @@ import { AppThunkAction } from "StoreTypes";
 
 import { Member } from "../../models/Member";
 import { getApiUrl } from "../../util/api";
+import { showSnackbar } from "../actions/dialogs";
+import { resetSession } from "../actions/session";
 import { ApiThunkOptions, callApi } from "./base";
 
 /**
@@ -24,9 +26,17 @@ export function setIsUnderstanding(
           url: getApiUrl(`${member.uri}/status?memberSecret=${member.secret}`),
           data: { understanding },
         },
-        apiThunkOptions
+        apiThunkOptions,
+        [404]
       )
     );
+
+    if (response?.error && response.error.code === 404) {
+      // The session was terminated, let's reset it and show a snackbar
+      dispatch(resetSession());
+      dispatch(showSnackbar("Session was terminated"));
+    }
+
     return !(typeof response === "undefined" || response.error);
   };
 }
