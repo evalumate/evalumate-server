@@ -66,9 +66,11 @@ export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
           </Typography>
         </Box>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <SessionIdField onSessionChange={setLocalSession} />
-          </Grid>
+          {!props.session && (
+            <Grid item xs={12}>
+              <SessionIdField onSessionChange={setLocalSession} />
+            </Grid>
+          )}
           {session && session.captchaRequired && (
             <Grid item xs={12}>
               <Captcha invalidSolutionCount={invalidCaptchaSolutionCount} stack />
