@@ -1,6 +1,6 @@
 import { ServerResponse } from "http";
 
-import nextRouter from "next/router";
+import { Router } from "./i18n";
 
 /**
  * Redirects the client to the given domain-relative location.
@@ -16,6 +16,6 @@ export function redirectTo(location: string, res?: ServerResponse) {
     });
     res.end();
   } else {
-    nextRouter.push(location);
+    Router.push(location);
   }
 }

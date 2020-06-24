@@ -21,7 +21,7 @@ module.exports = {
     __dirname: false, // if you don't put this is, __dirname
     __filename: false, // and __filename return blank or /
   },
-  externals: [nodeExternals()],
+  externals: [nodeExternals({whitelist: ["i18next-hmr"]})],
   module: {
     rules: [{ test: /\.(ts|js)x?$/, loader: "babel-loader", exclude: /node_modules/ }],
   },

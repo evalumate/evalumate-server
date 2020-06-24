@@ -20,8 +20,8 @@ export const makeStore = (initialState: RootState, { isServer, req }: MakeStoreO
     store = createStore(rootReducer, initialState, composeWithDevTools(enhancer));
   }
 
-  if (req || !isServer) {
-    (store as any).sagaTask = sagaMiddleware.run(rootSaga);
+  if (!isServer) {
+    sagaMiddleware.run(rootSaga);
   }
 
   return store;

@@ -1,20 +1,20 @@
-import nextRouter from "next/router";
 import httpMocks from "node-mocks-http";
 import { mocked } from "ts-jest/utils";
 
+import { Router } from "./i18n";
 import { redirectTo } from "./redirect";
 
-jest.mock("next/router");
+jest.mock("./i18n");
 
 describe("redirectTo()", () => {
   afterEach(() => {
-    mocked(nextRouter.push).mockClear();
+    mocked(Router.push).mockClear();
   });
 
   describe("on the client side", () => {
     it("should redirect using the next router", () => {
       redirectTo("/destination");
-      expect(nextRouter.push).toHaveBeenLastCalledWith("/destination");
+      expect(Router.push).toHaveBeenLastCalledWith("/destination");
     });
   });
 
@@ -24,7 +24,7 @@ describe("redirectTo()", () => {
 
       redirectTo("/destination", response);
 
-      expect(nextRouter.push).not.toHaveBeenCalled();
+      expect(Router.push).not.toHaveBeenCalled();
       expect(response._getStatusCode()).toBe(302);
       expect(response._getHeaders().location).toBe("/destination");
     });

@@ -1,5 +1,5 @@
-const withPlugins = require("next-compose-plugins");
 const config = require("config"); // Server config access
+const path = require("path");
 
 const serverRuntimeConfig = {
   port: config.get("port"),
@@ -15,14 +15,22 @@ const publicRuntimeConfig = {
   historyScaleChangeInterval: config.get("client.historyScaleChangeInterval"),
 };
 
-const configuration = {
+module.exports = {
   distDir: "../../dist/frontend",
-  webpack: (config, options) => {
+  webpack(config, options) {
+    // For i18next-hmr:
+    if (!options.isServer && config.mode === "development") {
+      const { I18NextHMRPlugin } = require("i18next-hmr/plugin");
+      config.plugins.push(
+        new I18NextHMRPlugin({
+          localesDir: path.resolve(__dirname, "public/static/locales")
+        })
+      );
+    }
     return config;
   },
   serverRuntimeConfig,
   publicRuntimeConfig,
 };
 
-module.exports = withPlugins([], configuration);
 module.exports.config = { serverRuntimeConfig, publicRuntimeConfig };

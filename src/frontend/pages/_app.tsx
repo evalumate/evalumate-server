@@ -1,7 +1,6 @@
 import { CssBaseline } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { withReduxCookiePersist } from "next-redux-cookie-wrapper";
-import withReduxSaga from "next-redux-saga";
 import { ReduxWrapperAppProps } from "next-redux-wrapper";
 import NextApp, { AppContext } from "next/app";
 import * as React from "react";
@@ -13,6 +12,7 @@ import { GlobalInfoDialog } from "../lib/components/layout/dialogs/GlobalInfoDia
 import { GlobalSnackbar } from "../lib/components/layout/GlobalSnackbar";
 import { makeStore } from "../lib/store";
 import theme from "../lib/theme";
+import { appWithTranslation } from "../lib/util/i18n";
 
 class App extends NextApp<ReduxWrapperAppProps> {
   static async getInitialProps({ Component, ctx }: AppContext) {
@@ -39,4 +39,4 @@ class App extends NextApp<ReduxWrapperAppProps> {
   }
 }
 
-export default withReduxCookiePersist(makeStore)(withReduxSaga(App));
+export default withReduxCookiePersist(makeStore)(appWithTranslation(App));

@@ -4,8 +4,10 @@ import path from "path";
 import express from "express";
 import createError from "http-errors";
 import nextJs from "next";
+import nextI18NextMiddleware from "next-i18next/middleware";
 import { Connection, createConnection } from "typeorm";
 
+import { i18n } from "../frontend/lib/util/i18n";
 import CaptchaController from "./controllers/CaptchaController";
 import Controller from "./controllers/Controller";
 import MemberController from "./controllers/MemberController";
@@ -76,6 +78,7 @@ class App implements Destructable {
     // this.app.use(morgan("combined", { stream: logStream }));
 
     logger.debug("Initializing middlewares");
+    this.app.use(nextI18NextMiddleware(i18n));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
   }
@@ -131,6 +134,10 @@ class App implements Destructable {
   private async prepareNextJsServer() {
     logger.debug("Preparing Next.js server");
     await App.nextJsServer.prepare();
+    if (dev) {
+      const { applyServerHMR } = require("i18next-hmr/server");
+      applyServerHMR(i18n.i18n);
+    }
     logger.debug("Next.js server is ready");
   }
 
