@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "prettier.prettier-vscode",
+    "stkb.rewrap",
+    "firefox-devtools.vscode-firefox-debug",
+    "fabiospampinato.vscode-todo-plus",
+    "lextudio.restructuredtext"
+  ]
+}

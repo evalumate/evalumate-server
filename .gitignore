@@ -1,4 +1,4 @@
-.vscode/
+.vscode/settings.json
 coverage/
 node_modules/
 dist/
