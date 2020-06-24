@@ -2,7 +2,7 @@ import { ListItemIcon, ListItemText } from "@material-ui/core";
 import { SvgIconComponent } from "@material-ui/icons";
 import * as React from "react";
 
-import { ListItemLink } from "../../links/ListItemLink";
+import { ListItemLink } from "../links/ListItemLink";
 
 type LinkedListItemProps = {
   text: string;
