@@ -42,13 +42,10 @@ const AboutPage: NextPage<{}, void> = () => {
               }),
             }}
           />
-          <br />
-          <center>
-            <i>Button design in progress...</i>
-          </center>
-          <br />
-          <br />
         </Typography>
+      </Grid>
+      <Grid item xs={12} container justify="center">
+        <i>Button design currently in progress...</i>
       </Grid>
     </Page>
   );
