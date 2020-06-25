@@ -6,6 +6,7 @@ import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 import { JoinSessionForm } from "../lib/components/forms/JoinSessionForm";
 import { Page } from "../lib/components/layout/Page";
 import { Paper } from "../lib/components/layout/Paper";
+import { TitleSubtitleBox } from "../lib/components/layout/TitleSubtitleBox";
 import { selectSession } from "../lib/store/selectors/session";
 import { useTranslation } from "../lib/util/i18n";
 import { redirectTo } from "../lib/util/redirect";
@@ -14,16 +15,9 @@ const HomePage: NextPage = () => {
   const { t } = useTranslation();
 
   return (
-    <Page title={`EvaluMate – ${t("title")}`} titleAddHomepageTitle={false} maxWidth="sm">
+    <Page title={"EvaluMate – " + t("title_suffix")} titleAddHomepageTitle={false} maxWidth="sm">
       <Grid item xs={12}>
-        <Box style={{ flexGrow: 1 }}>
-          <Typography variant="h3" component="h1" align="center">
-            Evaluate? EvaluMate!
-          </Typography>
-          <Typography variant="subtitle1" align="center">
-            A social project by students, for students.
-          </Typography>
-        </Box>
+        <TitleSubtitleBox />
       </Grid>
       <Grid item xs={12}>
         <Paper>
