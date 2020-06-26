@@ -17,7 +17,7 @@ type Props = ConnectedProps<typeof connectToRedux>;
 const InternalTitle: React.FunctionComponent<Props> = ({ role, session }) => {
   const classes = useStyles({});
 
-  const appTitle = "EvaluMate (Alpha)";
+  const appTitle = "EvaluMate";
 
   if (role === UserRole.Visitor) {
     return (
