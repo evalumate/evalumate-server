@@ -1,13 +1,21 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, Link, Paper, Typography } from "@material-ui/core";
+import ReactMarkdown from "markdown-to-jsx";
 import { NextPage } from "next";
 import * as React from "react";
 
+import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 import { Page } from "../lib/components/layout/Page";
 import { TitleSubtitleBox } from "../lib/components/layout/TitleSubtitleBox";
 import { useTranslation } from "../lib/util/i18n";
 
 const AboutPage: NextPage<{}, void> = () => {
   const { t } = useTranslation(["about"]);
+
+  const options = {
+    overrides: {
+      p: { component: Typography, props: { paragraph: true } },
+    },
+  };
 
   return (
     <Page title="About">
@@ -18,34 +26,19 @@ const AboutPage: NextPage<{}, void> = () => {
         <hr />
       </Grid>
       <Grid item xs={12} container justify="center">
-        <Typography>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: t("problem_text", {
-                interpolation: { escapeValue: false },
-              }),
-            }}
-          />
-          <br />
-          <div
-            dangerouslySetInnerHTML={{
-              __html: t("solution_text", {
-                interpolation: { escapeValue: false },
-              }),
-            }}
-          />
-          <br />
-          <div
-            dangerouslySetInnerHTML={{
-              __html: t("advantage_text", {
-                interpolation: { escapeValue: false },
-              }),
-            }}
-          />
-        </Typography>
+        <ReactMarkdown options={options}>{t("problem_text")}</ReactMarkdown>
+        <ReactMarkdown options={options}>{t("solution_text")}</ReactMarkdown>
+        <ReactMarkdown options={options}>{t("advantage_text")}</ReactMarkdown>
       </Grid>
-      <Grid item xs={12} container justify="center">
-        <i>Button design currently in progress...</i>
+      <Grid xs={12} container justify="center">
+        <Grid xs={6} item>
+          <Paper>
+            <CreateSessionForm />
+          </Paper>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <br />
       </Grid>
     </Page>
   );
