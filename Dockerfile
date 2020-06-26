@@ -20,9 +20,10 @@ RUN npm ci
 # Copy built files
 COPY --from=builder dist dist
 
-# Copy configs
+# Copy configs and static files
 COPY config config
 COPY src/frontend/next.config.js src/frontend/next.config.js
+COPY src/frontend/public src/frontend/public
 
 # Configure volumes
 RUN mkdir sqlite && chown node:node sqlite
