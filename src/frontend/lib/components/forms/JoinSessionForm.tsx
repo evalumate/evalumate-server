@@ -8,6 +8,7 @@ import { Member } from "../../models/Member";
 import { Session } from "../../models/Session";
 import { useThunkDispatch } from "../../store";
 import { joinSession } from "../../store/thunks/session";
+import { useTranslation } from "../../util/i18n";
 import { Captcha } from "./fields/Captcha";
 import { SessionIdField } from "./fields/SessionIdField";
 
@@ -32,6 +33,7 @@ export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
   const dispatch = useThunkDispatch();
+  const { t } = useTranslation(["joinSessionForm"]);
 
   const initialFormValues = {
     sessionId: session ? session.id : "",
@@ -62,7 +64,8 @@ export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
       <Form>
         <Box marginBottom={3}>
           <Typography variant="h4" align="center">
-            Join {session ? `"${session.name}"` : "a session"}
+            {t("title_first_part")}
+            {session ? `"${session.name} + ${t("title_third_part")}"` : t("title_second_part")}
           </Typography>
         </Box>
         <Grid container spacing={2}>
@@ -78,7 +81,7 @@ export const JoinSessionForm: React.FunctionComponent<Props> = (props) => {
           )}
           <Grid item xs={12} container alignItems="center" justify="center">
             <Button type="submit" variant="contained" color="primary">
-              Join session
+              {t("button_text")}
             </Button>
           </Grid>
         </Grid>

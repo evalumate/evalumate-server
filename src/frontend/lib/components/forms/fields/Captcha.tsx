@@ -8,6 +8,7 @@ import { string } from "yup";
 
 import { useThunkDispatch } from "../../../store";
 import { fetchCaptcha } from "../../../store/thunks/captcha";
+import { useTranslation } from "../../../util/i18n";
 
 const { publicRuntimeConfig } = getConfig();
 const captchaSolutionLength: number = publicRuntimeConfig.captchaSolutionLength;
@@ -31,6 +32,7 @@ export const Captcha = connect<Props>(({ formik, invalidSolutionCount, stack = f
   const [captcha, setCaptcha] = React.useState({ image: "", token: "" });
   const [showRetryMessage, setShowRetryMessage] = React.useState(false);
   const dispatch = useThunkDispatch();
+  const { t } = useTranslation(["captcha", "errMsgs"]);
 
   React.useEffect(() => {
     // Load a captcha on mount and when invalidSolutionCount changes
@@ -57,16 +59,16 @@ export const Captcha = connect<Props>(({ formik, invalidSolutionCount, stack = f
   const validateSolution = (value: string) => {
     if (showRetryMessage) {
       if (value.length < captchaSolutionLength) {
-        return "Please try again!";
+        return t("errMsgs:try_again");
       } else {
         setShowRetryMessage(false); // Don't show the error again on subsequent validations
       }
     }
     if (value.length == 0) {
-      return "Required";
+      return t("errMsgs:required");
     }
     if (value.length < captchaSolutionLength) {
-      return "Too short";
+      return t("errMsgs:too_short");
     }
   };
 
@@ -77,7 +79,7 @@ export const Captcha = connect<Props>(({ formik, invalidSolutionCount, stack = f
       <Grid item xs={12} sm={smallScreenFieldWidth}>
         <Field
           name="captcha.solution"
-          label="What letters do you see?"
+          label={t("captcha:solution_placeholder")}
           validate={validateSolution}
           inputProps={{ maxLength: captchaSolutionLength }}
           component={TextField}

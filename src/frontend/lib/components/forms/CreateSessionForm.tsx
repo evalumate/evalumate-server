@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import { CaptchaSolution } from "../../models/CaptchaSolution";
 import { useThunkDispatch } from "../../store";
 import { createSession } from "../../store/thunks/session";
+import { useTranslation } from "../../util/i18n";
 import { Captcha } from "./fields/Captcha";
 
 const { publicRuntimeConfig } = getConfig();
@@ -20,17 +21,18 @@ type FormValues = {
   captchaRequired: boolean;
 };
 
-const FormSchema = Yup.object().shape({
-  sessionName: Yup.string()
-    .min(2, "Too Short!")
-    .max(sessionNameMaxLength, "Too Long!")
-    .required("Required"),
-});
-
 export const CreateSessionForm: React.FunctionComponent = (props) => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
   const dispatch = useThunkDispatch();
+  const { t } = useTranslation(["createSessionForm", "errMsgs"]);
+
+  const FormSchema = Yup.object().shape({
+    sessionName: Yup.string()
+      .min(2, t("errMsgs:too_short"))
+      .max(sessionNameMaxLength, t("errMsgs:too_long"))
+      .required(t("errMsgs:required")),
+  });
 
   const onCreateFormSubmit = async (values: FormValues) => {
     const session = await dispatch(createSession(values));
@@ -55,14 +57,14 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
       <Form>
         <Box marginBottom={3}>
           <Typography variant="h4" align="center">
-            Create a new session
+            {t("createSessionForm:title")}
           </Typography>
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Field
               name="sessionName"
-              label="Session name"
+              label={t("createSessionForm:name")}
               inputProps={{ maxLength: sessionNameMaxLength }}
               component={TextField}
             />
@@ -71,7 +73,7 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
             <Tooltip title="Whether participants will need to solve a captcha">
               <FormControlLabel
                 control={<Field name="captchaRequired" component={Switch} />}
-                label="Captcha required?"
+                label={t("createSessionForm:captcha_subtitle")}
               />
             </Tooltip>
           </Grid>
@@ -80,7 +82,7 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
           </Grid>
           <Grid item xs={12} container alignItems="center" justify="center">
             <Button type="submit" variant="contained" color="primary">
-              Create session
+              {t("createSessionForm:button_text")}
             </Button>
           </Grid>
         </Grid>

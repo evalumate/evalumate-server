@@ -72,7 +72,7 @@ export const SessionIdField = connect<Props, { sessionId: string }>(
     return (
       <Field
         name="sessionId"
-        label="Session Id"
+        label="Session ID"
         validate={validateSessionId}
         inputProps={{ maxLength: sessionIdLength }}
         component={TextField}
