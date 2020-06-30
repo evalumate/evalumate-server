@@ -1,3 +1,4 @@
 {
-  "solution_placeholder": "Which letters do you see?"
+  "solution_placeholder": "Which letters do you see?",
+  "tooltip": "Whether participants will need to solve a captcha"
 }

@@ -1,3 +1,4 @@
 {
-  "solution_placeholder": "Welche Buchstaben sehen Sie?"
+  "solution_placeholder": "Welche Buchstaben sehen Sie?",
+  "tooltip": "Gibt an, ob Teilnehmer beim Beitritt ein Captcha lösen sollen"
 }

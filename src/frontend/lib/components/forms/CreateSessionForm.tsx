@@ -25,7 +25,7 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
   const [invalidCaptchaSolutionCount, setInvalidCaptchaSolutionCount] = React.useState(0);
   const router = useRouter();
   const dispatch = useThunkDispatch();
-  const { t } = useTranslation(["createSessionForm", "errMsgs"]);
+  const { t } = useTranslation(["createSessionForm", "captcha", "errMsgs"]);
 
   const FormSchema = Yup.object().shape({
     sessionName: Yup.string()
@@ -43,6 +43,12 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
       router.push(`/${session.id}`);
     }
   };
+
+  let tooltipText = t("captcha:tooltip");
+  // make sure the tooltip text is not null
+  if (tooltipText == null) {
+    tooltipText = "Whether participants will need to solve a captcha";
+  }
 
   return (
     <Formik
@@ -70,7 +76,7 @@ export const CreateSessionForm: React.FunctionComponent = (props) => {
             />
           </Grid>
           <Grid item xs={12} sm={6} container alignItems="center" justify="center">
-            <Tooltip title="Whether participants will need to solve a captcha">
+            <Tooltip title={tooltipText}>
               <FormControlLabel
                 control={<Field name="captchaRequired" component={Switch} />}
                 label={t("createSessionForm:captcha_subtitle")}
