@@ -2,5 +2,6 @@
   "too_short": "Too short!",
   "too_long": "Too long!",
   "required": "This value is required.",
-  "try_again": "Please try again!"
+  "try_again": "Please try again!",
+  "invalid": "Invalid"
 }

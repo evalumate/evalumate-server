@@ -6,6 +6,7 @@ import * as React from "react";
 import { Session } from "../../../models/Session";
 import { useThunkDispatch } from "../../../store";
 import { fetchSession } from "../../../store/thunks/session";
+import { useTranslation } from "../../../util/i18n";
 
 const { publicRuntimeConfig } = getConfig();
 const sessionIdLength: number = publicRuntimeConfig.sessionIdLength;
@@ -29,6 +30,7 @@ export const SessionIdField = connect<Props, { sessionId: string }>(
   ({ formik, onSessionChange }) => {
     const [session, setSession] = React.useState<Session | null>(null);
     const dispatch = useThunkDispatch();
+    const { t } = useTranslation(["errMsgs"]);
 
     // Call `onSessionChange` when `session` is updated
     React.useEffect(() => {
@@ -48,7 +50,7 @@ export const SessionIdField = connect<Props, { sessionId: string }>(
               // Unset any previously fetched session
               setSession(null);
             }
-            error = "Invalid";
+            error = t("invalid");
           } else {
             // sessionId is valid
             setSession(fetchedSession);
@@ -64,7 +66,7 @@ export const SessionIdField = connect<Props, { sessionId: string }>(
           // Unset any previously fetched session
           setSession(null);
         }
-        error = sessionId.length > 0 ? "Too short" : "Required";
+        error = sessionId.length > 0 ? t("too_short") : t("required");
       }
       return error;
     };
