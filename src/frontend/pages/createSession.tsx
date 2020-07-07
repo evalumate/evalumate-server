@@ -1,4 +1,4 @@
-import { Box, Grid, Link, Typography } from "@material-ui/core";
+import { Box, Grid, Link, Typography, useMediaQuery, useTheme } from "@material-ui/core";
 import ReactMarkdown from "markdown-to-jsx";
 import { NextPage } from "next";
 import * as React from "react";
@@ -11,26 +11,28 @@ import { useTranslation } from "../lib/util/i18n";
 
 const SessionPage: NextPage<{}, void> = () => {
   const { t } = useTranslation(["createSession"]);
-
-  const options = {
-    overrides: {
-      p: { component: Typography, props: { paragraph: true } },
-    },
-  };
+  const theme = useTheme();
+  const isScreenMediumUpwards = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
     <Page title="Create Session">
-      <Grid item xs={6} container justify="center" style={{ paddingRight: "50" }}>
-        <Box borderRight={2} paddingRight={2}>
-          <ReactMarkdown options={options}>{t("explanation")}</ReactMarkdown>
+      <Grid item xs={12} md={6} container justify="center" style={{ paddingRight: "50" }}>
+        <Box borderRight={isScreenMediumUpwards ? 2 : 0} paddingRight={2}>
+          <ReactMarkdown
+            options={{
+              overrides: {
+                p: { component: Typography, props: { paragraph: true } },
+              },
+            }}
+          >
+            {t("explanation")}
+          </ReactMarkdown>
         </Box>
       </Grid>
-      <Grid xs={6} container justify="center">
-        <Grid xs={12} item>
-          <Paper>
-            <CreateSessionForm />
-          </Paper>
-        </Grid>
+      <Grid xs={12} md={6} item container justify="center">
+        <Paper>
+          <CreateSessionForm />
+        </Paper>
       </Grid>
     </Page>
   );
