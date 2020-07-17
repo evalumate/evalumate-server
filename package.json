@@ -38,7 +38,7 @@
     "formik-material-ui": "1.0.1",
     "http-errors": "1.7.3",
     "http-status-codes": "1.4.0",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "markdown-to-jsx": "6.11.4",
     "minimatch": "3.0.4",
     "moment": "2.27.0",
