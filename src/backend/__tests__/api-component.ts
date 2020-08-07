@@ -51,7 +51,7 @@ let evalumateApp: App;
 let app: Express.Application;
 
 beforeAll(async () => {
-  evalumateApp = new App(null, false);
+  evalumateApp = new App(null);
   await evalumateApp.run();
   app = evalumateApp.app;
 });

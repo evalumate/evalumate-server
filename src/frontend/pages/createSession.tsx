@@ -6,7 +6,6 @@ import * as React from "react";
 import { CreateSessionForm } from "../lib/components/forms/CreateSessionForm";
 import { Page } from "../lib/components/layout/Page";
 import { Paper } from "../lib/components/layout/Paper";
-import { TitleSubtitleBox } from "../lib/components/layout/TitleSubtitleBox";
 import { useTranslation } from "../lib/util/i18n";
 
 const SessionPage: NextPage<{}, void> = () => {

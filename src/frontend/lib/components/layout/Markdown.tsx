@@ -1,6 +1,6 @@
 import { Link, Theme, Typography, WithStyles, createStyles, withStyles } from "@material-ui/core";
-import { MarkdownProps, default as ReactMarkdown } from "markdown-to-jsx";
-import React from "react";
+import { MarkdownToJSX, default as ReactMarkdown } from "markdown-to-jsx";
+import * as React from "react";
 
 // Based on https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/blog/Markdown.js
 
@@ -11,7 +11,7 @@ const styles = (theme: Theme) =>
     },
   });
 
-const overrides = {
+const overrides: MarkdownToJSX.Overrides = {
   h1: {
     component: Typography,
     props: {
@@ -36,9 +36,15 @@ const overrides = {
   },
 };
 
-export const Markdown: React.FunctionComponent<MarkdownProps> = ({ options, ...props }) => (
+export const Markdown: typeof ReactMarkdown = ({ options, ...props }) => (
   <ReactMarkdown
-    options={{ overrides: { ...overrides, ...options?.overrides }, ...options }}
+    options={{
+      overrides: {
+        ...overrides,
+        ...(options?.overrides as MarkdownToJSX.Overrides) /*Why wouldn't TypeScript accept an optional undefined here? Spreading undefined into an object is legal and no risk here!*/,
+      },
+      ...options,
+    }}
     {...props}
   />
 );

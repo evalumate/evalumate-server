@@ -5,7 +5,7 @@ module.exports = {
   coveragePathIgnorePatterns: ["/node_modules/", "enzyme.js"],
   globals: {
     "ts-jest": {
-      tsConfig: "src/tsconfig.json",
+      tsConfig: "tsconfig.json",
     },
   },
   setupFilesAfterEnv: ["jest-extended"],

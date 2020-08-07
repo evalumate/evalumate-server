@@ -1,5 +1,3 @@
-import { Store } from "redux";
-
 import Member from "./entities/Member";
 import Session from "./entities/Session";
 
@@ -8,7 +6,6 @@ declare global {
     interface Request {
       session?: Session;
       member?: Member;
-      reduxState?: any;
     }
   }
 }

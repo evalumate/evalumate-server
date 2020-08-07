@@ -2,11 +2,11 @@ const config = require("config"); // Server config access
 const path = require("path");
 
 const serverRuntimeConfig = {
-  port: config.get("port"),
+  backendPort: config.get("backendPort"),
 };
 
 const publicRuntimeConfig = {
-  publicUrl: config.get("publicUrl"),
+  publicBackendUrl: config.get("publicBackendUrl"),
   captchaSolutionLength: config.get("captcha.solutionLength"),
   sessionIdLength: config.get("session.idLength"),
   sessionNameMaxLength: config.get("session.nameMaxLength"),
@@ -16,7 +16,7 @@ const publicRuntimeConfig = {
 };
 
 module.exports = {
-  distDir: "../../dist/frontend",
+  distDir: "./dist",
   webpack(config, options) {
     // For i18next-hmr:
     if (!options.isServer && config.mode === "development") {

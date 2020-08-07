@@ -8,13 +8,7 @@ import { createLogger } from "./utils/logger";
 
 const logger = createLogger();
 
-const app = new App(config.get("port"));
-
-// Warn in a test environment
-if (process.env.NODE_ENV == "test") {
-  logger.warn("You have imported backend/index.ts in a test environment. Is this intended?");
-}
-
+const app = new App(config.get("backendPort"));
 app.run();
 
 // https://www.npmjs.com/package/node-cleanup

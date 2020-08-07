@@ -1,6 +1,0 @@
-// Next.js babel configuration
-{
-  "presets": [
-    "next/babel"
-  ]
-}

@@ -4,7 +4,6 @@ import { TextField } from "formik-material-ui";
 import getConfig from "next/config";
 import * as React from "react";
 import InlineSVG from "svg-inline-react";
-import { string } from "yup";
 
 import { useThunkDispatch } from "../../../store";
 import { fetchCaptcha } from "../../../store/thunks/captcha";

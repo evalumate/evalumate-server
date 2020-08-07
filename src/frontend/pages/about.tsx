@@ -1,4 +1,4 @@
-import { Grid, Link, Typography } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import ReactMarkdown from "markdown-to-jsx";
 import { NextPage } from "next";
 import * as React from "react";

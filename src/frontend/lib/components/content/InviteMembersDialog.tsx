@@ -16,6 +16,7 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 
 import { selectSession } from "../../store/selectors/session";
+import { Router } from "../../util/i18n";
 
 const { publicRuntimeConfig } = getConfig();
 const { publicUrl } = publicRuntimeConfig;
@@ -47,7 +48,7 @@ export const InviteMembersDialog: React.FunctionComponent<Props> = ({
     return null;
   }
 
-  const sessionUrl = `${publicUrl}/${session.id}`;
+  const sessionUrl = `${new URL(Router.pathname).host}/${session.id}`;
 
   return (
     <Dialog {...dialogProps} aria-labelledby="responsive-dialog-title">

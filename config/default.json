@@ -1,6 +1,6 @@
 {
-  "port": 3000,
-  "publicUrl": "http://localhost:3000",
+  "backendPort": 3080,
+  "publicBackendUrl": "/api",
   "database": {
     "type": "sqlite",
     "database": "db.sqlite",

@@ -1,26 +1,21 @@
 import http from "http";
-import path from "path";
 
 import express from "express";
 import createError from "http-errors";
-import nextJs from "next";
-import nextI18NextMiddleware from "next-i18next/middleware";
 import { Connection, createConnection } from "typeorm";
 
-import { i18n } from "../frontend/lib/util/i18n";
 import CaptchaController from "./controllers/CaptchaController";
 import Controller from "./controllers/Controller";
 import MemberController from "./controllers/MemberController";
 import RecordController from "./controllers/RecordController";
 import SessionController from "./controllers/SessionController";
 import Destructable from "./interfaces/Destructable";
-import { apiErrorHandler, frontendErrorHandler } from "./middlewares/errors";
+import { apiErrorHandler } from "./middlewares/errors";
 import databaseConfig from "./ormconfig";
 import { success as apiRespondSuccess } from "./utils/api-respond";
 import { createLogger } from "./utils/logger";
 
 const env = process.env.NODE_ENV!;
-const dev = env !== "production";
 
 const logger = createLogger(module);
 
@@ -28,16 +23,6 @@ class App implements Destructable {
   public app: express.Application;
   public port: number | null;
   public server?: http.Server;
-
-  /**
-   * Next.js server instance
-   */
-  static nextJsServer = nextJs({
-    dev,
-    dir: path.join(__dirname, `../${!dev ? "../src/" : ""}frontend`),
-  });
-
-  private runNextJsServer: boolean;
 
   private dbConnection: Connection;
   private apiControllers: Controller[];
@@ -47,12 +32,10 @@ class App implements Destructable {
    *
    * @param port The port for the http server to listen on. If it is not specified (like for testing
    *             purposes), no http server is created. In this case,
-   * @param runNextJsServer Whether or not to serve requests using next.js
    */
-  constructor(port: number | null = null, runNextJsServer: boolean = true) {
+  constructor(port: number | null = null) {
     logger.info("Initializing App");
     this.port = port;
-    this.runNextJsServer = runNextJsServer;
 
     this.app = express();
 
@@ -60,10 +43,6 @@ class App implements Destructable {
     this.initializeRoutes();
     this.initializeApiControllers();
     this.initializeErrorHandling();
-
-    if (runNextJsServer) {
-      this.initializeNextJsRequestHandling();
-    }
 
     if (this.port) {
       // Create HTTP server
@@ -78,7 +57,6 @@ class App implements Destructable {
     // this.app.use(morgan("combined", { stream: logStream }));
 
     logger.debug("Initializing middlewares");
-    this.app.use(nextI18NextMiddleware(i18n));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
   }
@@ -113,32 +91,12 @@ class App implements Destructable {
 
     // Error middlewares
     this.app.use("/api", apiErrorHandler);
-
-    if (this.runNextJsServer) {
-      this.app.use(frontendErrorHandler);
-    }
-  }
-
-  private initializeNextJsRequestHandling() {
-    // Render page with Next.js
-    const requestHandler = App.nextJsServer.getRequestHandler();
-    this.app.use((req, res) => requestHandler(req, res));
   }
 
   private async destructApiControllers() {
     logger.debug("Shutting down API controllers");
     await Promise.all(this.apiControllers.map((controller) => controller.shutDown()));
     logger.debug("API controllers shut down");
-  }
-
-  private async prepareNextJsServer() {
-    logger.debug("Preparing Next.js server");
-    await App.nextJsServer.prepare();
-    if (dev) {
-      const { applyServerHMR } = require("i18next-hmr/server");
-      applyServerHMR(i18n.i18n);
-    }
-    logger.debug("Next.js server is ready");
   }
 
   private async connectToDatabase() {
@@ -219,9 +177,6 @@ class App implements Destructable {
   }
 
   public async run() {
-    if (this.runNextJsServer) {
-      await this.prepareNextJsServer();
-    }
     await this.connectToDatabase();
     if (typeof this.server !== "undefined") {
       await this.listen();

@@ -10,14 +10,9 @@ import RandomIdEntityEntity from "./entities/RandomIdEntity";
 import RecordEntity from "./entities/Record";
 import SessionEntity from "./entities/Session";
 
-const prod = process.env.NODE_ENV === "production";
-
 const databaseConfig: ConnectionOptions = {
   entities: [CaptchaEntity, MemberEntity, RandomIdEntityEntity, RecordEntity, SessionEntity],
-  migrations: [
-    // Production: Transpiled migration files; Development: Original migration files
-    prod ? "dist/backend/migrations/*.js" : "src/backend/migrations/*.ts",
-  ],
+  migrations: ["migrations/*.ts"],
   ...config.get("database"),
 };
 
