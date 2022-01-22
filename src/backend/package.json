@@ -25,7 +25,7 @@
     "minimatch": "3.0.4",
     "moment": "2.27.0",
     "morgan": "~1.10.0",
-    "nanoid": "3.1.10",
+    "nanoid": "3.1.31",
     "node-cleanup": "2.1.2",
     "password-generator": "2.3.2",
     "path": "0.12.7",
