@@ -23,7 +23,7 @@
     "http-status-codes": "1.4.0",
     "lodash": "4.17.19",
     "minimatch": "3.0.4",
-    "moment": "2.27.0",
+    "moment": "2.29.4",
     "morgan": "~1.10.0",
     "nanoid": "3.1.10",
     "node-cleanup": "2.1.2",
